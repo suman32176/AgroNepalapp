@@ -1,0 +1,825 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+
+{% block content %}
+<!-- Messages container with improved styling and animation -->
+{% if messages %}
+<div class="fixed top-4 right-4 z-50 w-full max-w-md">
+    {% for message in messages %}
+        <div class="bg-white border-l-4 border-indigo-500 text-indigo-700 p-4 mb-3 rounded-lg shadow-lg animate-fade-in-down flex items-center">
+            <i class="fas fa-info-circle mr-2"></i>
+            <span>{{ message }}</span>
+            <button class="ml-auto text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6">
+    <div class="max-w-5xl mx-auto">
+        <!-- Main Profile Card with enhanced design -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
+            <!-- Cover Image with Overlay and improved pattern -->
+            <div class="h-64 bg-gradient-to-r from-violet-600 to-indigo-600 relative">
+                <!-- Pattern Overlay with improved pattern -->
+                <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z\' fill=\'%23ffffff\' fill-opacity=\'0.4\' fill-rule=\'evenodd\'/%3E%3C/svg%3E');"></div>
+                
+                <!-- Wallet Balance Card with animated coins -->
+                <div class="absolute right-8 top-8 p-4 bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 shadow-xl coin-balance-card">
+                    <div class="flex items-center">
+                        <div class="mr-3 relative coin-icon-container">
+                            <!-- Animated coin stack -->
+                            <div class="h-10 w-10 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg z-10 relative">
+                                <i class="fas fa-coins text-white text-lg"></i>
+                            </div>
+                            <div class="h-10 w-10 rounded-full bg-gradient-to-r from-yellow-300 to-yellow-500 flex items-center justify-center shadow-lg absolute -bottom-1 -right-1 z-0 opacity-70"></div>
+                            <div class="h-10 w-10 rounded-full bg-gradient-to-r from-yellow-500 to-yellow-700 flex items-center justify-center shadow-lg absolute -bottom-2 -right-2 z-0 opacity-40"></div>
+                            
+                            <!-- Coin sparkles -->
+                            <div class="coin-sparkle absolute -top-1 -left-1 h-3 w-3 bg-yellow-300 rounded-full"></div>
+                            <div class="coin-sparkle absolute top-2 -right-2 h-2 w-2 bg-yellow-300 rounded-full"></div>
+                        </div>
+                        <div>
+                            <p class="text-white/80 text-xs font-medium">Wallet Balance</p>
+                            <p class="text-white text-xl font-bold flex items-center">
+                                <i class="fas fa-rupee-sign text-sm mr-1 text-yellow-300"></i>
+                                <span class="balance-value">{{ profile.wallet_balance }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Gradient Overlay -->
+                <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white to-transparent"></div>
+            </div>
+            
+            <!-- Profile Content with improved layout -->
+            <div class="relative px-6 pb-8">
+                <!-- Profile Picture Container with improved hover effects -->
+                <div class="flex justify-center">
+                    <div class="relative -mt-24 group">
+                        <div class="h-40 w-40 rounded-full border-4 border-white overflow-hidden shadow-xl transition-all duration-500 group-hover:shadow-indigo-200">
+                            <img alt="{{ profile.user.username }}" src="{{ profile.profile_picture.url }}" 
+                                class="h-full w-full object-cover transition-all duration-500 group-hover:scale-110">
+                        </div>
+                        
+                        <!-- Edit Profile Picture Button with improved styling -->
+                        <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <button class="text-white p-2 rounded-full bg-indigo-600 hover:bg-indigo-700 transition-all duration-300 flex items-center space-x-1">
+                                <i class="fas fa-camera"></i>
+                                <span class="text-xs font-medium">Change</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Verification Badge -->
+                        {% if profile.is_verified %}
+                        <div class="absolute bottom-0 right-0 bg-green-500 text-white p-1 rounded-full border-2 border-white h-8 w-8 flex items-center justify-center">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- User Info with improved typography and layout -->
+                <div class="text-center mt-6">
+                    <h1 class="text-3xl font-bold text-gray-800 tracking-tight">{{ profile.user.username }}</h1>
+                    
+                    <!-- Email with Copy Option and improved interaction -->
+                    <div class="flex items-center justify-center mt-2 text-gray-600">
+                        <i class="fas fa-envelope text-indigo-500 mr-2"></i>
+                        <span>{% if profile.user.email %}{{ profile.user.email }}{% else %}Email not provided{% endif %}</span>
+                        {% if profile.user.email %}
+                        <button class="ml-2 text-gray-400 hover:text-indigo-500 transition-colors" 
+                                title="Copy email" 
+                                onclick="navigator.clipboard.writeText('{{ profile.user.email }}').then(() => {
+                                    this.innerHTML = '<i class=\'fas fa-check\'></i>';
+                                    setTimeout(() => { this.innerHTML = '<i class=\'fas fa-copy\'></i>'; }, 2000);
+                                })">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Member Since with improved icon -->
+                    <p class="mt-2 text-gray-500 flex items-center justify-center">
+                        <i class="fas fa-calendar-alt text-indigo-400 mr-2"></i>
+                        Member since {{ profile.created_at|date:"F d, Y" }}
+                    </p>
+                    
+                    <!-- Bio section (if available) -->
+                    {% if profile.bio %}
+                    <div class="mt-4 max-w-md mx-auto">
+                        <p class="text-gray-600 italic">{{ profile.bio }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Account Status Badge with improved styling -->
+                    <div class="mt-4">
+                        {% if profile.is_verified %}
+                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
+                            <i class="fas fa-check-circle mr-1.5"></i> Verified Account
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-red-100 text-red-800 border border-red-200">
+                            <i class="fas fa-exclamation-circle mr-1.5"></i> Not Verified
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Verification Button with improved styling -->
+                    {% if not profile.is_verified %}
+                    <div class="mt-4">
+                        <a href="{% url 'resend_verification' %}" 
+                           class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-lg shadow transition-all duration-300 transform hover:scale-105 hover:shadow-yellow-200/50">
+                            <i class="fas fa-envelope-open-text mr-2"></i> Verify Account
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Profile Actions with improved styling -->
+                <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="#" class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl shadow-lg hover:shadow-indigo-500/30 transition-all duration-300 transform hover:-translate-y-1">
+                        <i class="fas fa-user-edit mr-2"></i> Edit Profile
+                    </a>
+                    <a href="{% url 'request_withdrawal' %}" class="inline-flex items-center justify-center px-6 py-3 border border-indigo-200 text-indigo-600 bg-white rounded-xl shadow-sm hover:bg-indigo-50 transition-all duration-300 transform hover:-translate-y-1">
+                        <i class="fas fa-wallet mr-2"></i> Withdraw Funds
+                    </a>
+                    <a href="{% url 'logout_attempt' %}" class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl shadow-lg hover:shadow-red-500/30 transition-all duration-300 transform hover:-translate-y-1">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    </a>
+                    {% if user.is_authenticated and user.coadmin_profile %}
+                        <button onclick="window.location.href='{{ '/orders/' }}'" class="inline-flex items-center justify-center px-6 py-3 bg-blue-500 text-white font-bold rounded-2xl shadow-2xl hover:shadow-green-500/50 transition-all duration-300 transform hover:-translate-y-1">
+                            🏠 Dashboard
+                        </button>
+                    {% else %}
+                        {% if show_btn %}
+                            <button onclick="window.location.href='{{ '/coadmin_form/' }}'" class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-yellow-400 via-orange-500 to-green-500 text-white font-bold rounded-2xl shadow-2xl hover:shadow-pink-500/50 transition-all duration-300 transform hover:-translate-y-1 animate-pulse">
+                                🌟 Request for Manager
+                            </button>
+                        {% comment %} {% else %} {% endcomment %}
+                            
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Referral Code Highlight Box (NEW) -->
+        <div class="mt-8 bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-indigo-100">
+            <div class="px-6 py-5 border-b border-gray-200 bg-indigo-50">
+                <h2 class="text-xl font-bold text-indigo-800 flex items-center">
+                    <i class="fas fa-gift text-indigo-600 mr-2"></i> Your Referral Details
+                </h2>
+            </div>
+            <div class="p-6">
+                <!-- Referral Code Display -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Your Referral Code</label>
+                    <div class="flex">
+                        <div class="relative flex-1">
+                            <input type="text" id="referralCode" value="{{ profile.referral_code }}" 
+                                   class="w-full py-3 px-4 bg-gray-50 border border-gray-300 rounded-lg text-lg font-mono font-bold tracking-wider text-indigo-700" readonly>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                                <i class="fas fa-fingerprint"></i>
+                            </div>
+                        </div>
+                        <button onclick="copyToClipboard('referralCode')" 
+                                class="ml-2 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-300 flex items-center">
+                            <i class="fas fa-copy mr-2"></i>
+                            <span>Copy</span>
+                        </button>
+                    </div>
+                    <p class="mt-2 text-sm text-gray-500">Share this code with friends to earn rewards</p>
+                </div>
+                
+                <!-- Referral Link Display -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Your Referral Link</label>
+                    <div class="flex">
+                        <div class="relative flex-1">
+                            <input type="text" id="referralLink" 
+                                   value="https://{{ request.get_host }}/refer/{{ profile.referral_code }}" 
+                                   class="w-full py-3 px-4 bg-gray-50 border border-gray-300 rounded-lg text-sm font-medium text-gray-700" readonly>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                                <i class="fas fa-link"></i>
+                            </div>
+                        </div>
+                        <button onclick="copyToClipboard('referralLink')" 
+                                class="ml-2 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-300 flex items-center">
+                            <i class="fas fa-copy mr-2"></i>
+                            <span>Copy</span>
+                        </button>
+                    </div>
+                    <p class="mt-2 text-sm text-gray-500">Share this link directly with friends</p>
+                </div>
+                
+                <!-- Social Sharing -->
+                <div class="mt-6 flex flex-wrap justify-center gap-3">
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=https://{{ request.get_host }}/refer/{{ profile.referral_code }}" 
+                       target="_blank" rel="noopener noreferrer"
+                       class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300">
+                        <i class="fab fa-facebook-f mr-2"></i>
+                        <span>Facebook</span>
+                    </a>
+                    <a href="https://api.whatsapp.com/send?text=Join%20me%20on%20this%20amazing%20platform!%20Use%20my%20referral%20code%20{{ profile.referral_code }}%20or%20click%20this%20link:%20https://{{ request.get_host }}/refer/{{ profile.referral_code }}" 
+                       target="_blank" rel="noopener noreferrer"
+                       class="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all duration-300">
+                        <i class="fab fa-whatsapp mr-2"></i>
+                        <span>WhatsApp</span>
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?text=Join%20me%20on%20this%20amazing%20platform!%20Use%20my%20referral%20code%20{{ profile.referral_code }}%20or%20click%20this%20link:%20https://{{ request.get_host }}/refer/{{ profile.referral_code }}" 
+                       target="_blank" rel="noopener noreferrer"
+                       class="flex items-center px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-all duration-300">
+                        <i class="fab fa-twitter mr-2"></i>
+                        <span>Twitter</span>
+                    </a>
+                    <button id="shareBtn" class="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all duration-300">
+                        <i class="fas fa-share-alt mr-2"></i>
+                        <span>Share</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Cards with improved design and animations -->
+        <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            <!-- Orders Card -->
+            <div class="bg-white rounded-xl shadow-lg p-6 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-t-4 border-indigo-500 group">
+                <div class="flex flex-col items-center">
+                    <div class="p-3 rounded-full bg-indigo-100 text-indigo-600 mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+                        <i class="fas fa-box-open text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-700">Orders</h3>
+                    <p class="text-3xl font-bold text-indigo-600 mt-2 group-hover:scale-110 transition-transform duration-300">12</p>
+                    <a href="#" class="mt-4 text-sm text-indigo-500 hover:text-indigo-700 flex items-center group-hover:font-medium transition-all duration-300">
+                        <span>View all</span>
+                        <i class="fas fa-chevron-right ml-1 text-xs group-hover:ml-2 transition-all duration-300"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Wallet/Coins Card with improved design -->
+            <div class="bg-white rounded-xl shadow-lg p-6 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-t-4 border-green-500 group">
+                <div class="flex flex-col items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600 mb-4 group-hover:bg-green-600 group-hover:text-white transition-all duration-300">
+                        <i class="fas fa-coins text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-700">Wallet</h3>
+                    <div class="flex items-center justify-center mt-2">
+                        <p class="text-3xl font-bold text-green-600 group-hover:scale-110 transition-transform duration-300">
+                            <span class="coin-value">{{ profile.wallet_balance }}</span>
+                        </p>
+                        <div class="ml-1 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full h-5 w-5 flex items-center justify-center animate-pulse-slow">
+                            <i class="fas fa-rupee-sign text-white text-xs"></i>
+                        </div>
+                    </div>
+                    <a href="{% url 'request_withdrawal' %}" class="mt-4 text-sm text-green-500 hover:text-green-700 flex items-center group-hover:font-medium transition-all duration-300">
+                        <span>Withdraw funds</span>
+                        <i class="fas fa-chevron-right ml-1 text-xs group-hover:ml-2 transition-all duration-300"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Reviews Card -->
+            <div class="bg-white rounded-xl shadow-lg p-6 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-t-4 border-yellow-500 group">
+                <div class="flex flex-col items-center">
+                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mb-4 group-hover:bg-yellow-600 group-hover:text-white transition-all duration-300">
+                        <i class="fas fa-star text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-700">Reviews</h3>
+                    <p class="text-3xl font-bold text-yellow-600 mt-2 group-hover:scale-110 transition-transform duration-300">8</p>
+                    <a href="#" class="mt-4 text-sm text-yellow-500 hover:text-yellow-700 flex items-center group-hover:font-medium transition-all duration-300">
+                        <span>View all</span>
+                        <i class="fas fa-chevron-right ml-1 text-xs group-hover:ml-2 transition-all duration-300"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Referrals Card with improved counter display -->
+            <div class="bg-white rounded-xl shadow-lg p-6 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-t-4 border-purple-500 group">
+                <div class="flex flex-col items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-600 mb-4 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300">
+                        <i class="fas fa-users text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-700">Referrals</h3>
+                    <div class="flex flex-col items-center mt-2">
+                        <p class="text-3xl font-bold text-purple-600 group-hover:scale-110 transition-transform duration-300">{{ referred_users.count }}</p>
+                        <div class="flex space-x-2 mt-1">
+                            <div class="px-2 py-0.5 rounded-full bg-purple-100 text-purple-600 text-xs font-semibold flex items-center">
+                                <i class="fas fa-gift text-xs mr-1"></i>
+                                {{ profile.points }} Points
+                            </div>
+                            {% if commissions %}
+                            <div class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-600 text-xs font-semibold flex items-center">
+                                <i class="fas fa-coins text-xs mr-1"></i>
+                                ₹{{ total_commission|floatformat:0 }} Earned
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <button class="mt-4 text-sm text-purple-500 hover:text-purple-700 flex items-center group-hover:font-medium transition-all duration-300" onclick="document.getElementById('referredUsersSection').scrollIntoView({behavior: 'smooth'})">
+                        <span>View users</span>
+                        <i class="fas fa-chevron-right ml-1 text-xs group-hover:ml-2 transition-all duration-300"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Refer & Earn Section with improved design -->
+        <div class="mt-8">
+            <div class="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl shadow-xl overflow-hidden">
+                <div class="relative p-8">
+                    <!-- Background Pattern with improved pattern -->
+                    <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z\' fill=\'%23ffffff\' fill-opacity=\'0.4\' fill-rule=\'evenodd\'/%3E%3C/svg%3E');"></div>
+                    
+                    <!-- Content with improved layout -->
+                    <div class="relative">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                            <div class="flex items-center mb-4 md:mb-0">
+                                <div class="p-3 bg-white/20 rounded-full mr-4 backdrop-blur-sm">
+                                    <i class="fas fa-gift text-white text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-2xl font-bold text-white">Refer & Earn Rewards!</h2>
+                                    <p class="text-indigo-100 mt-1 text-sm">Share your code and earn Rs. 500 per referral</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Referral Stats with improved layout -->
+                        <div class="grid grid-cols-3 gap-4 mt-6 mb-8">
+                            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center transform transition-all duration-300 hover:bg-white/20 hover:scale-105">
+                                <h3 class="text-white text-sm font-medium">Referrals Sent</h3>
+                                <p class="text-2xl font-bold text-white mt-1">{{ referred_users.count|default:"0" }}</p>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center transform transition-all duration-300 hover:bg-white/20 hover:scale-105">
+                                <h3 class="text-white text-sm font-medium">Successful</h3>
+                                <p class="text-2xl font-bold text-white mt-1">{{ profile.points|default:"0" }}</p>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center transform transition-all duration-300 hover:bg-white/20 hover:scale-105">
+                                <h3 class="text-white text-sm font-medium">Earned</h3>
+                                <p class="text-2xl font-bold text-white mt-1">Rs. {{ profile.points|default:"0"|multiply:500 }}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- How it works section -->
+                        <div class="mt-8 bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                            <h3 class="text-white font-semibold mb-2 flex items-center">
+                                <i class="fas fa-info-circle mr-2"></i> How it works
+                            </h3>
+                            <ol class="text-indigo-100 text-sm space-y-2 ml-6 list-decimal">
+                                <li>Share your unique referral link with friends</li>
+                                <li>When they sign up using your referral link, they become your referred user</li>
+                                <li>You receive Rs. 500 in your wallet immediately upon their signup</li>
+                                <li><span class="text-yellow-300 font-medium">NEW:</span> You earn commission on <strong>every purchase</strong> your referred users make!</li>
+                                <li>Commission varies by product and is set by the seller</li>
+                                <li>Earnings are automatically added to your wallet balance</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Referred Users Section with enhanced styling -->
+        <div id="referredUsersSection" class="mt-8 bg-white rounded-2xl shadow-xl overflow-hidden animate-fade-in-up">
+            <div class="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
+                <h2 class="text-xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-user-friends text-purple-600 mr-2"></i> Users You've Referred
+                </h2>
+                <p class="text-sm text-gray-600 mt-1">People who joined using your referral code</p>
+            </div>
+            
+            <div class="p-6">
+                {% if referred_users %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {% for user in referred_users %}
+                    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+                        <div class="flex items-center">
+                            <div class="h-12 w-12 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg overflow-hidden">
+                                {% if user.profile.profile_picture %}
+                                <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.username }}" class="h-full w-full object-cover">
+                                {% else %}
+                                {{ user.username|slice:":1"|upper }}
+                                {% endif %}
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-gray-800 font-medium">{{ user.username }}</h3>
+                                <div class="flex items-center mt-1">
+                                    <p class="text-xs text-gray-500 truncate max-w-[150px]">{{ user.email }}</p>
+                                    {% if user.profile.is_verified %}
+                                    <span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <i class="fas fa-check-circle text-xs mr-1"></i> Verified
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="ml-auto text-xs text-gray-500">
+                                Joined {{ user.date_joined|date:"M d, Y" }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="flex flex-col items-center justify-center py-10 text-center">
+                    <div class="h-20 w-20 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 mb-4">
+                        <i class="fas fa-users text-3xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-800 mb-2">No Referrals Yet</h3>
+                    <p class="text-gray-500 max-w-md mb-6">You haven't referred any users yet. Share your referral code to start earning rewards!</p>
+                    
+                    <a href="#" onclick="document.querySelector('.social-share-section').scrollIntoView({behavior: 'smooth'})" class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-share-alt mr-2"></i> Share Your Code
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Commissions Section (NEW) -->
+        {% if commissions %}
+        <div class="mt-8 bg-white rounded-2xl shadow-xl overflow-hidden animate-fade-in-up">
+            <div class="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-amber-50 to-yellow-50">
+                <h2 class="text-xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-coins text-amber-600 mr-2"></i> Your Referral Commission
+                </h2>
+                <p class="text-sm text-gray-600 mt-1">Earnings from purchases made by users you referred</p>
+            </div>
+            
+            <div class="p-6">
+                <!-- Commission Summary -->
+                <div class="bg-gradient-to-r from-amber-500 to-yellow-500 rounded-xl p-6 mb-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-medium text-white/90">Total Earned</h3>
+                            <p class="text-3xl font-bold mt-2">₹{{ total_commission|floatformat:2 }}</p>
+                        </div>
+                        <div class="p-4 bg-white/20 rounded-full">
+                            <i class="fas fa-wallet text-3xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Commission History -->
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Recent Commission History</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Referred User</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for commission in recent_commissions %}
+                            <tr class="hover:bg-gray-50 transition-colors duration-200">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ commission.created_at|date:"M d, Y" }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm overflow-hidden mr-3">
+                                            {% if commission.referred_user.profile.profile_picture %}
+                                            <img src="{{ commission.referred_user.profile.profile_picture.url }}" alt="{{ commission.referred_user.username }}" class="h-full w-full object-cover">
+                                            {% else %}
+                                            {{ commission.referred_user.username|slice:":1"|upper }}
+                                            {% endif %}
+                                        </div>
+                                        <div class="text-sm font-medium text-gray-900">{{ commission.referred_user.username }}</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ commission.product.name }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        ₹{{ commission.commission_amount }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                {% if commissions.count > 5 %}
+                <div class="mt-4 text-center">
+                    <a href="#" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">
+                        View All Commissions
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Two-column layout for Recent Activity and Orders -->
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Recent Activity Section with improved design -->
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div class="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-800">Recent Activity</h2>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Last 30 days</span>
+                        <a href="{% url 'withdrawal_history' %}" class="text-xs text-indigo-600 bg-indigo-50 px-2 py-1 rounded-full hover:bg-indigo-100 transition-colors">
+                            <i class="fas fa-history text-xs mr-1"></i> Withdrawal History
+                        </a>
+                    </div>
+                </div>
+                <div class="divide-y divide-gray-200">
+                    <!-- Activity Item 1 -->
+                    <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center">
+                            <div class="p-2 rounded-full bg-green-100 text-green-600 mr-4">
+                                <i class="fas fa-shopping-bag"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-sm font-medium text-gray-800">Order Completed</h3>
+                                <p class="text-xs text-gray-500">Your order #12345 has been delivered</p>
+                            </div>
+                            <span class="text-xs text-gray-500">2 days ago</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Activity Item 2 -->
+                    <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center">
+                            <div class="p-2 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-sm font-medium text-gray-800">Review Posted</h3>
+                                <p class="text-xs text-gray-500">You reviewed Organic Tomatoes</p>
+                            </div>
+                            <span class="text-xs text-gray-500">1 week ago</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Activity Item 3 -->
+                    <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center">
+                            <div class="p-2 rounded-full bg-indigo-100 text-indigo-600 mr-4">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-sm font-medium text-gray-800">Wallet Credited</h3>
+                                <p class="text-xs text-gray-500">Rs. 500 added to your wallet</p>
+                            </div>
+                            <span class="text-xs text-gray-500">2 weeks ago</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                    <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800 flex items-center justify-center">
+                        <span>View All Activity</span>
+                        <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Recent Orders Section -->
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div class="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-800">Recent Orders</h2>
+                    <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center">
+                        <span>View All</span>
+                        <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                    </a>
+                </div>
+                <div class="divide-y divide-gray-200">
+                    <!-- Order Item 1 -->
+                    <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center">
+                            <div class="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center mr-4 overflow-hidden">
+                                <img src="/placeholder.svg?height=48&width=48" alt="Product" class="object-cover">
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-sm font-medium text-gray-800">Organic Vegetables Pack</h3>
+                                <div class="flex items-center mt-1">
+                                    <span class="text-xs text-gray-500">Order #12345</span>
+                                    <span class="mx-2 text-gray-300">•</span>
+                                    <span class="text-xs font-medium text-green-600">Delivered</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-800">Rs. 450</p>
+                                <p class="text-xs text-gray-500">Mar 15, 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Item 2 -->
+                    <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center">
+                            <div class="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center mr-4 overflow-hidden">
+                                <img src="/placeholder.svg?height=48&width=48" alt="Product" class="object-cover">
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-sm font-medium text-gray-800">Fresh Fruits Basket</h3>
+                                <div class="flex items-center mt-1">
+                                    <span class="text-xs text-gray-500">Order #12344</span>
+                                    <span class="mx-2 text-gray-300">•</span>
+                                    <span class="text-xs font-medium text-blue-600">Shipped</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-800">Rs. 650</p>
+                                <p class="text-xs text-gray-500">Mar 10, 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Item 3 -->
+                    <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center">
+                            <div class="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center mr-4 overflow-hidden">
+                                <img src="/placeholder.svg?height=48&width=48" alt="Product" class="object-cover">
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-sm font-medium text-gray-800">Premium Dairy Products</h3>
+                                <div class="flex items-center mt-1">
+                                    <span class="text-xs text-gray-500">Order #12343</span>
+                                    <span class="mx-2 text-gray-300">•</span>
+                                    <span class="text-xs font-medium text-green-600">Delivered</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-800">Rs. 350</p>
+                                <p class="text-xs text-gray-500">Mar 5, 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>     
+</div>
+
+<!-- JavaScript for Copy Functionality -->
+<script>
+    function copyToClipboard(elementId) {
+        const element = document.getElementById(elementId);
+        element.select();
+        document.execCommand('copy');
+        
+        // UI Feedback
+        const button = event.target.closest('button');
+        const originalHTML = button.innerHTML;
+        
+        button.classList.add('bg-green-600');
+        button.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+        button.innerHTML = '<i class="fas fa-check mr-2"></i><span>Copied!</span>';
+        
+        // Confetti effect
+        createConfetti();
+        
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.classList.remove('bg-green-600');
+            button.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+        }, 2000);
+    }
+    
+    // Simple confetti effect
+    function createConfetti() {
+        const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.top = '0';
+        container.style.left = '0';
+        container.style.width = '100%';
+        container.style.height = '100%';
+        container.style.pointerEvents = 'none';
+        container.style.zIndex = '9999';
+        document.body.appendChild(container);
+        
+        const colors = ['#5046e5', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
+        
+        for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'absolute';
+            confetti.style.width = Math.random() * 10 + 5 + 'px';
+            confetti.style.height = Math.random() * 10 + 5 + 'px';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.borderRadius = '50%';
+            confetti.style.opacity = Math.random() + 0.5;
+            
+            const startX = 50;
+            const startY = 50;
+            
+            confetti.style.left = startX + '%';
+            confetti.style.top = startY + '%';
+            
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 50 + 50;
+            const endX = startX + Math.cos(angle) * distance;
+            const endY = startY + Math.sin(angle) * distance;
+            
+            container.appendChild(confetti);
+            
+            confetti.animate([
+                { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
+                { transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+            ], {
+                duration: Math.random() * 1000 + 1000,
+                easing: 'cubic-bezier(0.1, 0.8, 0.2, 1)'
+            });
+            
+            setTimeout(() => {
+                confetti.remove();
+            }, 2000);
+        }
+        
+        setTimeout(() => {
+            container.remove();
+        }, 2500);
+    }
+    
+    // Web Share API (if available)
+    if (navigator.share) {
+        document.getElementById('shareBtn')?.addEventListener('click', async () => {
+            try {
+                await navigator.share({
+                    title: 'Join me on our platform!',
+                    text: 'Use my referral code {{ profile.referral_code }} to get Rs. 500 on signup!',
+                    url: document.getElementById('referralLink').value
+                });
+            } catch (err) {
+                console.error('Share failed:', err);
+            }
+        });
+    } else {
+        // Fallback for browsers that don't support Web Share API
+        document.getElementById('shareBtn')?.addEventListener('click', () => {
+            copyToClipboard('referralLink');
+        });
+    }
+
+    // Coin animations
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add coin animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes sparkle {
+                0%, 100% { transform: scale(0.8); opacity: 0.2; }
+                50% { transform: scale(1.2); opacity: 1; }
+            }
+            
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+            }
+            
+            @keyframes glow {
+                0%, 100% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+                50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+            }
+            
+            .coin-sparkle {
+                animation: sparkle 2s infinite ease-in-out;
+            }
+            
+            .coin-sparkle:nth-child(odd) {
+                animation-delay: 0.5s;
+            }
+            
+            .coin-icon-container {
+                animation: float 3s infinite ease-in-out;
+            }
+            
+            .coin-icon-container > div:first-child {
+                animation: glow 2s infinite ease-in-out;
+            }
+            
+            .coin-balance-card {
+                transition: all 0.3s ease;
+            }
+            
+            .coin-balance-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            }
+            
+            .coin-value, .balance-value {
+                background: linear-gradient(to right, #f6d365 0%, #fda085 100%);
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+                transition: all 0.3s ease;
+            }
+            
+            .coin-value:hover, .balance-value:hover {
+                text-shadow: 0 0 8px rgba(253, 160, 133, 0.5);
+                letter-spacing: 0.5px;
+            }
+        `;
+        document.head.appendChild(style);
+    });
+</script>
+{% endblock %}

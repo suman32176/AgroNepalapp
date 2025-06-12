@@ -1,0 +1,791 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product | Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        
+        .gradient-border {
+            position: relative;
+        }
+        
+        .gradient-border::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .image-preview {
+            width: 100%;
+            height: 240px;
+            border-radius: 0.75rem;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 0.875rem;
+            margin-top: 0.75rem;
+            border: 2px dashed #e5e7eb;
+            transition: all 0.2s ease;
+        }
+        
+        .image-preview:hover {
+            border-color: #d1d5db;
+        }
+        
+        /* Custom checkbox styling */
+        .custom-checkbox {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .custom-checkbox input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        
+        .checkmark {
+            height: 22px;
+            width: 22px;
+            background-color: #f3f4f6;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .custom-checkbox:hover input ~ .checkmark {
+            background-color: #e5e7eb;
+        }
+        
+        .custom-checkbox input:checked ~ .checkmark {
+            background-color: #4f46e5;
+            border-color: #4f46e5;
+        }
+        
+        .checkmark:after {
+            content: "";
+            display: none;
+        }
+        
+        .custom-checkbox input:checked ~ .checkmark:after {
+            display: block;
+            color: white;
+        }
+        
+        .custom-checkbox .checkmark:after {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 12px;
+            color: white;
+        }
+        
+        /* Form validation styling */
+        .error-message {
+            color: #ef4444;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        
+        input.error, textarea.error, select.error {
+            border-color: #ef4444;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+        
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Form field styling */
+        .form-input {
+            transition: all 0.2s ease;
+            border-width: 1px;
+        }
+        
+        .form-input:hover {
+            border-color: #a5b4fc;
+        }
+        
+        /* Card hover effect */
+        .card-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Button styling */
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4338ca, #4f46e5);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1f2937 transparent transparent transparent;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Header styling */
+        .header-shadow {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        
+        /* Input group */
+        .input-group {
+            position: relative;
+        }
+        
+        .input-group-text {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            padding: 0 12px;
+            display: flex;
+            align-items: center;
+            pointer-events: none;
+            color: #6b7280;
+        }
+        
+        .input-group input {
+            padding-left: 36px;
+        }
+        
+        /* Alert messages */
+        .alert {
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .alert-success {
+            background-color: #ecfdf5;
+            border: 1px solid #10b981;
+            color: #065f46;
+        }
+        
+        .alert-error {
+            background-color: #fef2f2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
+        }
+        
+        /* Product status badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-inactive {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    {% if messages %}
+            <div class="fixed top-4 right-4 z-50 w-full max-w-md">
+                {% for message in messages %}
+                    <div class="bg-white border-l-4 border-indigo-500 text-indigo-700 p-4 mb-3 rounded-lg shadow-lg animate-fade-in-down flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <span>{{ message }}</span>
+                        <button class="ml-auto text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    <!-- Header -->
+    <header class="bg-white header-shadow sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'admin_dashboard' %}" class="text-xl font-bold gradient-text">E-Commerce Admin</a>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="{% url 'admin_dashboard' %}" class="text-gray-500 hover:text-indigo-600 transition-colors flex items-center">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span class="ml-2 text-sm font-medium">Dashboard</span>
+                    </a>
+                    <a href="{% url 'admin_products' %}" class="text-indigo-600 border-b-2 border-indigo-600 pb-0.5 flex items-center">
+                        <i class="fas fa-box"></i>
+                        <span class="ml-2 text-sm font-medium">Products</span>
+                    </a>
+                    <div class="relative">
+                        <button class="flex items-center text-sm focus:outline-none group">
+                            <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold border-2 border-indigo-200 overflow-hidden group-hover:border-indigo-300 transition-colors">
+                                {% if user.profile.profile_picture %}
+                                    <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.username }}" class="w-full h-full object-cover">
+                                {% else %}
+                                    {{ user.username|first|upper }}
+                                {% endif %}
+                            </div>
+                            <span class="ml-2 hidden md:block font-medium">{{ user.get_full_name|default:user.username }}</span>
+                            <i class="fas fa-chevron-down ml-1 text-xs text-gray-500"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Breadcrumbs -->
+    <div class="bg-gray-100 py-2">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center space-x-2 text-xs">
+                <a href="{% url 'admin_dashboard' %}" class="text-indigo-600 hover:text-indigo-800 hover:underline">Home</a>
+                <i class="fas fa-chevron-right text-gray-400 text-[10px]"></i>
+                <a href="{% url 'admin_products' %}" class="text-indigo-600 hover:text-indigo-800 hover:underline">Products</a>
+                <i class="fas fa-chevron-right text-gray-400 text-[10px]"></i>
+                <span class="text-gray-600 font-medium">Edit Product</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="fade-in">
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-error{% endif %} mb-6">
+                        <i class="{% if message.tags == 'success' %}fas fa-check-circle{% elif message.tags == 'error' %}fas fa-exclamation-circle{% endif %} mr-3 text-lg"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="md:flex md:items-center md:justify-between mb-8">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center">
+                        <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate flex items-center">
+                            <i class="fas fa-edit text-indigo-500 mr-3"></i>
+                            Edit Product
+                        </h1>
+                        <span class="ml-4 status-badge {% if product.is_available %}status-active{% else %}status-inactive{% endif %}">
+                            <span class="h-2 w-2 rounded-full {% if product.is_available %}bg-green-500{% else %}bg-red-500{% endif %} mr-1.5"></span>
+                            {% if product.is_available %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </div>
+                    <p class="mt-2 text-sm text-gray-600">
+                        Update the details for <span class="font-medium">{{ product.name }}</span>
+                    </p>
+                </div>
+                <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
+                    <a href="{% url 'seller_dashboard' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Dashboard
+                    </a>
+                    <a href="#" class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
+                        <i class="fas fa-trash-alt mr-2"></i>
+                        Delete
+                    </a>
+                </div>
+            </div>
+            
+            <div class="bg-white shadow-md rounded-xl overflow-hidden card-hover">
+                <div class="p-8 gradient-border">
+                    <form method="post" enctype="multipart/form-data" class="space-y-8">
+                        {% csrf_token %}
+                        
+                        <div class="grid grid-cols-1 gap-y-6 gap-x-6 sm:grid-cols-6">
+                            <!-- Product Name -->
+                            <div class="sm:col-span-4">
+                                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Product Name <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-tag text-gray-400"></i>
+                                    </div>
+                                    <input type="text" name="name" id="name" 
+                                        class="form-input pl-10 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg"
+                                        placeholder="Enter product name" value="{{ product.name }}">
+                                </div>
+                            </div>
+                            
+                            <!-- Category -->
+                            <div class="sm:col-span-2">
+                                <label for="category" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Category <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-folder text-gray-400"></i>
+                                    </div>
+                                    <select name="category" id="category" 
+                                        class="form-input pl-10 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg">
+                                        {% for category in categories %}
+                                            <option value="{{ category.id }}" {% if product.category.id == category.id %}selected{% endif %}>
+                                                {{ category.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="sm:col-span-6">
+                                <div class="bg-indigo-50 rounded-lg p-4 border border-indigo-100">
+                                    <h3 class="text-sm font-medium text-indigo-800 mb-2 flex items-center">
+                                        <i class="fas fa-info-circle mr-2"></i>
+                                        Pricing Information
+                                    </h3>
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <!-- Price -->
+                                        <div>
+                                            <label for="price" class="block text-sm font-medium text-gray-700 mb-1">
+                                                Price <span class="text-red-500">*</span>
+                                            </label>
+                                            <div class="relative rounded-md shadow-sm">
+                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <span class="text-gray-500 sm:text-sm">₹</span>
+                                                </div>
+                                                <input type="number" step="0.01" name="price" id="price" 
+                                                    class="form-input pl-8 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg"
+                                                    placeholder="0.00" value="{{ product.price }}">
+                                            </div>
+                                        </div>
+
+                                        <!-- Commission -->
+                                        <div>
+                                            <label for="commission" class="block text-sm font-medium text-gray-700 mb-1">
+                                                Commission <span class="text-red-500">*</span>
+                                                <span class="tooltip ml-1">
+                                                    <i class="fas fa-question-circle text-gray-400 text-xs"></i>
+                                                    <span class="tooltip-text">Commission amount earned per sale of this product</span>
+                                                </span>
+                                            </label>
+                                            <div class="relative rounded-md shadow-sm">
+                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <span class="text-gray-500 sm:text-sm">₹</span>
+                                                </div>
+                                                <input type="number" step="0.01" name="commission" id="commission" 
+                                                    class="form-input pl-8 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg"
+                                                    placeholder="0.00" value="{{ product.commission }}">
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Stock -->
+                                        <div>
+                                            <label for="stock" class="block text-sm font-medium text-gray-700 mb-1">
+                                                Stock <span class="text-red-500">*</span>
+                                            </label>
+                                            <div class="relative rounded-md shadow-sm">
+                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <i class="fas fa-cubes text-gray-400"></i>
+                                                </div>
+                                                <input type="number" name="stock" id="stock" 
+                                                    class="form-input pl-10 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg"
+                                                    placeholder="0" value="{{ product.stock }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Availability -->
+                            <div class="sm:col-span-6">
+                                <div class="flex items-center p-4 bg-white border border-gray-200 rounded-lg">
+                                    <label class="custom-checkbox flex-grow">
+                                        <input type="checkbox" name="is_available" id="is_available" 
+                                            {% if product.is_available %}checked{% endif %}>
+                                        <span class="checkmark"></span>
+                                        <div>
+                                            <span class="text-sm font-medium text-gray-700">Available for purchase</span>
+                                            <p class="text-xs text-gray-500 mt-1">Make this product visible and available for customers to purchase</p>
+                                        </div>
+                                    </label>
+                                    <div class="ml-4">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium {% if product.is_available %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                            <span class="h-2 w-2 rounded-full {% if product.is_available %}bg-green-500{% else %}bg-red-500{% endif %} mr-1.5"></span>
+                                            {% if product.is_available %}Active{% else %}Inactive{% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Description -->
+                            <div class="sm:col-span-6">
+                                <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Description <span class="text-red-500">*</span>
+                                </label>
+                                <div class="mt-1 relative">
+                                    <div class="absolute top-3 left-3 text-gray-400">
+                                        <i class="fas fa-align-left"></i>
+                                    </div>
+                                    <textarea name="description" id="description" rows="5" 
+                                        class="form-input pl-10 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg"
+                                        placeholder="Enter product description">{{ product.description }}</textarea>
+                                </div>
+                                <p class="mt-2 text-sm text-gray-500 flex items-start">
+                                    <i class="fas fa-lightbulb text-yellow-500 mr-2 mt-0.5"></i>
+                                    <span>Write a detailed description of your product. Include features, specifications, and any other relevant information to help customers make informed decisions.</span>
+                                </p>
+                            </div>
+                            
+                            <!-- Product Image -->
+                            <div class="sm:col-span-6">
+                                <label for="image" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Product Image
+                                </label>
+                                <div class="mt-1 flex flex-col">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="file-input-wrapper">
+                                            <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                                <i class="fas fa-upload mr-2 text-indigo-500"></i>
+                                                Change Image
+                                            </button>
+                                            <input type="file" name="image" id="image" accept="image/*" onchange="previewImage(this)">
+                                        </div>
+                                        <p class="text-xs text-gray-500" id="file-name">
+                                            Current image: {{ product.image.name|default:"No image" }}
+                                        </p>
+                                    </div>
+                                    <div id="image-preview" class="image-preview mt-3">
+                                        {% if product.image %}
+                                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="h-full w-auto object-contain">
+                                        {% else %}
+                                            <div class="text-center">
+                                                <i class="fas fa-image text-gray-300 text-4xl mb-2"></i>
+                                                <p>No image available</p>
+                                                <p class="text-xs text-gray-400 mt-1">Click "Change Image" to upload</p>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="mt-3 bg-blue-50 rounded-lg p-3 border border-blue-100 flex items-start">
+                                    <i class="fas fa-info-circle text-blue-500 mr-2 mt-0.5"></i>
+                                    <p class="text-sm text-blue-700">
+                                        Leave this field empty to keep the current image. Upload a new image to replace the current one.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-6 border-t border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <div class="text-sm text-gray-500">
+                                    <span class="text-red-500">*</span> Required fields
+                                </div>
+                                <div class="flex space-x-3">
+                                    <a href="{% url 'seller_dashboard' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                        Cancel
+                                    </a>
+                                    <button type="submit" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all btn-primary">
+                                        <i class="fas fa-save mr-2"></i>
+                                        Update Product
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Product Stats -->
+            <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div class="bg-white overflow-hidden shadow-sm rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-indigo-100 rounded-md p-3">
+                                <i class="fas fa-shopping-cart text-indigo-600 text-xl"></i>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Total Sales</dt>
+                                    <dd>
+                                        <div class="text-lg font-medium text-gray-900">{{ product.total_sales|default:"0" }}</div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white overflow-hidden shadow-sm rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
+                                <i class="fas fa-dollar-sign text-green-600 text-xl"></i>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Revenue</dt>
+                                    <dd>
+                                        <div class="text-lg font-medium text-gray-900">₹{{ product.revenue|default:"0.00" }}</div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white overflow-hidden shadow-sm rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-yellow-100 rounded-md p-3">
+                                <i class="fas fa-star text-yellow-600 text-xl"></i>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Average Rating</dt>
+                                    <dd>
+                                        <div class="text-lg font-medium text-gray-900">{{ product.avg_rating|default:"0.0" }} <span class="text-sm text-gray-500">/5</span></div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pending Orders -->
+            {% if pending_orders_count > 0 %}
+            <div class="mt-8 bg-white overflow-hidden shadow-sm rounded-lg">
+                <div class="p-5 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                        <i class="fas fa-clock text-orange-500 mr-2"></i>
+                        Pending Orders
+                        <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                            {{ pending_orders_count }}
+                        </span>
+                    </h3>
+                </div>
+                <div class="p-5">
+                    <p class="text-sm text-gray-600">
+                        There are <span class="font-medium">{{ pending_orders_count }}</span> pending orders that include this product. 
+                        <a href="#" class="text-indigo-600 hover:text-indigo-900 font-medium">View all orders</a>
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-white mt-12 border-t border-gray-200">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p class="text-center text-sm text-gray-500">
+                    &copy; {% now "Y" %} Your E-Commerce Store. All rights reserved.
+                </p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-gray-500">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-gray-500">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-gray-500">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        function previewImage(input) {
+            const preview = document.getElementById('image-preview');
+            const fileNameDisplay = document.getElementById('file-name');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Product image preview" class="h-full w-auto object-contain">`;
+                    fileNameDisplay.textContent = input.files[0].name;
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                // If no new file is selected, keep the current image
+                {% if product.image %}
+                preview.innerHTML = `<img src="{{ product.image.url }}" alt="{{ product.name }}" class="h-full w-auto object-contain">`;
+                fileNameDisplay.textContent = 'Current image: {{ product.image.name }}';
+                {% else %}
+                preview.innerHTML = `
+                    <div class="text-center">
+                        <i class="fas fa-image text-gray-300 text-4xl mb-2"></i>
+                        <p>No image available</p>
+                        <p class="text-xs text-gray-400 mt-1">Click "Change Image" to upload</p>
+                    </div>
+                `;
+                fileNameDisplay.textContent = 'No image selected';
+                {% endif %}
+            }
+        }
+        
+        // Form validation enhancement
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const requiredInputs = form.querySelectorAll('input[required], textarea[required], select[required]');
+            
+            form.addEventListener('submit', function(event) {
+                let isValid = true;
+                
+                requiredInputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        isValid = false;
+                        input.classList.add('error');
+                        const errorMessage = document.createElement('p');
+                        errorMessage.className = 'error-message mt-1';
+                        errorMessage.textContent = 'This field is required';
+                        
+                        // Remove any existing error messages
+                        const existingError = input.parentNode.querySelector('.error-message');
+                        if (existingError) {
+                            existingError.remove();
+                        }
+                        
+                        input.parentNode.appendChild(errorMessage);
+                    }
+                });
+                
+                if (!isValid) {
+                    event.preventDefault();
+                    // Scroll to the first error
+                    const firstError = form.querySelector('.error');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            });
+            
+            // Clear error styling on input
+            requiredInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    if (this.value.trim()) {
+                        this.classList.remove('error');
+                        const errorMessage = this.parentNode.querySelector('.error-message');
+                        if (errorMessage) {
+                            errorMessage.remove();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

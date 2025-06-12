@@ -1,0 +1,675 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product | Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        
+        .gradient-border {
+            position: relative;
+        }
+        
+        .gradient-border::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .image-preview {
+            width: 100%;
+            height: 240px;
+            border-radius: 0.75rem;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 0.875rem;
+            margin-top: 0.75rem;
+            border: 2px dashed #e5e7eb;
+            transition: all 0.2s ease;
+        }
+        
+        .image-preview:hover {
+            border-color: #d1d5db;
+        }
+        
+        /* Custom checkbox styling */
+        .custom-checkbox {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .custom-checkbox input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        
+        .checkmark {
+            height: 22px;
+            width: 22px;
+            background-color: #f3f4f6;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .custom-checkbox:hover input ~ .checkmark {
+            background-color: #e5e7eb;
+        }
+        
+        .custom-checkbox input:checked ~ .checkmark {
+            background-color: #4f46e5;
+            border-color: #4f46e5;
+        }
+        
+        .checkmark:after {
+            content: "";
+            display: none;
+        }
+        
+        .custom-checkbox input:checked ~ .checkmark:after {
+            display: block;
+            color: white;
+        }
+        
+        .custom-checkbox .checkmark:after {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 12px;
+            color: white;
+        }
+        
+        /* Form validation styling */
+        .error-message {
+            color: #ef4444;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        
+        input.error, textarea.error, select.error {
+            border-color: #ef4444;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+        
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Form field styling */
+        .form-input {
+            transition: all 0.2s ease;
+            border-width: 1px;
+        }
+        
+        .form-input:hover {
+            border-color: #a5b4fc;
+        }
+        
+        /* Card hover effect */
+        .card-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Button styling */
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4338ca, #4f46e5);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1f2937 transparent transparent transparent;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Header styling */
+        .header-shadow {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        
+        /* Input group */
+        .input-group {
+            position: relative;
+        }
+        
+        .input-group-text {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            padding: 0 12px;
+            display: flex;
+            align-items: center;
+            pointer-events: none;
+            color: #6b7280;
+        }
+        
+        .input-group input {
+            padding-left: 36px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <!-- Header -->
+    <header class="bg-white header-shadow sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'admin_dashboard' %}" class="text-xl font-bold gradient-text">E-Commerce Admin</a>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="{% url 'admin_dashboard' %}" class="text-gray-500 hover:text-indigo-600 transition-colors flex items-center">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span class="ml-2 text-sm font-medium">Dashboard</span>
+                    </a>
+                    <a href="{% url 'admin_products' %}" class="text-indigo-600 border-b-2 border-indigo-600 pb-0.5 flex items-center">
+                        <i class="fas fa-box"></i>
+                        <span class="ml-2 text-sm font-medium">Products</span>
+                    </a>
+                    <div class="relative">
+                        <button class="flex items-center text-sm focus:outline-none group">
+                            <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold border-2 border-indigo-200 overflow-hidden group-hover:border-indigo-300 transition-colors">
+                                {% if user.profile.profile_picture %}
+                                    <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.username }}" class="w-full h-full object-cover">
+                                {% else %}
+                                    {{ user.username|first|upper }}
+                                {% endif %}
+                            </div>
+                            <span class="ml-2 hidden md:block font-medium">{{ user.get_full_name|default:user.username }}</span>
+                            <i class="fas fa-chevron-down ml-1 text-xs text-gray-500"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Breadcrumbs -->
+    <div class="bg-gray-100 py-2">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center space-x-2 text-xs">
+                <a href="{% url 'admin_dashboard' %}" class="text-indigo-600 hover:text-indigo-800 hover:underline">Home</a>
+                <i class="fas fa-chevron-right text-gray-400 text-[10px]"></i>
+                <a href="{% url 'admin_products' %}" class="text-indigo-600 hover:text-indigo-800 hover:underline">Products</a>
+                <i class="fas fa-chevron-right text-gray-400 text-[10px]"></i>
+                <span class="text-gray-600 font-medium">Add Product</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    {% if messages %}
+    <div class="fixed top-4 right-4 z-50 w-full max-w-md">
+        {% for message in messages %}
+            <div class="bg-white border-l-4 border-indigo-500 text-indigo-700 p-4 mb-3 rounded-lg shadow-lg animate-fade-in-down flex items-center">
+                <i class="fas fa-info-circle mr-2"></i>
+                <span>{{ message }}</span>
+                <button class="ml-auto text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="fade-in">
+            <div class="md:flex md:items-center md:justify-between mb-8">
+                <div class="flex-1 min-w-0">
+                    <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate flex items-center">
+                        <i class="fas fa-plus-circle text-indigo-500 mr-3"></i>
+                        Add New Product
+                    </h1>
+                    <p class="mt-2 text-sm text-gray-600">
+                        Create a new product to add to your store inventory. Fill in all required fields marked with <span class="text-red-500">*</span>
+                    </p>
+                </div>
+                <div class="mt-4 flex md:mt-0 md:ml-4">
+                    <a href="{% url 'admin_products' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Products
+                    </a>
+                </div>
+            </div>
+            
+            <div class="bg-white shadow-md rounded-xl overflow-hidden card-hover">
+                <div class="p-8 gradient-border">
+                    <form method="post" enctype="multipart/form-data" class="space-y-8">
+                        {% csrf_token %}
+                        
+                        <div class="grid grid-cols-1 gap-y-6 gap-x-6 sm:grid-cols-6">
+                            <!-- Product Name -->
+                            <div class="sm:col-span-4">
+                                <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Product Name <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-tag text-gray-400"></i>
+                                    </div>
+                                    <input type="text" name="{{ form.name.name }}" id="{{ form.name.id_for_label }}" 
+                                        class="form-input pl-10 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg {% if form.name.errors %}error{% endif %}"
+                                        placeholder="Enter product name" value="{{ form.name.value|default:'' }}">
+                                </div>
+                                {% if form.name.errors %}
+                                    <p class="error-message mt-1">{{ form.name.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Category -->
+                            <div class="sm:col-span-2">
+                                <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Category <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-folder text-gray-400"></i>
+                                    </div>
+                                    <select name="{{ form.category.name }}" id="{{ form.category.id_for_label }}" 
+                                        class="form-input pl-10 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg {% if form.category.errors %}error{% endif %}">
+                                        <option value="">Select a category</option>
+                                        {% for choice in form.category.field.choices %}
+                                            <option value="{{ choice.0 }}" {% if form.category.value|stringformat:"s" == choice.0|stringformat:"s" %}selected{% endif %}>
+                                                {{ choice.1 }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                {% if form.category.errors %}
+                                    <p class="error-message mt-1">{{ form.category.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="sm:col-span-6">
+                                <div class="bg-indigo-50 rounded-lg p-4 border border-indigo-100">
+                                    <h3 class="text-sm font-medium text-indigo-800 mb-2 flex items-center">
+                                        <i class="fas fa-info-circle mr-2"></i>
+                                        Pricing Information
+                                    </h3>
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <!-- Price -->
+                                        <div>
+                                            <label for="{{ form.price.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                                Price <span class="text-red-500">*</span>
+                                            </label>
+                                            <div class="relative rounded-md shadow-sm">
+                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <span class="text-gray-500 sm:text-sm">Rs </span>
+                                                </div>
+                                                <input type="number" step="0.01" name="{{ form.price.name }}" id="{{ form.price.id_for_label }}" 
+                                                    class="form-input pl-8 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg {% if form.price.errors %}error{% endif %}"
+                                                    placeholder="0.00" value="{{ form.price.value|default:'' }}">
+                                            </div>
+                                            {% if form.price.errors %}
+                                                <p class="error-message mt-1">{{ form.price.errors.0 }}</p>
+                                            {% endif %}
+                                        </div>
+
+                                        <!-- Commission -->
+                                        <div>
+                                            <label for="{{ form.commission.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                                Commission <span class="text-red-500">*</span>
+                                                <span class="tooltip ml-1">
+                                                    <i class="fas fa-question-circle text-gray-400 text-xs"></i>
+                                                    <span class="tooltip-text">Commission amount earned per sale of this product</span>
+                                                </span>
+                                            </label>
+                                            <div class="relative rounded-md shadow-sm">
+                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <span class="text-gray-500 sm:text-sm">Rs </span>
+                                                </div>
+                                                <input type="number" step="0.01" name="{{ form.commission.name }}" id="{{ form.commission.id_for_label }}" 
+                                                    class="form-input pl-8 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg {% if form.commission.errors %}error{% endif %}"
+                                                    placeholder="0.00" value="{{ form.commission.value|default:'' }}">
+                                            </div>
+                                            {% if form.commission.errors %}
+                                                <p class="error-message mt-1">{{ form.commission.errors.0 }}</p>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Stock -->
+                                        <div>
+                                            <label for="{{ form.stock.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                                Stock <span class="text-red-500">*</span>
+                                            </label>
+                                            <div class="relative rounded-md shadow-sm">
+                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <i class="fas fa-cubes text-gray-400"></i>
+                                                </div>
+                                                <input type="number" name="{{ form.stock.name }}" id="{{ form.stock.id_for_label }}" 
+                                                    class="form-input pl-10 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg {% if form.stock.errors %}error{% endif %}"
+                                                    placeholder="0" value="{{ form.stock.value|default:'' }}">
+                                            </div>
+                                            {% if form.stock.errors %}
+                                                <p class="error-message mt-1">{{ form.stock.errors.0 }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Availability -->
+                            <div class="sm:col-span-6">
+                                <div class="flex items-center p-4 bg-white border border-gray-200 rounded-lg">
+                                    <label class="custom-checkbox flex-grow">
+                                        <input type="checkbox" name="{{ form.is_available.name }}" id="{{ form.is_available.id_for_label }}" 
+                                            {% if form.is_available.value %}checked{% endif %}>
+                                        <span class="checkmark"></span>
+                                        <div>
+                                            <span class="text-sm font-medium text-gray-700">Available for purchase</span>
+                                            <p class="text-xs text-gray-500 mt-1">Make this product visible and available for customers to purchase</p>
+                                        </div>
+                                    </label>
+                                    <div class="ml-4">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <span class="h-2 w-2 rounded-full bg-green-500 mr-1.5"></span>
+                                            Active
+                                        </span>
+                                    </div>
+                                </div>
+                                {% if form.is_available.errors %}
+                                    <p class="error-message mt-1">{{ form.is_available.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Description -->
+                            <div class="sm:col-span-6">
+                                <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Description <span class="text-red-500">*</span>
+                                </label>
+                                <div class="mt-1 relative">
+                                    <div class="absolute top-3 left-3 text-gray-400">
+                                        <i class="fas fa-align-left"></i>
+                                    </div>
+                                    <textarea name="{{ form.description.name }}" id="{{ form.description.id_for_label }}" rows="5" 
+                                        class="form-input pl-10 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg {% if form.description.errors %}error{% endif %}"
+                                        placeholder="Enter product description">{{ form.description.value|default:'' }}</textarea>
+                                </div>
+                                {% if form.description.errors %}
+                                    <p class="error-message mt-1">{{ form.description.errors.0 }}</p>
+                                {% endif %}
+                                <p class="mt-2 text-sm text-gray-500 flex items-start">
+                                    <i class="fas fa-lightbulb text-yellow-500 mr-2 mt-0.5"></i>
+                                    <span>Write a detailed description of your product. Include features, specifications, and any other relevant information to help customers make informed decisions.</span>
+                                </p>
+                            </div>
+                            
+                            <!-- Product Image -->
+                            <div class="sm:col-span-6">
+                                <label for="{{ form.image.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Product Image <span class="text-red-500">*</span>
+                                </label>
+                                <div class="mt-1 flex flex-col">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="file-input-wrapper">
+                                            <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                                <i class="fas fa-upload mr-2 text-indigo-500"></i>
+                                                Choose Image
+                                            </button>
+                                            <input type="file" name="{{ form.image.name }}" id="{{ form.image.id_for_label }}" accept="image/*" onchange="previewImage(this)">
+                                        </div>
+                                        <p class="text-xs text-gray-500" id="file-name">
+                                            {% if form.image.value %}
+                                                {{ form.image.value.name }}
+                                            {% else %}
+                                                No file selected
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    <div id="image-preview" class="image-preview mt-3">
+                                        {% if form.image.value %}
+                                            <img src="{{ form.image.value.url }}" alt="Product image preview" class="h-full w-auto object-contain">
+                                        {% else %}
+                                            <div class="text-center">
+                                                <i class="fas fa-image text-gray-300 text-4xl mb-2"></i>
+                                                <p>No image selected</p>
+                                                <p class="text-xs text-gray-400 mt-1">Click "Choose Image" to upload</p>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    {% if form.image.errors %}
+                                        <p class="error-message mt-1">{{ form.image.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="mt-3 bg-blue-50 rounded-lg p-3 border border-blue-100 flex items-start">
+                                    <i class="fas fa-info-circle text-blue-500 mr-2 mt-0.5"></i>
+                                    <p class="text-sm text-blue-700">
+                                        Upload a high-quality image of your product. Recommended size: 800x800 pixels. Maximum file size: 5MB. Supported formats: JPG, PNG, WEBP.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-6 border-t border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <div class="text-sm text-gray-500">
+                                    <span class="text-red-500">*</span> Required fields
+                                </div>
+                                <div class="flex space-x-3">
+                                    <a href="{% url 'admin_products' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                        Cancel
+                                    </a>
+                                    <button type="submit" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all btn-primary">
+                                        <i class="fas fa-save mr-2"></i>
+                                        Save Product
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-white mt-12 border-t border-gray-200">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p class="text-center text-sm text-gray-500">
+                    &copy; {% now "Y" %} Your E-Commerce Store. All rights reserved.
+                </p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-gray-500">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-gray-500">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-gray-500">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        function previewImage(input) {
+            const preview = document.getElementById('image-preview');
+            const fileNameDisplay = document.getElementById('file-name');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Product image preview" class="h-full w-auto object-contain">`;
+                    fileNameDisplay.textContent = input.files[0].name;
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.innerHTML = `
+                    <div class="text-center">
+                        <i class="fas fa-image text-gray-300 text-4xl mb-2"></i>
+                        <p>No image selected</p>
+                        <p class="text-xs text-gray-400 mt-1">Click "Choose Image" to upload</p>
+                    </div>
+                `;
+                fileNameDisplay.textContent = 'No file selected';
+            }
+        }
+        
+        // Form validation enhancement
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const requiredInputs = form.querySelectorAll('input[required], textarea[required], select[required]');
+            
+            form.addEventListener('submit', function(event) {
+                let isValid = true;
+                
+                requiredInputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        isValid = false;
+                        input.classList.add('error');
+                        const errorMessage = document.createElement('p');
+                        errorMessage.className = 'error-message mt-1';
+                        errorMessage.textContent = 'This field is required';
+                        
+                        // Remove any existing error messages
+                        const existingError = input.parentNode.querySelector('.error-message');
+                        if (existingError) {
+                            existingError.remove();
+                        }
+                        
+                        input.parentNode.appendChild(errorMessage);
+                    }
+                });
+                
+                if (!isValid) {
+                    event.preventDefault();
+                    // Scroll to the first error
+                    const firstError = form.querySelector('.error');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            });
+            
+            // Clear error styling on input
+            requiredInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    if (this.value.trim()) {
+                        this.classList.remove('error');
+                        const errorMessage = this.parentNode.querySelector('.error-message');
+                        if (errorMessage) {
+                            errorMessage.remove();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

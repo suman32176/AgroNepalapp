@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat with {{ other_user.username }} about {{ deal.title }}{% endblock %}
+
+{% block content %}
+<div class="relative py-12">
+    <!-- Decorative background elements -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-purple-500/20 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/3 -left-24 w-80 h-80 bg-gradient-to-tr from-primary/10 to-pink-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 right-1/4 w-64 h-64 bg-gradient-to-tr from-yellow-400/10 to-primary/10 rounded-full blur-3xl"></div>
+        <div class="absolute inset-0 bg-white/40 backdrop-blur-3xl -z-10"></div>
+        <div class="absolute inset-0 bg-grid-primary/[0.03] -z-10"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <!-- Breadcrumbs -->
+        <nav class="flex mb-8 text-sm text-gray-500" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="{% url 'home' %}" class="inline-flex items-center hover:text-primary transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                        </svg>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        <a href="{% url 'deals' %}" class="ml-1 hover:text-primary transition-colors">Wholesale Opportunities</a>
+                    </div>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        <a href="{% url 'deal_detail' deal.pk %}" class="ml-1 hover:text-primary transition-colors truncate max-w-xs">{{ deal.title }}</a>
+                    </div>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        <a href="{% url 'deal_chat' deal.id %}" class="ml-1 hover:text-primary transition-colors">Manage Chats</a>
+                    </div>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="ml-1 text-gray-500 font-medium">{{ other_user.username }}</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Left sidebar - User info -->
+            <div class="md:w-1/3 lg:w-1/4">
+                <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden border border-gray-100/50 sticky top-24">
+                    <div class="p-6">
+                        <div class="flex flex-col items-center text-center mb-6">
+                            <div class="w-20 h-20 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-2xl mb-4">
+                                {{ other_user.username|slice:":1"|upper }}
+                            </div>
+                            <h3 class="font-bold text-xl text-gray-900">{{ other_user.username }}</h3>
+                            <p class="text-sm text-gray-500">Member since {{ other_user.date_joined|date:"F Y" }}</p>
+                        </div>
+                        
+                        <div class="border-t border-gray-100 pt-4 mt-4">
+                            <h4 class="font-medium text-gray-900 mb-2">About the Deal</h4>
+                            <div class="bg-gray-50 rounded-xl p-4 mb-4">
+                                <h5 class="font-medium text-gray-900 mb-1">{{ deal.title }}</h5>
+                                <p class="text-sm text-gray-600 line-clamp-3 mb-2">
+                                    {{ deal.description|truncatechars:150 }}
+                                </p>
+                                {% if deal.price %}
+                                <div class="flex items-center text-sm">
+                                    <span class="text-gray-700 font-medium">Price:</span>
+                                    <span class="ml-2 text-primary font-medium">${{ deal.price }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <a href="{% url 'deal_chat' deal.id %}" class="inline-flex items-center text-primary hover:text-primary/80 text-sm font-medium">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                </svg>
+                                Back to All Conversations
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat area -->
+            <div class="md:w-2/3 lg:w-3/4">
+                <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden border border-gray-100/50 flex flex-col h-[700px]">
+                    <!-- Chat header -->
+                    <div class="p-4 border-b border-gray-200 bg-gray-50/80 backdrop-blur-sm flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-lg">
+                            {{ other_user.username|slice:":1"|upper }}
+                        </div>
+                        <div class="ml-3">
+                            <p class="font-medium text-gray-900">{{ other_user.username }}</p>
+                            <p class="text-xs text-gray-500">Discussing: {{ deal.title }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Messages area -->
+                    <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-4">
+                        {% if chat_messages %}
+                            {% for message in chat_messages %}
+                                <div class="flex {% if message.sender == request.user %}justify-end{% else %}justify-start{% endif %}">
+                                    <div class="{% if message.sender == request.user %}bg-primary text-white{% else %}bg-gray-200 text-gray-800{% endif %} rounded-lg py-2 px-4 max-w-[80%]">
+                                        <div class="text-sm mb-1">{{ message.message }}</div>
+                                        <div class="text-xs opacity-70 text-right">{{ message.timestamp|date:"g:i A" }}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="flex items-center justify-center h-full">
+                                <div class="text-center text-gray-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                    </svg>
+                                    <p class="text-lg font-medium mb-1">No messages yet</p>
+                                    <p>Start the conversation with {{ other_user.username }}!</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Message input -->
+                    <div class="p-4 border-t border-gray-200">
+                        <form id="message-form" class="flex items-center space-x-2">
+                            <input type="text" id="message-input" class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-primary focus:border-primary" placeholder="Type your message...">
+                            <button type="submit" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                </svg>
+                                Send
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-grid-primary {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23000' fill-opacity='0.1'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dealId = {{ deal.id }};
+        const receiverId = {{ other_user.id }};
+        const userId = {{ request.user.id }};
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+        const messagesContainer = document.getElementById('messages-container');
+        
+        // Scroll to bottom of messages
+        const scrollToBottom = () => {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        };
+        
+        // Scroll down on initial load
+        scrollToBottom();
+        
+        // Handle form submission
+        messageForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            // Send message to server
+            fetch('/send_deal_message/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    deal_id: dealId,
+                    receiver_id: receiverId,
+                    message: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Clear input
+                    messageInput.value = '';
+                    
+                    // Add message to UI immediately
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'flex justify-end';
+                    messageElement.innerHTML = `
+                        <div class="bg-primary text-white rounded-lg py-2 px-4 max-w-[80%]">
+                            <div class="text-sm mb-1">${message}</div>
+                            <div class="text-xs opacity-70 text-right">${new Date().toLocaleTimeString([], {hour: 'numeric', minute:'2-digit'})}</div>
+                        </div>
+                    `;
+                    
+                    // Remove "no messages" placeholder if it exists
+                    if (messagesContainer.querySelector('.flex.items-center.justify-center')) {
+                        messagesContainer.innerHTML = '';
+                    }
+                    
+                    messagesContainer.appendChild(messageElement);
+                    scrollToBottom();
+                }
+            })
+            .catch(error => {
+                console.error('Error sending message:', error);
+            });
+        });
+        
+        // Set up Pusher for real-time messages
+        const pusher = new Pusher('{{ pusher_key }}', {
+            cluster: '{{ pusher_cluster }}',
+            encrypted: true
+        });
+        
+        // Create a unique channel name using deal ID and sorted user IDs to ensure same channel for both users
+        const channelName = `deal_chat_${dealId}_${Math.min(userId, receiverId)}_${Math.max(userId, receiverId)}`;
+        const channel = pusher.subscribe(channelName);
+        
+        channel.bind('message', function(data) {
+            // Only add the message to UI if it's from the other user
+            if (data.sender !== '{{ request.user.username }}') {
+                const messageElement = document.createElement('div');
+                messageElement.className = 'flex justify-start';
+                messageElement.innerHTML = `
+                    <div class="bg-gray-200 text-gray-800 rounded-lg py-2 px-4 max-w-[80%]">
+                        <div class="text-sm mb-1">${data.message}</div>
+                        <div class="text-xs opacity-70 text-right">${new Date(data.timestamp).toLocaleTimeString([], {hour: 'numeric', minute:'2-digit'})}</div>
+                    </div>
+                `;
+                
+                // Remove "no messages" placeholder if it exists
+                if (messagesContainer.querySelector('.flex.items-center.justify-center')) {
+                    messagesContainer.innerHTML = '';
+                }
+                
+                messagesContainer.appendChild(messageElement);
+                scrollToBottom();
+            }
+        });
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% if messages %}
+            <div class="fixed top-4 right-4 z-50 w-full max-w-md">
+                {% for message in messages %}
+                    <div class="bg-white border-l-4 border-indigo-500 text-indigo-700 p-4 mb-3 rounded-lg shadow-lg animate-fade-in-down flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <span>{{ message }}</span>
+                        <button class="ml-auto text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+    <!-- Hero Section -->
+    <div class="relative overflow-hidden bg-gradient-to-b from-blue-50 via-white to-green-50 py-16">
+        <div class="absolute top-0 left-0 w-full h-64 bg-gradient-to-r from-blue-500/10 to-green-500/10"></div>
+        <div class="absolute bottom-0 right-0 w-full h-64 bg-gradient-to-l from-blue-500/10 to-green-500/10"></div>
+        
+        <div class="container mx-auto px-4 relative">
+            <div class="text-center mb-16">
+                <h1 class="text-6xl font-extrabold mb-6 text-gray-800 relative inline-block">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-green-600">Earning Opportunities</span>
+                    <div class="absolute -bottom-2 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 to-green-500 rounded-full"></div>
+    </h1>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Discover multiple ways to generate income on our platform. Start your journey to financial freedom today!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-16">
+        <!-- Cards Section -->
+        <div class="grid md:grid-cols-2 gap-12 mb-20">
+            <!-- Refer & Earn Program Card -->
+            <div class="group bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100">
+                <div class="h-3 bg-gradient-to-r from-blue-500 to-blue-600"></div>
+                <div class="p-8">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4 group-hover:bg-blue-500 transition-colors duration-300">
+                            <svg class="w-6 h-6 text-blue-600 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-3xl font-bold text-blue-600">Refer & Earn Program</h2>
+                    </div>
+                    
+                    <p class="mb-8 text-gray-600 leading-relaxed text-lg">Join our exclusive referral program and earn lifetime commissions on every purchase made by your referrals. The more you share, the more you earn!</p>
+                    
+                    <div class="bg-blue-50 rounded-xl p-6 mb-8">
+                        <h3 class="text-xl font-semibold text-blue-700 mb-4">How It Works</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-3">1</div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Get Your Unique Link</h4>
+                                    <p class="text-gray-600">Register and receive your personalized referral link</p>
+                                </div>
+                </li>
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-3">2</div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Share Everywhere</h4>
+                                    <p class="text-gray-600">Share your link on social media, email, or with friends</p>
+                                </div>
+                </li>
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-3">3</div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Earn Commissions</h4>
+                                    <p class="text-gray-600">Earn commissions based on each seller's referral rate</p>
+                                </div>
+                </li>
+            </ul>
+        </div>
+
+                    <div class="flex flex-wrap gap-4 mb-6">
+                        <div class="flex-1 min-w-[150px] bg-blue-50 rounded-lg p-4 text-center">
+                            <div class="text-3xl font-bold text-blue-600 mb-1">Variable</div>
+                            <div class="text-sm text-gray-600">Commission Rate</div>
+                        </div>
+                        <div class="flex-1 min-w-[150px] bg-blue-50 rounded-lg p-4 text-center">
+                            <div class="text-3xl font-bold text-blue-600 mb-1">Lifetime</div>
+                            <div class="text-sm text-gray-600">Earning Period</div>
+                        </div>
+                        <div class="flex-1 min-w-[150px] bg-blue-50 rounded-lg p-4 text-center">
+                            <div class="text-3xl font-bold text-blue-600 mb-1">Instant</div>
+                            <div class="text-sm text-gray-600">Payouts</div>
+        </div>
+    </div>
+
+                    <button id="referralBtn" onclick="window.location.href='{% url 'profile' %}'" class="w-full py-4 px-6 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center">
+                        <span>Share your referral</span>
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+        </button>
+    </div>
+            </div>
+
+            <!-- Product Selling Section Card -->
+            <div class="group bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100">
+                <div class="h-3 bg-gradient-to-r from-green-500 to-green-600"></div>
+                <div class="p-8">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4 group-hover:bg-green-500 transition-colors duration-300">
+                            <svg class="w-6 h-6 text-green-600 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-3xl font-bold text-green-600">Earn by Selling Products</h2>
+            </div>
+                    
+                    <p class="mb-8 text-gray-600 leading-relaxed text-lg">Become a seller on our platform and turn your passion into profit. We provide all the tools you need to succeed in the digital marketplace.</p>
+                    
+                    <div class="bg-green-50 rounded-xl p-6 mb-8">
+                        <h3 class="text-xl font-semibold text-green-700 mb-4">Seller Benefits</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold mr-3">1</div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Global Reach</h4>
+                                    <p class="text-gray-600">Access customers from around the world</p>
+            </div>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold mr-3">2</div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Secure Payments</h4>
+                                    <p class="text-gray-600">Receive payments safely and on time</p>
+            </div>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold mr-3">3</div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Marketing Support</h4>
+                                    <p class="text-gray-600">We help promote your products to the right audience</p>
+            </div>
+                            </li>
+                        </ul>
+    </div>
+
+                    <div class="flex flex-wrap gap-4 mb-6">
+                        <div class="flex-1 min-w-[150px] bg-green-50 rounded-lg p-4 text-center">
+                            <div class="text-3xl font-bold text-green-600 mb-1">100%</div>
+                            <div class="text-sm text-gray-600">Total Earning</div>
+                        </div>
+                        <div class="flex-1 min-w-[150px] bg-green-50 rounded-lg p-4 text-center">
+                            <div class="text-3xl font-bold text-green-600 mb-1">24/7</div>
+                            <div class="text-sm text-gray-600">Seller Support</div>
+                        </div>
+                        <div class="flex-1 min-w-[150px] bg-green-50 rounded-lg p-4 text-center">
+                            <div class="text-3xl font-bold text-green-600 mb-1">Free</div>
+                            <div class="text-sm text-gray-600">Store Setup</div>
+            </div>
+            </div>
+                    
+                    <button id="sellerBtn" onclick="window.location.href='{% url 'profile' %}'" class="w-full py-4 px-6 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center">
+                        <span>Become a Seller</span>
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </button>
+            </div>
+            </div>
+            </div>
+
+        
+    </div>
+
+    <!-- Custom Animations -->
+    <style>
+        @keyframes fade-in-down {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-down {
+            animation: fade-in-down 0.5s ease-out forwards;
+        }
+        .animate-fade-in {
+            animation: fade-in 0.5s ease-out forwards;
+        }
+        @keyframes fade-in {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+
+<script>
+    // Toggle application forms
+        const referralBtn = document.getElementById('referralBtn');
+        const sellerBtn = document.getElementById('sellerBtn');
+        const referralCta = document.getElementById('referralCta');
+        const sellerCta = document.getElementById('sellerCta');
+        const referralForm = document.getElementById('referralForm');
+        const sellerForm = document.getElementById('sellerForm');
+
+        function toggleReferralForm() {
+            referralForm.classList.toggle('hidden');
+            if (!referralForm.classList.contains('hidden')) {
+                sellerForm.classList.add('hidden');
+                referralForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function toggleSellerForm() {
+            sellerForm.classList.toggle('hidden');
+            if (!sellerForm.classList.contains('hidden')) {
+                referralForm.classList.add('hidden');
+                sellerForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        if (referralBtn) referralBtn.addEventListener('click', toggleReferralForm);
+        if (sellerBtn) sellerBtn.addEventListener('click', toggleSellerForm);
+        if (referralCta) referralCta.addEventListener('click', toggleReferralForm);
+        if (sellerCta) sellerCta.addEventListener('click', toggleSellerForm);
+
+        // FAQ Toggles
+        document.querySelectorAll('.faq-toggle').forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const content = toggle.nextElementSibling;
+                const icon = toggle.querySelector('svg');
+                
+                content.classList.toggle('hidden');
+                if (!content.classList.contains('hidden')) {
+                    icon.classList.add('rotate-180');
+                } else {
+                    icon.classList.remove('rotate-180');
+                }
+            });
+    });
+
+    // Add smooth scrolling to form fields
+        document.querySelectorAll('input, textarea, select').forEach(element => {
+        element.addEventListener('focus', (e) => {
+                const rect = e.target.getBoundingClientRect();
+                const isOutOfView = rect.top < 0 || rect.bottom > window.innerHeight;
+                
+                if (isOutOfView) {
+            e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+        });
+    });
+
+    // Add form validation
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+                
+                // Basic validation
+                let isValid = true;
+                form.querySelectorAll('[required]').forEach(field => {
+                    if (!field.value.trim()) {
+                        isValid = false;
+                        field.classList.add('border-red-500');
+                        
+                        // Add error message if it doesn't exist
+                        const errorId = `${field.id}-error`;
+                        if (!document.getElementById(errorId)) {
+                            const errorMsg = document.createElement('p');
+                            errorMsg.id = errorId;
+                            errorMsg.className = 'text-red-500 text-sm mt-1';
+                            errorMsg.textContent = 'This field is required';
+                            field.parentNode.appendChild(errorMsg);
+                        }
+                    } else {
+                        field.classList.remove('border-red-500');
+                        const errorMsg = document.getElementById(`${field.id}-error`);
+                        if (errorMsg) errorMsg.remove();
+                    }
+                });
+                
+                if (isValid) {
+                    // Simulate form submission
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+                    
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...';
+                    
+                    setTimeout(() => {
+                        form.reset();
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        
+                        // Show success message
+                        const formContainer = form.closest('div');
+                        formContainer.innerHTML = `
+                            <div class="text-center py-12">
+                                <svg class="w-16 h-16 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <h3 class="text-2xl font-bold text-gray-800 mb-2">Application Submitted!</h3>
+                                <p class="text-gray-600 mb-6">Thank you for your interest. We'll review your application and get back to you within 48 hours.</p>
+                                <button class="py-2 px-6 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors duration-200" onclick="this.closest('.hidden').classList.add('hidden')">Close</button>
+                            </div>
+                        `;
+                    }, 1500);
+                }
+        });
+    });
+</script>
+{% endblock %}

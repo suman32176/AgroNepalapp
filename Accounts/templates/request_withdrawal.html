@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Request Wallet Withdrawal{% endblock %}
+
+{% block content %}
+<div class="bg-gray-100 min-h-screen py-10">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 py-6 px-6">
+                <h1 class="text-2xl font-bold text-white flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                    </svg>
+                    Request Wallet Withdrawal
+                </h1>
+                <p class="mt-2 text-indigo-100">
+                    Request to withdraw funds from your wallet balance
+                </p>
+            </div>
+            
+            <!-- Wallet Balance Card -->
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-medium text-gray-900">Your Wallet Balance</h2>
+                        <p class="text-sm text-gray-500">Available amount for withdrawal</p>
+                    </div>
+                    <div class="text-2xl font-bold text-indigo-600">Rs {{ wallet_balance }}</div>
+                </div>
+            </div>
+            
+            <!-- Withdrawal Form -->
+            <form method="post" enctype="multipart/form-data" class="p-6 space-y-6">
+                {% csrf_token %}
+                
+                {% if messages %}
+                <div class="space-y-2">
+                    {% for message in messages %}
+                    <div class="p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 text-red-700{% else %}bg-green-50 text-green-700{% endif %}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <div>
+                    <label for="amount" class="block text-sm font-medium text-gray-700">Withdrawal Amount (Rs)</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">Rs</span>
+                        </div>
+                        <input type="number" name="amount" id="amount" step="0.01" min="0.01" max="{{ wallet_balance }}" required
+                            class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                            placeholder="0.00">
+                    </div>
+                    <p class="mt-1 text-sm text-gray-500">Enter an amount up to your available balance</p>
+                </div>
+                
+                <div>
+                    <label for="proof_image" class="block text-sm font-medium text-gray-700">
+                        Proof Image / QR Code (Optional)
+                    </label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                        <div class="space-y-1 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" 
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <div class="flex text-sm text-gray-600">
+                                <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                    <span>Upload a file</span>
+                                    <input id="file-upload" name="proof_image" type="file" class="sr-only" accept="image/*">
+                                </label>
+                                <p class="pl-1">or drag and drop</p>
+                            </div>
+                            <p class="text-xs text-gray-500">
+                                PNG, JPG, GIF up to 10MB
+                            </p>
+                        </div>
+                    </div>
+                    <p class="mt-1 text-sm text-gray-500">Upload a screenshot or QR code for payment</p>
+                </div>
+                
+                <div>
+                    <label for="notes" class="block text-sm font-medium text-gray-700">Notes (Optional)</label>
+                    <div class="mt-1">
+                        <textarea id="notes" name="notes" rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                            placeholder="Add any additional information here..."></textarea>
+                    </div>
+                    <p class="mt-1 text-sm text-gray-500">Any additional details about your withdrawal request</p>
+                </div>
+                
+                <div class="pt-4 flex items-center justify-between">
+                    <a href="{% url 'withdrawal_history' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Back to History
+                    </a>
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Submit Withdrawal Request
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Important Information -->
+        <div class="mt-6 bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="px-6 py-4 bg-yellow-50 border-b border-yellow-100">
+                <h2 class="text-lg font-medium text-yellow-800 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Important Information
+                </h2>
+            </div>
+            <div class="p-6 space-y-4 text-sm text-gray-600">
+                <p>• Withdrawal requests are typically processed within 1-3 business days.</p>
+                <p>• You must upload a QR code or screenshot for payment information.</p>
+                <p>• The minimum withdrawal amount is Rs 10.00.</p>
+                <p>• Funds will be reduced from your wallet balance once your withdrawal is approved.</p>
+                <p>• You will receive a notification once your withdrawal request has been processed.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Preview uploaded image
+    document.getElementById('file-upload').addEventListener('change', function(e) {
+        const fileUpload = e.target;
+        const uploadParent = fileUpload.closest('.flex.text-sm');
+        
+        // Remove existing preview if any
+        const existingPreview = document.getElementById('image-preview');
+        if (existingPreview) {
+            existingPreview.remove();
+        }
+        
+        if (fileUpload.files && fileUpload.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const preview = document.createElement('div');
+                preview.id = 'image-preview';
+                preview.className = 'mt-3';
+                preview.innerHTML = `
+                    <p class="text-xs text-gray-500 mb-1">Preview:</p>
+                    <img src="${e.target.result}" class="h-32 w-auto mx-auto object-contain border rounded-md">
+                `;
+                
+                uploadParent.parentNode.after(preview);
+            }
+            
+            reader.readAsDataURL(fileUpload.files[0]);
+        }
+    });
+</script>
+{% endblock %} 

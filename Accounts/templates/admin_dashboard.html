@@ -1,0 +1,3102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | E-commerce Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .dark .glass-effect {
+            background: rgba(17, 24, 39, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .gradient-border {
+            position: relative;
+        }
+        
+        .gradient-border::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .grid-pattern {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .dark .grid-pattern {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        }
+        
+        .glow {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+        
+        .dark .glow {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background-color: #EF4444;
+            border-radius: 50%;
+        }
+        
+        .table-hover tr:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .dark .table-hover tr:hover {
+            background-color: rgba(59, 130, 246, 0.2);
+        }
+        
+        /* Animation for page transitions */
+        .page-transition {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .page-enter {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        
+        .page-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dark .modal-content {
+            background-color: #1F2937;
+            color: #F9FAFB;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+        
+        .dark .close:hover,
+        .dark .close:focus {
+            color: white;
+        }
+        
+        /* Form styles */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.375rem;
+            background-color: white;
+        }
+        
+        .dark .form-input {
+            background-color: #374151;
+            border-color: #4B5563;
+            color: white;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+    </style>
+</head>
+{% if messages %}
+            <div class="fixed top-4 right-4 z-50 w-full max-w-md">
+                {% for message in messages %}
+                    <div class="bg-white border-l-4 border-indigo-500 text-indigo-700 p-4 mb-3 rounded-lg shadow-lg animate-fade-in-down flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <span>{{ message }}</span>
+                        <button class="ml-auto text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="hidden md:flex md:flex-col w-64 bg-white dark:bg-gray-800 shadow-lg z-10">
+            <div class="flex items-center justify-center h-16 border-b border-gray-200 dark:border-gray-700">
+                <h1 class="text-xl font-bold gradient-text">Agro-Nepal Admin</h1>
+            </div>
+            
+            <div class="flex flex-col justify-between flex-1 overflow-y-auto scrollbar-hide">
+                <nav class="px-2 py-4 space-y-1">
+                    <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-lg" data-page="dashboard">
+                        <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    
+                    <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="users">
+                        <i class="fas fa-users w-5 h-5 mr-3"></i>
+                        <span>Users & Profiles</span>
+                    </a>
+                    
+                    <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="referrals">
+                        <i class="fas fa-share-alt w-5 h-5 mr-3"></i>
+                        <span>Referrals</span>
+                    </a>
+                    
+                    <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="categories">
+                        <i class="fas fa-tags w-5 h-5 mr-3"></i>
+                        <span>Categories</span>
+                    </a>
+                    
+                    <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="products">
+                        <i class="fas fa-box w-5 h-5 mr-3"></i>
+                        <span>Products</span>
+                    </a>
+                    
+                    <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="orders">
+                        <i class="fas fa-shopping-cart w-5 h-5 mr-3"></i>
+                        <span>Orders</span>
+                        <span class="ml-auto bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">{{ pending_orders_count }}</span>
+                    </a>
+                    
+                    <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="reviews">
+                        <i class="fas fa-star w-5 h-5 mr-3"></i>
+                        <span>Reviews</span>
+                    </a>
+                    
+                    <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="chat">
+                        <i class="fas fa-comments w-5 h-5 mr-3"></i>
+                        <span>Chat Messages</span>
+                    </a>
+                    
+                    <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="deals">
+                        <i class="fas fa-percentage w-5 h-5 mr-3"></i>
+                        <span>Deals</span>
+                    </a>
+                    
+                    <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="carts">
+                        <i class="fas fa-shopping-basket w-5 h-5 mr-3"></i>
+                        <span>Shopping Carts</span>
+                    </a>
+                    
+                    <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="analytics">
+                        <i class="fas fa-chart-bar w-5 h-5 mr-3"></i>
+                        <span>Analytics</span>
+                    </a>
+                    
+                    <div class="relative group">
+                        <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+                            <i class="fas fa-wallet w-5 h-5 mr-3"></i>
+                            <span>Withdrawals</span>
+                            {% if pending_withdrawals > 0 %}
+                            <span class="ml-auto bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">{{ pending_withdrawals }}</span>
+                            {% endif %}
+                            <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                        </a>
+                        <div class="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white z-10 hidden group-hover:block">
+                            <div class="py-1">
+                                <a href="{% url 'admin_withdrawals' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-hourglass-half w-5 h-5 mr-2 text-yellow-500"></i>
+                                    <span>Pending Requests</span>
+                                    {% if pending_withdrawals > 0 %}
+                                    <span class="ml-auto bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">{{ pending_withdrawals }}</span>
+                                    {% endif %}
+                                </a>
+                                <a href="{% url 'admin_withdrawal_history' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-history w-5 h-5 mr-2 text-blue-500"></i>
+                                    <span>Withdrawal History</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+                
+                <div class="p-4">
+                    <div class="glass-effect p-4 rounded-lg">
+                        <div class="flex items-center">
+                            {% if user.profile.profile_picture %}
+                                <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.username }}" class="w-10 h-10 rounded-full mr-3">
+                            {% else %}
+                                <img src="{% static 'img/avatar.jpg' %}" alt="{{ user.username }}" class="w-10 h-10 rounded-full mr-3">
+                            {% endif %}
+                            <div>
+                                <p class="text-sm font-medium">{{ user.get_full_name|default:user.username }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ user.email }}</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex space-x-2">
+                            <a href="{% url 'profile' %}" class="flex-1 px-3 py-1 text-xs bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-center">Profile</a>
+                            <a href="{% url 'logout_attempt' %}" class="flex-1 px-3 py-1 text-xs bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-center">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Mobile sidebar toggle -->
+        <div class="md:hidden fixed bottom-4 right-4 z-20">
+            <button id="sidebar-toggle" class="p-3 bg-blue-600 text-white rounded-full shadow-lg">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile sidebar -->
+        <div id="mobile-sidebar" class="fixed inset-0 z-10 transform -translate-x-full transition-transform duration-300 md:hidden">
+            <div class="absolute inset-0 bg-gray-900 opacity-50"></div>
+            <div class="absolute inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 shadow-lg">
+                <!-- Mobile sidebar content (same as desktop) -->
+                <div class="flex items-center justify-between h-16 border-b border-gray-200 dark:border-gray-700 px-4">
+                    <h1 class="text-xl font-bold gradient-text">E-Commerce Admin</h1>
+                    <button id="close-sidebar" class="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="overflow-y-auto h-full">
+                    <nav class="px-2 py-4 space-y-1">
+                        <!-- Same navigation items as desktop -->
+                        <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-lg" data-page="dashboard">
+                            <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        
+                        <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="users">
+                            <i class="fas fa-users w-5 h-5 mr-3"></i>
+                            <span>Users & Profiles</span>
+                        </a>
+                        
+                        <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="referrals">
+                            <i class="fas fa-share-alt w-5 h-5 mr-3"></i>
+                            <span>Referrals</span>
+                        </a>
+                        
+                        <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="categories">
+                            <i class="fas fa-tags w-5 h-5 mr-3"></i>
+                            <span>Categories</span>
+                        </a>
+                        
+                        <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="products">
+                            <i class="fas fa-box w-5 h-5 mr-3"></i>
+                            <span>Products</span>
+                        </a>
+                        
+                        <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="orders">
+                            <i class="fas fa-shopping-cart w-5 h-5 mr-3"></i>
+                            <span>Orders</span>
+                            <span class="ml-auto bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">{{ pending_orders_count }}</span>
+                        </a>
+                        
+                        <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="reviews">
+                            <i class="fas fa-star w-5 h-5 mr-3"></i>
+                            <span>Reviews</span>
+                        </a>
+                        
+                        <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="chat">
+                            <i class="fas fa-comments w-5 h-5 mr-3"></i>
+                            <span>Chat Messages</span>
+                        </a>
+                        
+                        <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="deals">
+                            <i class="fas fa-percentage w-5 h-5 mr-3"></i>
+                            <span>Deals</span>
+                        </a>
+                        
+                        <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" data-page="carts">
+                            <i class="fas fa-shopping-basket w-5 h-5 mr-3"></i>
+                            <span>Shopping Carts</span>
+                        </a>
+                        
+                        <div class="relative group">
+                            <a href="#" class="nav-link flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+                                <i class="fas fa-wallet w-5 h-5 mr-3"></i>
+                                <span>Withdrawals</span>
+                                {% if pending_withdrawals > 0 %}
+                                <span class="ml-auto bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">{{ pending_withdrawals }}</span>
+                                {% endif %}
+                            </a>
+                            <div class="py-1 pl-10">
+                                <a href="{% url 'admin_withdrawals' %}" class="block py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-hourglass-half mr-2 text-yellow-500"></i>
+                                    Pending Requests
+                                    {% if pending_withdrawals > 0 %}
+                                    <span class="ml-2 bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">{{ pending_withdrawals }}</span>
+                                    {% endif %}
+                                </a>
+                                <a href="{% url 'admin_withdrawal_history' %}" class="block py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-history mr-2 text-blue-500"></i>
+                                    Withdrawal History
+                                </a>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main content -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 grid-pattern">
+            <!-- Top navigation -->
+            <div class="sticky top-0 z-10 bg-white dark:bg-gray-800 shadow-sm">
+                <div class="flex items-center justify-between h-16 px-4 md:px-6 lg:px-8">
+                    <div class="flex items-center">
+                        <button class="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white md:hidden">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h2 class="ml-4 text-xl font-semibold" id="page-title">Dashboard</h2>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <button id="theme-toggle" class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">
+                            <i class="fas fa-moon dark:hidden"></i>
+                            <i class="fas fa-sun hidden dark:block"></i>
+                        </button>
+                        
+                        <div class="relative">
+                            <button class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">
+                                <i class="fas fa-bell"></i>
+                                {% if notifications_count > 0 %}
+                                <span class="notification-dot"></span>
+                                {% endif %}
+                            </button>
+                        </div>
+                        
+                        <div class="relative">
+                            <button class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">
+                                <i class="fas fa-envelope"></i>
+                                {% if unread_messages_count > 0 %}
+                                <span class="notification-dot"></span>
+                                {% endif %}
+                            </button>
+                        </div>
+                        
+                        <div class="relative">
+                            <a href="{% url 'profile' %}">
+                            <button class="flex items-center text-sm focus:outline-none">
+                                {% if user.profile.profile_picture %}
+                                    <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.username }}" class="w-8 h-8 rounded-full">
+                                {% else %}
+                                    <img src="{% static 'img/avatar.jpg' %}" alt="{{ user.username }}" class="w-8 h-8 rounded-full">
+                                {% endif %}
+                                <span class="ml-2 hidden md:block">{{ user.get_full_name|default:user.username }}</span>
+                                <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                            </button>
+                        </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Breadcrumbs -->
+                <div class="px-4 md:px-6 lg:px-8 py-2 bg-gray-100 dark:bg-gray-700 text-xs">
+                    <div class="flex items-center space-x-2">
+                        <a href="{% url 'admin_dashboard' %}" class="text-blue-600 dark:text-blue-400 hover:underline">Home</a>
+                        <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500"></i>
+                        <span class="text-gray-600 dark:text-gray-300" id="breadcrumb-current">Dashboard</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Page content container -->
+            <div class="page-container">
+                <!-- Dashboard content -->
+                <div id="dashboard-page" class="page-content px-4 md:px-6 lg:px-8 py-6">
+                    <!-- Stats cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 gradient-border">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Users</p>
+                                    <p class="text-2xl font-bold">{{ users_count }}</p>
+                                    <p class="text-xs {% if users_growth > 0 %}text-green-500{% else %}text-red-500{% endif %} mt-1">
+                                        <i class="fas fa-arrow-{% if users_growth > 0 %}up{% else %}down{% endif %} mr-1"></i>
+                                        <span>{{ users_growth_percent }}% from last month</span>
+                                    </p>
+                                </div>
+                                <div class="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
+                                    <i class="fas fa-users text-blue-600 dark:text-blue-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 gradient-border">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Products</p>
+                                    <p class="text-2xl font-bold">{{ products_count }}</p>
+                                    <p class="text-xs {% if products_growth > 0 %}text-green-500{% else %}text-red-500{% endif %} mt-1">
+                                        <i class="fas fa-arrow-{% if products_growth > 0 %}up{% else %}down{% endif %} mr-1"></i>
+                                        <span>{{ products_growth_percent }}% from last month</span>
+                                    </p>
+                                </div>
+                                <div class="p-3 bg-purple-100 dark:bg-purple-900 rounded-full">
+                                    <i class="fas fa-box text-purple-600 dark:text-purple-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 gradient-border">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Orders</p>
+                                    <p class="text-2xl font-bold">{{ orders_count }}</p>
+                                    <p class="text-xs {% if orders_growth > 0 %}text-green-500{% else %}text-red-500{% endif %} mt-1">
+                                        <i class="fas fa-arrow-{% if orders_growth > 0 %}up{% else %}down{% endif %} mr-1"></i>
+                                        <span>{{ orders_growth_percent }}% from last month</span>
+                                    </p>
+                                </div>
+                                <div class="p-3 bg-green-100 dark:bg-green-900 rounded-full">
+                                    <i class="fas fa-shopping-cart text-green-600 dark:text-green-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 gradient-border">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Revenue</p>
+                                    <p class="text-2xl font-bold">Rs {{ total_revenue|floatformat:0 }}</p>
+                                    <p class="text-xs {% if revenue_growth > 0 %}text-green-500{% else %}text-red-500{% endif %} mt-1">
+                                        <i class="fas fa-arrow-{% if revenue_growth > 0 %}up{% else %}down{% endif %} mr-1"></i>
+                                        <span>{{ revenue_growth_percent }}% from last month</span>
+                                    </p>
+                                </div>
+                                <div class="p-3 bg-pink-100 dark:bg-pink-900 rounded-full">
+                                    <i class="fas fa-dollar-sign text-pink-600 dark:text-pink-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Charts -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold">Sales Overview</h3>
+                                <div class="flex space-x-2">
+                                    <button class="px-3 py-1 text-xs bg-blue-600 text-white rounded-md">Monthly</button>
+                                    <button class="px-3 py-1 text-xs bg-gray-200 dark:bg-gray-700 rounded-md">Weekly</button>
+                                    <button class="px-3 py-1 text-xs bg-gray-200 dark:bg-gray-700 rounded-md">Daily</button>
+                                </div>
+                            </div>
+                            <div class="h-80">
+                                <canvas id="salesChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold">Top Categories</h3>
+                                <a href="{% url 'admin_categories' %}" class="px-3 py-1 text-xs bg-gray-200 dark:bg-gray-700 rounded-md">View All</a>
+                            </div>
+                            <div class="h-80">
+                                <canvas id="categoriesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent orders and top products -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <!-- Recent orders -->
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                                <h3 class="text-lg font-semibold">Recent Orders</h3>
+                                <a href="{% url 'admin_orders' %}" class="px-3 py-1 text-xs bg-blue-600 text-white rounded-md">View All</a>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full table-hover">
+                                    <thead>
+                                        <tr class="text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                            <th class="px-6 py-3">Order ID</th>
+                                            <th class="px-6 py-3">Customer</th>
+                                            <th class="px-6 py-3">Product</th>
+                                            <th class="px-6 py-3">Amount</th>
+                                            <th class="px-6 py-3">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        {% for order in recent_orders %}
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">#{{ order.id }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ order.customer_name }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ order.product.name }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">Rs {{ order.total_price }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                {% if order.status == 'Delivered' %}
+                                                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Delivered</span>
+                                                {% elif order.status == 'Shipped' %}
+                                                <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">Shipped</span>
+                                                {% elif order.status == 'Pending' %}
+                                                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">Pending</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Top products -->
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                                <h3 class="text-lg font-semibold">Top Products</h3>
+                                <a href="{% url 'admin_products' %}" class="px-3 py-1 text-xs bg-blue-600 text-white rounded-md">View All</a>
+                            </div>
+                            <div class="p-6">
+                                <div class="space-y-4">
+                                    {% for product in top_products %}
+                                    <div class="flex items-center">
+                                        {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-12 h-12 rounded-lg object-cover mr-4">
+                                        {% else %}
+                                        <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}" class="w-12 h-12 rounded-lg object-cover mr-4">
+                                        {% endif %}
+                                        <div class="flex-1">
+                                            <h4 class="text-sm font-medium">{{ product.name }}</h4>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ product.category.name }}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-sm font-medium">Rs {{ product.price }}</p>
+                                            <p class="text-xs text-green-500">{{ product.sold }} sold</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Users & Profiles Page -->
+                <div id="users-page" class="page-content px-4 md:px-6 lg:px-8 py-6 hidden">
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold">Users & Profiles</h3>
+                            <div class="flex space-x-2">
+                                <button id="add-user-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-plus mr-2"></i> Add User
+                                </button>
+                                <form method="get" action="{% url 'admin_users' %}" class="relative">
+                                    <input type="text" name="search" placeholder="Search users..." class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button type="submit" class="absolute right-3 top-3 text-gray-400">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full table-hover">
+                                    <thead>
+                                        <tr class="text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-700">
+                                            <th class="px-6 py-3">User</th>
+                                            <th class="px-6 py-3">Email</th>
+                                            <th class="px-6 py-3">Referral Code</th>
+                                            <th class="px-6 py-3">Points</th>
+                                            <th class="px-6 py-3">Wallet Balance</th>
+                                            <th class="px-6 py-3">Status</th>
+                                            <th class="px-6 py-3">Joined</th>
+                                            <th class="px-6 py-3">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        {% for profile in profiles %}
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    {% if profile.profile_picture %}
+                                                    <img src="{{ profile.profile_picture.url }}" alt="{{ profile.user.username }}" class="w-10 h-10 rounded-full mr-3">
+                                                    {% else %}
+                                                    <img src="{% static 'img/user-placeholder.jpg' %}" alt="{{ profile.user.username }}" class="w-10 h-10 rounded-full mr-3">
+                                                    {% endif %}
+                                                    <div>
+                                                        <p class="text-sm font-medium">{{ profile.user.get_full_name|default:profile.user.username }}</p>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">@{{ profile.user.username }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ profile.user.email }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ profile.referral_code }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ profile.points }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">Rs {{ profile.wallet_balance }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                {% if profile.is_verified %}
+                                                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Verified</span>
+                                                {% else %}
+                                                <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">Pending</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ profile.created_at|date:"M d, Y" }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 edit-user-btn" data-id="{{ profile.user.id }}">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 delete-user-btn" data-id="{{ profile.user.id }}">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        Showing <span class="font-medium">{{ profiles.start_index }}</span> to <span class="font-medium">{{ profiles.end_index }}</span> of <span class="font-medium">{{ profiles.paginator.count }}</span> results
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        {% if profiles.has_previous %}
+                                        <a href="?page={{ profiles.previous_page_number }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">Previous</a>
+                                        {% else %}
+                                        <span class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md opacity-50 cursor-not-allowed">Previous</span>
+                                        {% endif %}
+                                        
+                                        {% for i in profiles.paginator.page_range %}
+                                            {% if profiles.number == i %}
+                                            <span class="px-3 py-1 text-sm bg-blue-600 text-white rounded-md">{{ i }}</span>
+                                            {% else %}
+                                            <a href="?page={{ i }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">{{ i }}</a>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {% if profiles.has_next %}
+                                        <a href="?page={{ profiles.next_page_number }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">Next</a>
+                                        {% else %}
+                                        <span class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md opacity-50 cursor-not-allowed">Next</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- Referrals Page -->
+                 <div id="referrals-page" class="page-content px-4 md:px-6 lg:px-8 py-6 hidden">
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold">Referrals</h3>
+                            <div class="flex space-x-2">
+                                <form method="get" action="{% url 'admin_referrals' %}" class="relative">
+                                    <input type="text" name="search" placeholder="Search referrals..." class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button type="submit" class="absolute right-3 top-3 text-gray-400">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full table-hover">
+                                    <thead>
+                                        <tr class="text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-700">
+                                            <th class="px-6 py-3">Referrer</th>
+                                            <th class="px-6 py-3">Referred User</th>
+                                            <th class="px-6 py-3">Date</th>
+                                            <th class="px-6 py-3">Status</th>
+                                            <th class="px-6 py-3">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        {% for referral in referrals %}
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    {% if referral.referrer.profile.profile_picture %}
+                                                    <img src="{{ referral.referrer.profile.profile_picture.url }}" alt="{{ referral.referrer.username }}" class="w-10 h-10 rounded-full mr-3">
+                                                    {% else %}
+                                                    <img src="{% static 'img/user-placeholder.jpg' %}" alt="{{ referral.referrer.username }}" class="w-10 h-10 rounded-full mr-3">
+                                                    {% endif %}
+                                                    <div>
+                                                        <p class="text-sm font-medium">{{ referral.referrer.get_full_name|default:referral.referrer.username }}</p>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">@{{ referral.referrer.username }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    {% if referral.referred.profile.profile_picture %}
+                                                    <img src="{{ referral.referred.profile.profile_picture.url }}" alt="{{ referral.referred.username }}" class="w-10 h-10 rounded-full mr-3">
+                                                    {% else %}
+                                                    <img src="{% static 'img/user-placeholder.jpg' %}" alt="{{ referral.referred.username }}" class="w-10 h-10 rounded-full mr-3">
+                                                    {% endif %}
+                                                    <div>
+                                                        <p class="text-sm font-medium">{{ referral.referred.get_full_name|default:referral.referred.username }}</p>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">@{{ referral.referred.username }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ referral.created_at|date:"M d, Y" }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                {% if referral.is_successful %}
+                                                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Successful</span>
+                                                {% else %}
+                                                <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">Pending</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <div class="flex space-x-2">
+                                                    <a href="{% url 'admin_view_referral' referral.id %}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        Showing <span class="font-medium">{{ referrals.start_index }}</span> to <span class="font-medium">{{ referrals.end_index }}</span> of <span class="font-medium">{{ referrals.paginator.count }}</span> results
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        {% if referrals.has_previous %}
+                                        <a href="?page={{ referrals.previous_page_number }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">Previous</a>
+                                        {% else %}
+                                        <span class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md opacity-50 cursor-not-allowed">Previous</span>
+                                        {% endif %}
+                                        
+                                        {% for i in referrals.paginator.page_range %}
+                                            {% if referrals.number == i %}
+                                            <span class="px-3 py-1 text-sm bg-blue-600 text-white rounded-md">{{ i }}</span>
+                                            {% else %}
+                                            <a href="?page={{ i }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">{{ i }}</a>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {% if referrals.has_next %}
+                                        <a href="?page={{ referrals.next_page_number }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">Next</a>
+                                        {% else %}
+                                        <span class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md opacity-50 cursor-not-allowed">Next</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Categories Page -->
+                <div id="categories-page" class="page-content px-4 md:px-6 lg:px-8 py-6 hidden">
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold">Categories</h3>
+                            <div class="flex space-x-2">
+                                <button id="add-category-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-plus mr-2"></i> Add Category
+                                </button>
+                                <form method="get" action="{% url 'admin_categories' %}" class="relative">
+                                    <input type="text" name="search" placeholder="Search categories..." class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button type="submit" class="absolute right-3 top-3 text-gray-400">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full table-hover">
+                                    <thead>
+                                        <tr class="text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-700">
+                                            <th class="px-6 py-3">Category</th>
+                                            <th class="px-6 py-3">Description</th>
+                                            <th class="px-6 py-3">Products</th>
+                                            <th class="px-6 py-3">Created</th>
+                                            <th class="px-6 py-3">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        {% for category in categorys %}
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    {% if category.image %}
+                                                    <img src="{{ category.image.url }}" alt="{{ category.name }}" class="w-10 h-10 rounded-lg object-cover mr-3">
+                                                    {% else %}
+                                                    <img src="{% static 'img/category-placeholder.jpg' %}" alt="{{ category.name }}" class="w-10 h-10 rounded-lg object-cover mr-3">
+                                                    {% endif %}
+                                                    <div>
+                                                        <p class="text-sm font-medium">{{ category.name }}</p>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">ID: {{ category.id }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 text-sm">
+                                                <p class="truncate max-w-xs">{{ category.description|default:"No description"|truncatechars:100 }}</p>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ category.products.count }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ category.created_at|date:"M d, Y" }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 edit-category-btn" data-id="{{ category.id }}">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 delete-category-btn" data-id="{{ category.id }}">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        Showing <span class="font-medium">{{ categories.start_index }}</span> to <span class="font-medium">{{ categories.end_index }}</span> of <span class="font-medium">{{ categories.paginator.count }}</span> results
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        {% if categories.has_previous %}
+                                        <a href="?page={{ categories.previous_page_number }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">Previous</a>
+                                        {% else %}
+                                        <span class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md opacity-50 cursor-not-allowed">Previous</span>
+                                        {% endif %}
+                                        
+                                        {% for i in categories.paginator.page_range %}
+                                            {% if categories.number == i %}
+                                            <span class="px-3 py-1 text-sm bg-blue-600 text-white rounded-md">{{ i }}</span>
+                                            {% else %}
+                                            <a href="?page={{ i }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">{{ i }}</a>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {% if categories.has_next %}
+                                        <a href="?page={{ categories.next_page_number }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">Next</a>
+                                        {% else %}
+                                        <span class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md opacity-50 cursor-not-allowed">Next</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Page -->
+                <div id="products-page" class="page-content px-4 md:px-6 lg:px-8 py-6 hidden">
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold">Products</h3>
+                            <div class="flex space-x-2">
+                                <button id="add-product-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-plus mr-2"></i> Add Product
+                                </button>
+                                <form method="get" action="{% url 'admin_products' %}" class="relative">
+                                    <input type="text" name="search" placeholder="Search products..." class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button type="submit" class="absolute right-3 top-3 text-gray-400">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full table-hover">
+                                    <thead>
+                                        <tr class="text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-700">
+                                            <th class="px-6 py-3">Product</th>
+                                            <th class="px-6 py-3">Category</th>
+                                            <th class="px-6 py-3">Price</th>
+                                            <th class="px-6 py-3">Commission</th>
+                                            <th class="px-6 py-3">Stock</th>
+                                            <th class="px-6 py-3">Sold</th>
+                                            <th class="px-6 py-3">Status</th>
+                                            <th class="px-6 py-3">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        {% for product in products %}
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    {% if product.image %}
+                                                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-10 h-10 rounded-lg object-cover mr-3">
+                                                    {% else %}
+                                                    <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}" class="w-10 h-10 rounded-lg object-cover mr-3">
+                                                    {% endif %}
+                                                    <div>
+                                                        <p class="text-sm font-medium">{{ product.name }}</p>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">ID: {{ product.id }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ product.category.name }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">Rs {{ product.price }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">Rs {{ product.commission }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ product.stock }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ product.sold }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                {% if product.is_available %}
+                                                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Available</span>
+                                                {% else %}
+                                                <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">Unavailable</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 edit-product-btn" data-id="{{ product.id }}">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 delete-product-btn" data-id="{{ product.id }}">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Page --> 
+                <div id="orders-page" class="page-content px-4 md:px-6 lg:px-8 py-6">
+                    <!-- Remove the "hidden" class from the div above -->
+                    
+                    <!-- Debug information (remove after fixing) -->
+                    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
+                        <p>Debug Info:</p>
+                        <p>Total orders in database: {{ total_orders_count }}</p>
+                        <p>Orders on this page: {{ orders|length }}</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold">Orders</h3>
+                            <div class="flex space-x-2">
+                                <form method="get" action="{% url 'admin_orders' %}" class="flex space-x-2">
+                                    <div class="relative">
+                                        <input type="text" name="search" placeholder="Search orders..." class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <button type="submit" class="absolute right-3 top-3 text-gray-400">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                    <select name="status" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">All Status</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="Shipped">Shipped</option>
+                                        <option value="Delivered">Delivered</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full table-hover">
+                                    <thead>
+                                        <tr class="text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-700">
+                                            <th class="px-6 py-3">Order ID</th>
+                                            <th class="px-6 py-3">Customer</th>
+                                            <th class="px-6 py-3">Product</th>
+                                            <th class="px-6 py-3">Date</th>
+                                            <th class="px-6 py-3">Amount</th>
+                                            <th class="px-6 py-3">Status</th>
+                                            <th class="px-6 py-3">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        {% if orders %}
+                                            {% for order in orders %}
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">#{{ order.id }}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ order.customer_name }}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ order.product.name }}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ order.ordered_at|date:"M d, Y" }}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">Rs {{ order.total_price }}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                    <form method="post" action="{% url 'update_order_status' order.id %}" class="status-update-form">
+                                                        {% csrf_token %}
+                                                        <select name="status" class="status-select px-2 py-1 text-xs rounded-full border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none 
+                                                            {% if order.status == 'Delivered' %} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                                                            {% elif order.status == 'Shipped' %} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
+                                                            {% elif order.status == 'Pending' %} bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
+                                                            {% endif %}">
+                                                            <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                                            <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                                                            <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                                                        </select>
+                                                    </form>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                    <div class="flex space-x-2">
+                                                        <a href="{% url 'admin_view_order' order.id %}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a href="{% url 'admin_print_order' order.id %}" class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300">
+                                                            <i class="fas fa-print"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+                                                    No orders found. 
+                                                    {% if search_query or status_filter %}
+                                                        Try adjusting your search criteria.
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            {% if orders.paginator.count > 0 %}
+                            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        Showing <span class="font-medium">{{ orders.start_index }}</span> to <span class="font-medium">{{ orders.end_index }}</span> of <span class="font-medium">{{ orders.paginator.count }}</span> results
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        {% if orders.has_previous %}
+                                        <a href="?page={{ orders.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">Previous</a>
+                                        {% else %}
+                                        <span class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md opacity-50 cursor-not-allowed">Previous</span>
+                                        {% endif %}
+                                        
+                                        {% for i in orders.paginator.page_range %}
+                                            {% if orders.number == i %}
+                                            <span class="px-3 py-1 text-sm bg-blue-600 text-white rounded-md">{{ i }}</span>
+                                            {% else %}
+                                            <a href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">{{ i }}</a>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {% if orders.has_next %}
+                                        <a href="?page={{ orders.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">Next</a>
+                                        {% else %}
+                                        <span class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md opacity-50 cursor-not-allowed">Next</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+
+                <!-- Reviews Page -->
+                <div id="reviews-page" class="page-content px-4 md:px-6 lg:px-8 py-6 hidden">
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold">Product Reviews</h3>
+                            <div class="flex space-x-2">
+                                <form method="get" action="{% url 'admin_reviews' %}" class="flex space-x-2">
+                                    <div class="relative">
+                                        <input type="text" name="search" placeholder="Search reviews..." class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <button type="submit" class="absolute right-3 top-3 text-gray-400">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                    <select name="rating" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">All Ratings</option>
+                                        <option value="5">5 Stars</option>
+                                        <option value="4">4 Stars</option>
+                                        <option value="3">3 Stars</option>
+                                        <option value="2">2 Stars</option>
+                                        <option value="1">1 Star</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full table-hover">
+                                    <thead>
+                                        <tr class="text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-700">
+                                            <th class="px-6 py-3">Product</th>
+                                            <th class="px-6 py-3">User</th>
+                                            <th class="px-6 py-3">Rating</th>
+                                            <th class="px-6 py-3">Comment</th>
+                                            <th class="px-6 py-3">Date</th>
+                                            <th class="px-6 py-3">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        {% for review in reviews %}
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    {% if review.product.image %}
+                                                    <img src="{{ review.product.image.url }}" alt="{{ review.product.name }}" class="w-10 h-10 rounded-lg object-cover mr-3">
+                                                    {% else %}
+                                                    <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ review.product.name }}" class="w-10 h-10 rounded-lg object-cover mr-3">
+                                                    {% endif %}
+                                                    <p class="text-sm font-medium">{{ review.product.name }}</p>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ review.user_name }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <div class="flex text-yellow-400">
+                                                    {% for i in "12345"|make_list %}
+                                                        {% if forloop.counter <= review.rating %}
+                                                        <i class="fas fa-star"></i>
+                                                        {% else %}
+                                                        <i class="far fa-star"></i>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 text-sm max-w-xs truncate">{{ review.comment }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ review.created_at|date:"M d, Y" }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <div class="flex space-x-2">
+                                                    <a href="{% url 'admin_view_review' review.id %}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="{% url 'admin_delete_review' review.id %}" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300" onclick="return confirm('Are you sure you want to delete this review?');">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        Showing <span class="font-medium">{{ reviews.start_index }}</span> to <span class="font-medium">{{ reviews.end_index }}</span> of <span class="font-medium">{{ reviews.paginator.count }}</span> results
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        {% if reviews.has_previous %}
+                                        <a href="?page={{ reviews.previous_page_number }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">Previous</a>
+                                        {% else %}
+                                        <span class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md opacity-50 cursor-not-allowed">Previous</span>
+                                        {% endif %}
+                                        
+                                        {% for i in reviews.paginator.page_range %}
+                                            {% if reviews.number == i %}
+                                            <span class="px-3 py-1 text-sm bg-blue-600 text-white rounded-md">{{ i }}</span>
+                                            {% else %}
+                                            <a href="?page={{ i }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">{{ i }}</a>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {% if reviews.has_next %}
+                                        <a href="?page={{ reviews.next_page_number }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">Next</a>
+                                        {% else %}
+                                        <span class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md opacity-50 cursor-not-allowed">Next</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Chat Messages Page -->
+                <div id="chat-page" class="page-content px-4 md:px-6 lg:px-8 py-6 hidden">
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold">Chat Messages</h3>
+                            <form method="get" action="{% url 'admin_chat' %}" class="relative">
+                                <input type="text" name="search" placeholder="Search messages..." class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <button type="submit" class="absolute right-3 top-3 text-gray-400">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full table-hover">
+                                    <thead>
+                                        <tr class="text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-700">
+                                            <th class="px-6 py-3">User</th>
+                                            <th class="px-6 py-3">Message</th>
+                                            <th class="px-6 py-3">Timestamp</th>
+                                            <th class="px-6 py-3">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        {% for message in chat_messages %}
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    {% if message.user.profile.profile_picture %}
+                                                    <img src="{{ message.user.profile.profile_picture.url }}" alt="{{ message.user.username }}" class="w-10 h-10 rounded-full mr-3">
+                                                    {% else %}
+                                                    <img src="{% static 'img/user-placeholder.jpg' %}" alt="{{ message.user.username }}" class="w-10 h-10 rounded-full mr-3">
+                                                    {% endif %}
+                                                    <div>
+                                                        <p class="text-sm font-medium">{{ message.user.get_full_name|default:message.user.username }}</p>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">@{{ message.user.username }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 text-sm">
+                                                <p class="truncate max-w-xs">{{ message.message }}</p>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ message.timestamp|date:"M d, Y H:i" }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 view-message-btn" data-id="{{ message.id }}">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 delete-message-btn" data-id="{{ message.id }}">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        Showing <span class="font-medium">{{ chat_messages.start_index }}</span> to <span class="font-medium">{{ chat_messages.end_index }}</span> of <span class="font-medium">{{ chat_messages.paginator.count }}</span> results
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        {% if chat_messages.has_previous %}
+                                        <a href="?page={{ chat_messages.previous_page_number }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">Previous</a>
+                                        {% else %}
+                                        <span class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md opacity-50 cursor-not-allowed">Previous</span>
+                                        {% endif %}
+                                        
+                                        {% for i in chat_messages.paginator.page_range %}
+                                            {% if chat_messages.number == i %}
+                                            <span class="px-3 py-1 text-sm bg-blue-600 text-white rounded-md">{{ i }}</span>
+                                            {% else %}
+                                            <a href="?page={{ i }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">{{ i }}</a>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {% if chat_messages.has_next %}
+                                        <a href="?page={{ chat_messages.next_page_number }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">Next</a>
+                                        {% else %}
+                                        <span class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md opacity-50 cursor-not-allowed">Next</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deals Page -->
+                <div id="deals-page" class="page-content px-4 md:px-6 lg:px-8 py-6 hidden">
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold">Deals</h3>
+                            <div class="flex space-x-2">
+                                <button id="add-deal-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-plus mr-2"></i> Add Deal
+                                </button>
+                                <form method="get" action="{% url 'admin_deals' %}" class="relative">
+                                    <input type="text" name="search" placeholder="Search deals..." class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button type="submit" class="absolute right-3 top-3 text-gray-400">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full table-hover">
+                                    <thead>
+                                        <tr class="text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-700">
+                                            <th class="px-6 py-3">Deal</th>
+                                            <th class="px-6 py-3">Seller</th>
+                                            <th class="px-6 py-3">Price</th>
+                                            <th class="px-6 py-3">Discount Price</th>
+                                            <th class="px-6 py-3">Status</th>
+                                            <th class="px-6 py-3">Created</th>
+                                            <th class="px-6 py-3">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        {% for deal in deals %}
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    {% if deal.image %}
+                                                    <img src="{{ deal.image.url }}" alt="{{ deal.title }}" class="w-10 h-10 rounded-lg object-cover mr-3">
+                                                    {% else %}
+                                                    <img src="{% static 'img/deal-placeholder.jpg' %}" alt="{{ deal.title }}" class="w-10 h-10 rounded-lg object-cover mr-3">
+                                                    {% endif %}
+                                                    <div>
+                                                        <p class="text-sm font-medium">{{ deal.title }}</p>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-xs">{{ deal.description|truncatechars:50 }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ deal.seller.username }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">Rs {{ deal.price }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                {% if deal.discount_price %}
+                                                Rs {{ deal.discount_price }}
+                                                {% else %}
+                                                <span class="text-gray-400">N/A</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                {% if deal.is_active %}
+                                                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Active</span>
+                                                {% else %}
+                                                <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">Inactive</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ deal.created_at|date:"M d, Y" }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 edit-deal-btn" data-id="{{ deal.id }}">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 delete-deal-btn" data-id="{{ deal.id }}">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        Showing <span class="font-medium">{{ deals.start_index }}</span> to <span class="font-medium">{{ deals.end_index }}</span> of <span class="font-medium">{{ deals.paginator.count }}</span> results
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        {% if deals.has_previous %}
+                                        <a href="?page={{ deals.previous_page_number }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">Previous</a>
+                                        {% else %}
+                                        <span class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md opacity-50 cursor-not-allowed">Previous</span>
+                                        {% endif %}
+                                        
+                                        {% for i in deals.paginator.page_range %}
+                                            {% if deals.number == i %}
+                                            <span class="px-3 py-1 text-sm bg-blue-600 text-white rounded-md">{{ i }}</span>
+                                            {% else %}
+                                            <a href="?page={{ i }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">{{ i }}</a>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {% if deals.has_next %}
+                                        <a href="?page={{ deals.next_page_number }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">Next</a>
+                                        {% else %}
+                                        <span class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md opacity-50 cursor-not-allowed">Next</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shopping Carts Page -->
+                <div id="carts-page" class="page-content px-4 md:px-6 lg:px-8 py-6 hidden">
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold">Shopping Carts</h3>
+                            <form method="get" action="{% url 'admin_carts' %}" class="relative">
+                                <input type="text" name="search" placeholder="Search carts..." class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <button type="submit" class="absolute right-3 top-3 text-gray-400">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full table-hover">
+                                    <thead>
+                                        <tr class="text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-700">
+                                            <th class="px-6 py-3">User</th>
+                                            <th class="px-6 py-3">Product</th>
+                                            <th class="px-6 py-3">Quantity</th>
+                                            <th class="px-6 py-3">Total Price</th>
+                                            <th class="px-6 py-3">Added At</th>
+                                            <th class="px-6 py-3">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        {% for cart in carts %}
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    {% if cart.user.profile.profile_picture %}
+                                                    <img src="{{ cart.user.profile.profile_picture.url }}" alt="{{ cart.user.username }}" class="w-10 h-10 rounded-full mr-3">
+                                                    {% else %}
+                                                    <img src="{% static 'img/user-placeholder.jpg' %}" alt="{{ cart.user.username }}" class="w-10 h-10 rounded-full mr-3">
+                                                    {% endif %}
+                                                    <div>
+                                                        <p class="text-sm font-medium">{{ cart.user.get_full_name|default:cart.user.username }}</p>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">@{{ cart.user.username }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    {% if cart.product.image %}
+                                                    <img src="{{ cart.product.image.url }}" alt="{{ cart.product.name }}" class="w-10 h-10 rounded-lg object-cover mr-3">
+                                                    {% else %}
+                                                    <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ cart.product.name }}" class="w-10 h-10 rounded-lg object-cover mr-3">
+                                                    {% endif %}
+                                                    <div>
+                                                        <p class="text-sm font-medium">{{ cart.product.name }}</p>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Rs {{ cart.product.price }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ cart.quantity }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">Rs {{ cart.total_price }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ cart.added_at|date:"M d, Y H:i" }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <div class="flex space-x-2">
+                                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 view-cart-btn" data-id="{{ cart.id }}">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 delete-cart-btn" data-id="{{ cart.id }}">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        Showing <span class="font-medium">{{ carts.start_index }}</span> to <span class="font-medium">{{ carts.end_index }}</span> of <span class="font-medium">{{ carts.paginator.count }}</span> results
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        {% if carts.has_previous %}
+                                        <a href="?page={{ carts.previous_page_number }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">Previous</a>
+                                        {% else %}
+                                        <span class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md opacity-50 cursor-not-allowed">Previous</span>
+                                        {% endif %}
+                                        
+                                        {% for i in carts.paginator.page_range %}
+                                            {% if carts.number == i %}
+                                            <span class="px-3 py-1 text-sm bg-blue-600 text-white rounded-md">{{ i }}</span>
+                                            {% else %}
+                                            <a href="?page={{ i }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">{{ i }}</a>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {% if carts.has_next %}
+                                        <a href="?page={{ carts.next_page_number }}" class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md">Next</a>
+                                        {% else %}
+                                        <span class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded-md opacity-50 cursor-not-allowed">Next</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Page -->
+                <div id="analytics-page" class="page-content px-4 md:px-6 lg:px-8 py-6">
+                    <h3 class="text-xl font-semibold mb-6">Analytics Dashboard</h3>
+                    
+                    <!-- Key Metrics Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                            <h4 class="text-sm text-gray-500 dark:text-gray-400 mb-2">Total Revenue</h4>
+                            <div class="flex items-end">
+                                <span class="text-2xl font-bold">Rs {{ total_revenue }}</span>
+                                <span class="text-sm text-green-500 ml-2">+{{ revenue_growth }}%</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">vs previous period</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                            <h4 class="text-sm text-gray-500 dark:text-gray-400 mb-2">Orders</h4>
+                            <div class="flex items-end">
+                                <span class="text-2xl font-bold">{{ total_orders }}</span>
+                                <span class="text-sm text-green-500 ml-2">+{{ order_growth }}%</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">vs previous period</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                            <h4 class="text-sm text-gray-500 dark:text-gray-400 mb-2">Avg. Order Value</h4>
+                            <div class="flex items-end">
+                                <span class="text-2xl font-bold">Rs {{ avg_order_value }}</span>
+                                <span class="text-sm text-red-500 ml-2">{{ aov_growth }}%</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">vs previous period</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                            <h4 class="text-sm text-gray-500 dark:text-gray-400 mb-2">Customers</h4>
+                            <div class="flex items-end">
+                                <span class="text-2xl font-bold">{{ total_customers }}</span>
+                                <span class="text-sm text-green-500 ml-2">+{{ customer_growth }}%</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">vs previous period</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Sales Trends Chart -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="font-medium">Sales Trends</h4>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 text-xs bg-blue-600 text-white rounded-md">Daily</button>
+                                <button class="px-3 py-1 text-xs bg-gray-200 dark:bg-gray-600 rounded-md">Weekly</button>
+                                <button class="px-3 py-1 text-xs bg-gray-200 dark:bg-gray-600 rounded-md">Monthly</button>
+                            </div>
+                        </div>
+                        <div class="h-64">
+                            <!-- Canvas for chart -->
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Two Column Analytics -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <!-- Top Products -->
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                            <h4 class="font-medium mb-4">Top Products</h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                            <th class="px-4 py-2">Product</th>
+                                            <th class="px-4 py-2">Orders</th>
+                                            <th class="px-4 py-2">Revenue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        {% for product in top_products %}
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm">{{ product.name }}</td>
+                                            <td class="px-4 py-2 text-sm">{{ product.orders }}</td>
+                                            <td class="px-4 py-2 text-sm">Rs {{ product.revenue }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Order Status Distribution -->
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                            <h4 class="font-medium mb-4">Order Status</h4>
+                            <div class="h-64">
+                                <!-- Canvas for chart -->
+                                <canvas id="orderStatusChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Activity -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                        <h4 class="font-medium mb-4">Recent Activity</h4>
+                        <div class="space-y-4">
+                            {% for activity in recent_activities %}
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                    <i class="fas fa-{{ activity.icon }} text-gray-500"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium">{{ activity.message }}</p>
+                                    <p class="text-xs text-gray-500">{{ activity.timestamp|timesince }} ago</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Include Chart.js -->
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script>
+                    // Sales Chart
+                    const salesCtx = document.getElementById('salesChart').getContext('2d');
+                    const salesChart = new Chart(salesCtx, {
+                        type: 'line',
+                        data: {
+                            labels: {{ sales_dates|safe }},
+                            datasets: [{
+                                label: 'Sales',
+                                data: {{ sales_data|safe }},
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        display: true,
+                                        color: 'rgba(0, 0, 0, 0.05)'
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Order Status Chart
+                    const statusCtx = document.getElementById('orderStatusChart').getContext('2d');
+                    const statusChart = new Chart(statusCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Pending', 'Shipped', 'Delivered'],
+                            datasets: [{
+                                data: [{{ pending_count }}, {{ shipped_count }}, {{ delivered_count }}],
+                                backgroundColor: ['#3b82f6', '#f59e0b', '#10b981']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
+                                }
+                            }
+                        }
+                    });
+                </script>
+
+                <!-- Settings Page -->
+                <div id="settings-section" class="page-content px-4 md:px-6 lg:px-8 py-6">
+                    <h3 class="text-xl font-semibold mb-6">Account</h3>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                        <!-- Profile Option -->
+                        <a href="" class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                    <i class="fas fa-user text-gray-500"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Profile</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">View and edit your profile information</p>
+                                </div>
+                                <div class="ml-auto">
+                                    <i class="fas fa-chevron-right text-gray-400"></i>
+                                </div>
+                            </div>
+                        </a>
+                        
+                        
+                    </div>
+                </div>
+
+
+                
+
+                
+
+
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modals -->
+    <!-- Add User Modal -->
+    <div id="add-user-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Add New User</h2>
+            <form id="add-user-form" method="post" action="{% url 'admin_add_user' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" id="username" name="username" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" name="email" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" name="password" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="first_name" class="form-label">First Name</label>
+                    <input type="text" id="first_name" name="first_name" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="last_name" class="form-label">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="profile_picture" class="form-label">Profile Picture</label>
+                    <input type="file" id="profile_picture" name="profile_picture" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="bio" class="form-label">Bio</label>
+                    <textarea id="bio" name="bio" class="form-input" rows="3"></textarea>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button type="button" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md mr-2 cancel-btn">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md">Add User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Edit User Modal -->
+    <div id="edit-user-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Edit User</h2>
+            <form id="edit-user-form" method="post" action="" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="edit_username" class="form-label">Username</label>
+                    <input type="text" id="edit_username" name="username" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_email" class="form-label">Email</label>
+                    <input type="email" id="edit_email" name="email" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_first_name" class="form-label">First Name</label>
+                    <input type="text" id="edit_first_name" name="first_name" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="edit_last_name" class="form-label">Last Name</label>
+                    <input type="text" id="edit_last_name" name="last_name" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="edit_profile_picture" class="form-label">Profile Picture</label>
+                    <input type="file" id="edit_profile_picture" name="profile_picture" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="edit_bio" class="form-label">Bio</label>
+                    <textarea id="edit_bio" name="bio" class="form-input" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit_wallet_balance" class="form-label">Wallet Balance</label>
+                    <input type="number" id="edit_wallet_balance" name="wallet_balance" class="form-input" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="edit_points" class="form-label">Points</label>
+                    <input type="number" id="edit_points" name="points" class="form-input">
+                </div>
+                <div class="form-group">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="edit_is_verified" name="is_verified" class="mr-2">
+                        <label for="edit_is_verified" class="form-label mb-0">Verified</label>
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button type="button" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md mr-2 cancel-btn">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md">Update User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Delete User Confirmation Modal -->
+    <div id="delete-user-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Delete User</h2>
+            <p>Are you sure you want to delete this user? This action cannot be undone.</p>
+            <form id="delete-user-form" method="post" action="">
+                {% csrf_token %}
+                <div class="mt-4 flex justify-end">
+                    <button type="button" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md mr-2 cancel-btn">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md">Delete User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Add Product Modal -->
+    <div id="add-product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Add New Product</h2>
+            <form id="add-product-form" method="post" action="{% url 'admin_add_product' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="product_name" class="form-label">Product Name</label>
+                    <input type="text" id="product_name" name="name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="product_category" class="form-label">Category</label>
+                    <select id="product_category" name="category" class="form-input" required>
+                        {% for category in categorys %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="product_description" class="form-label">Description</label>
+                    <textarea id="product_description" name="description" class="form-input" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="product_price" class="form-label">Price</label>
+                    <input type="number" id="product_price" name="price" class="form-input" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="product_commission" class="form-label">Commission</label>
+                    <input type="number" id="product_commission" name="commission" class="form-input" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="product_stock" class="form-label">Stock</label>
+                    <input type="number" id="product_stock" name="stock" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="product_image" class="form-label">Product Image</label>
+                    <input type="file" id="product_image" name="image" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="product_is_available" name="is_available" class="mr-2" checked>
+                        <label for="product_is_available" class="form-label mb-0">Available</label>
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button type="button" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md mr-2 cancel-btn">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md">Add Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Edit Product Modal -->
+    <div id="edit-product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Edit Product</h2>
+            <form id="edit-product-form" method="post" action="" enctype="multipart/form-data">
+                {% csrf  method="post" action="" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="edit_product_name" class="form-label">Product Name</label>
+                    <input type="text" id="edit_product_name" name="name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_product_category" class="form-label">Category</label>
+                    <select id="edit_product_category" name="category" class="form-input" required>
+                        {% for category in categorys %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit_product_description" class="form-label">Description</label>
+                    <textarea id="edit_product_description" name="description" class="form-input" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit_product_price" class="form-label">Price</label>
+                    <input type="number" id="edit_product_price" name="price" class="form-input" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_product_commission" class="form-label">Commission</label>
+                    <input type="number" id="edit_product_commission" name="commission" class="form-input" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_product_stock" class="form-label">Stock</label>
+                    <input type="number" id="edit_product_stock" name="stock" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_product_image" class="form-label">Product Image</label>
+                    <input type="file" id="edit_product_image" name="image" class="form-input">
+                    <small class="text-gray-500 dark:text-gray-400">Leave empty to keep current image</small>
+                </div>
+                <div class="form-group">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="edit_product_is_available" name="is_available" class="mr-2">
+                        <label for="edit_product_is_available" class="form-label mb-0">Available</label>
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button type="button" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md mr-2 cancel-btn">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md">Update Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Delete Product Confirmation Modal -->
+    <div id="delete-product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Hello Delete Product</h2>
+            <p>Are you sure you want to delete this product? This action cannot be undone.</p>
+            <form id="delete-product-form" method="post" action="">
+                {% csrf_token %}
+                <div class="mt-4 flex justify-end">
+                    <button type="button" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md mr-2 cancel-btn">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md">Delete Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div id="add-category-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Add New Category</h2>
+            <form id="add-category-form" method="post" action="{% url 'admin_add_category' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="category_name" class="form-label">Category Name</label>
+                    <input type="text" id="category_name" name="name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="category_description" class="form-label">Description</label>
+                    <textarea id="category_description" name="description" class="form-input" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="category_image" class="form-label">Category Image</label>
+                    <input type="file" id="category_image" name="image" class="form-input">
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button type="button" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md mr-2 cancel-btn">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md">Add Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Category Modal -->
+    <div id="edit-category-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Edit Category</h2>
+            <form id="edit-category-form" method="post" action="" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="edit_category_name" class="form-label">Category Name</label>
+                    <input type="text" id="edit_category_name" name="name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_category_description" class="form-label">Description</label>
+                    <textarea id="edit_category_description" name="description" class="form-input" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit_category_image" class="form-label">Category Image</label>
+                    <input type="file" id="edit_category_image" name="image" class="form-input">
+                    <small class="text-gray-500 dark:text-gray-400">Leave empty to keep current image</small>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button type="button" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md mr-2 cancel-btn">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md">Update Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Category Confirmation Modal -->
+    <div id="delete-category-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Delete Category</h2>
+            <p>Are you sure you want to delete this category? This will also affect all products in this category.</p>
+            <form id="delete-category-form" method="post" action="">
+                {% csrf_token %}
+                <div class="mt-4 flex justify-end">
+                    <button type="button" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md mr-2 cancel-btn">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md">Delete Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Deal Modal -->
+    <div id="add-deal-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Add New Deal</h2>
+            <form id="add-deal-form" method="post" action="" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="deal_title" class="form-label">Deal Title</label>
+                    <input type="text" id="deal_title" name="title" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="deal_description" class="form-label">Description</label>
+                    <textarea id="deal_description" name="description" class="form-input" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="deal_price" class="form-label">Price</label>
+                    <input type="number" id="deal_price" name="price" class="form-input" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="deal_discount_price" class="form-label">Discount Price (Optional)</label>
+                    <input type="number" id="deal_discount_price" name="discount_price" class="form-input" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="deal_seller" class="form-label">Seller</label>
+                    <select id="deal_seller" name="seller" class="form-input" required>
+                        {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="deal_image" class="form-label">Deal Image</label>
+                    <input type="file" id="deal_image" name="image" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="deal_is_active" name="is_active" class="mr-2" checked>
+                        <label for="deal_is_active" class="form-label mb-0">Active</label>
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button type="button" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md mr-2 cancel-btn">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md">Add Deal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Deal Modal -->
+    <div id="edit-deal-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Edit Deal</h2>
+            <form id="edit-deal-form" method="post" action="" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="edit_deal_title" class="form-label">Deal Title</label>
+                    <input type="text" id="edit_deal_title" name="title" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_deal_description" class="form-label">Description</label>
+                    <textarea id="edit_deal_description" name="description" class="form-input" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit_deal_price" class="form-label">Price</label>
+                    <input type="number" id="edit_deal_price" name="price" class="form-input" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_deal_discount_price" class="form-label">Discount Price (Optional)</label>
+                    <input type="number" id="edit_deal_discount_price" name="discount_price" class="form-input" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="edit_deal_seller" class="form-label">Seller</label>
+                    <select id="edit_deal_seller" name="seller" class="form-input" required>
+                        {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit_deal_image" class="form-label">Deal Image</label>
+                    <input type="file" id="edit_deal_image" name="image" class="form-input">
+                    <small class="text-gray-500 dark:text-gray-400">Leave empty to keep current image</small>
+                </div>
+                <div class="form-group">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="edit_deal_is_active" name="is_active" class="mr-2">
+                        <label for="edit_deal_is_active" class="form-label mb-0">Active</label>
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button type="button" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md mr-2 cancel-btn">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md">Update Deal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Deal Confirmation Modal -->
+    <div id="delete-deal-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Delete Deal</h2>
+            <p>Are you sure you want to delete this deal? This action cannot be undone.</p>
+            <form id="delete-deal-form" method="post" action="">
+                {% csrf_token %}
+                <div class="mt-4 flex justify-end">
+                    <button type="button" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md mr-2 cancel-btn">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md">Delete Deal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Cart Modal -->
+    <div id="view-cart-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">View Cart Details</h2>
+            <div class="mb-4">
+                <div class="flex items-center mb-3">
+                    <div id="cart-user-avatar" class="w-10 h-10 rounded-full mr-3 bg-gray-200"></div>
+                    <div>
+                        <p id="cart-username" class="text-sm font-medium"></p>
+                        <p id="cart-added-at" class="text-xs text-gray-500 dark:text-gray-400"></p>
+                    </div>
+                </div>
+                <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                    <div class="flex items-center mb-3">
+                        <div id="cart-product-image" class="w-16 h-16 rounded-lg mr-3 bg-gray-200 object-cover"></div>
+                        <div>
+                            <p id="cart-product-name" class="text-sm font-medium"></p>
+                            <p id="cart-product-price" class="text-xs text-gray-500 dark:text-gray-400"></p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center mt-3">
+                        <p class="text-sm">Quantity: <span id="cart-quantity" class="font-medium"></span></p>
+                        <p class="text-sm">Total: <span id="cart-total" class="font-medium"></span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 flex justify-end">
+                <button type="button" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md mr-2 cancel-btn">Close</button>
+                <button id="delete-cart-confirm" class="px-4 py-2 bg-red-600 text-white rounded-md">Delete Cart</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Cart Confirmation Modal -->
+    <div id="delete-cart-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Delete Cart</h2>
+            <p>Are you sure you want to delete this cart? This action cannot be undone.</p>
+            <form id="delete-cart-form" method="post" action="">
+                {% csrf_token %}
+                <div class="mt-4 flex justify-end">
+                    <button type="button" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md mr-2 cancel-btn">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md">Delete Cart</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        
+        // Check for saved theme preference or use the system preference
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+        
+        // Toggle theme
+        themeToggle.addEventListener('click', function() {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+        
+        // Mobile sidebar toggle
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const closeSidebar = document.getElementById('close-sidebar');
+        const mobileSidebar = document.getElementById('mobile-sidebar');
+        
+        sidebarToggle.addEventListener('click', function() {
+            mobileSidebar.classList.remove('-translate-x-full');
+        });
+        
+        closeSidebar.addEventListener('click', function() {
+            mobileSidebar.classList.add('-translate-x-full');
+        });
+        
+        // Page navigation
+        const navLinks = document.querySelectorAll('.nav-link');
+        const pageContents = document.querySelectorAll('.page-content');
+        const pageTitle = document.getElementById('page-title');
+        const breadcrumbCurrent = document.getElementById('breadcrumb-current');
+        
+        // Set active page on load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Default to dashboard
+            setActivePage('dashboard');
+            
+            // Initialize charts
+            initCharts();
+            
+            // Initialize modals
+            initModals();
+        });
+        
+        // Handle navigation clicks
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const page = this.getAttribute('data-page');
+                setActivePage(page);
+            });
+        });
+        
+        function setActivePage(page) {
+            // Update active link
+            navLinks.forEach(link => {
+                const linkPage = link.getAttribute('data-page');
+                if (linkPage === page) {
+                    link.classList.add('text-white', 'bg-gradient-to-r', 'from-blue-600', 'to-indigo-600');
+                    link.classList.remove('text-gray-700', 'dark:text-gray-200', 'hover:bg-gray-100', 'dark:hover:bg-gray-700');
+                } else {
+                    link.classList.remove('text-white', 'bg-gradient-to-r', 'from-blue-600', 'to-indigo-600');
+                    link.classList.add('text-gray-700', 'dark:text-gray-200', 'hover:bg-gray-100', 'dark:hover:bg-gray-700');
+                }
+            });
+            
+            // Update page content
+            pageContents.forEach(content => {
+                const contentId = content.getAttribute('id');
+                if (contentId === `${page}-page`) {
+                    content.classList.remove('hidden');
+                    // Add animation
+                    content.classList.add('page-enter');
+                    setTimeout(() => {
+                        content.classList.add('page-enter-active');
+                    }, 10);
+                    setTimeout(() => {
+                        content.classList.remove('page-enter', 'page-enter-active');
+                    }, 300);
+                } else {
+                    content.classList.add('hidden');
+                }
+            });
+            
+            // Update page title and breadcrumb
+            const pageTitleText = page.charAt(0).toUpperCase() + page.slice(1);
+            pageTitle.textContent = pageTitleText;
+            breadcrumbCurrent.textContent = pageTitleText;
+            
+            // Close mobile sidebar if open
+            mobileSidebar.classList.add('-translate-x-full');
+        }
+        
+        // Charts
+        function initCharts() {
+            // Sales Chart
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            const salesChart = new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: {{ monthly_labels|safe|default:"['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']" }},
+                    datasets: [{
+                        label: 'Sales',
+                        data: {{ monthly_sales|safe|default:"[12, 19, 15, 17, 22, 24, 20, 25, 28, 30, 35, 40]" }},
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(156, 163, 175, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+            
+            // Categories Chart
+            const categoriesCtx = document.getElementById('categoriesChart').getContext('2d');
+            const categoriesChart = new Chart(categoriesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: {{ category_names|safe|default:"['Electronics', 'Clothing', 'Home & Kitchen', 'Books', 'Sports']" }},
+                    datasets: [{
+                        data: {{ category_sales|safe|default:"[35, 25, 20, 10, 10]" }},
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(139, 92, 246, 0.8)',
+                            'rgba(236, 72, 153, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(245, 158, 11, 0.8)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+            
+            // Update charts when theme changes
+            themeToggle.addEventListener('click', function() {
+                const isDark = html.classList.contains('dark');
+                
+                // Update Sales Chart
+                salesChart.options.scales.y.grid.color = isDark ? 'rgba(156, 163, 175, 0.1)' : 'rgba(156, 163, 175, 0.1)';
+                salesChart.update();
+                
+                // Update Categories Chart
+                categoriesChart.update();
+            });
+        }
+        
+        // Modal functionality
+        function initModals() {
+            // Get all modals
+            const modals = document.querySelectorAll('.modal');
+            const closeButtons = document.querySelectorAll('.close');
+            const cancelButtons = document.querySelectorAll('.cancel-btn');
+            
+            // Add User Modal
+            const addUserBtn = document.getElementById('add-user-btn');
+            const addUserModal = document.getElementById('add-user-modal');
+            
+            if (addUserBtn) {
+                addUserBtn.addEventListener('click', function() {
+                    addUserModal.style.display = 'block';
+                });
+            }
+            
+            // Edit User Modal
+            const editUserBtns = document.querySelectorAll('.edit-user-btn');
+            const editUserModal = document.getElementById('edit-user-modal');
+            const editUserForm = document.getElementById('edit-user-form');
+            
+            editUserBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-id');
+                    editUserForm.action = `/admin/edit-user/${userId}/`;
+                    
+                    // Here you would typically fetch user data and populate the form
+                    // For demonstration, we'll just show the modal
+                    editUserModal.style.display = 'block';
+                });
+            });
+            
+            // Delete User Modal
+            const deleteUserBtns = document.querySelectorAll('.delete-user-btn');
+            const deleteUserModal = document.getElementById('delete-user-modal');
+            const deleteUserForm = document.getElementById('delete-user-form');
+            
+            deleteUserBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-id');
+                    deleteUserForm.action = `/admin/delete-user/${userId}/`;
+                    deleteUserModal.style.display = 'block';
+                });
+            });
+            
+            // Add Product Modal
+            const addProductBtn = document.getElementById('add-product-btn');
+            const addProductModal = document.getElementById('add-product-modal');
+            
+            if (addProductBtn) {
+                addProductBtn.addEventListener('click', function() {
+                    addProductModal.style.display = 'block';
+                });
+            }
+            
+            // Edit Product Modal
+            const editProductBtns = document.querySelectorAll('.edit-product-btn');
+            const editProductModal = document.getElementById('edit-product-modal');
+            const editProductForm = document.getElementById('edit-product-form');
+            
+            editProductBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-id');
+                    editProductForm.action = `/admin/edit-product/${productId}/`;
+                    
+                    // Here you would typically fetch product data and populate the form
+                    // For demonstration, we'll just show the modal
+                    editProductModal.style.display = 'block';
+                });
+            });
+            
+            // Delete Product Modal
+            const deleteProductBtns = document.querySelectorAll('.delete-product-btn');
+            const deleteProductModal = document.getElementById('delete-product-modal');
+            const deleteProductForm = document.getElementById('delete-product-form');
+            
+            deleteProductBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-id');
+                    deleteProductForm.action = `/admin_dashboard/delete-product/${productId}/`;
+                    deleteProductModal.style.display = 'block';
+                });
+            });
+            
+            // Close modals
+            closeButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    modals.forEach(modal => {
+                        modal.style.display = 'none';
+                    });
+                });
+            });
+            
+            cancelButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    modals.forEach(modal => {
+                        modal.style.display = 'none';
+                    });
+                });
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                modals.forEach(modal => {
+                    if (event.target == modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        
+    </script>
+    <script>
+        // Category modal functionality
+        function initCategoryModals() {
+            // Add Category Modal
+            const addCategoryBtn = document.getElementById('add-category-btn');
+            const addCategoryModal = document.getElementById('add-category-modal');
+            
+            if (addCategoryBtn) {
+                addCategoryBtn.addEventListener('click', function() {
+                    addCategoryModal.style.display = 'block';
+                });
+            }
+            
+            // Edit Category Modal
+            const editCategoryBtns = document.querySelectorAll('.edit-category-btn');
+            const editCategoryModal = document.getElementById('edit-category-modal');
+            const editCategoryForm = document.getElementById('edit-category-form');
+            
+            editCategoryBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const categoryId = this.getAttribute('data-id');
+                    editCategoryForm.action = `/admin/edit-category/${categoryId}/`;
+                    
+                    // Here you would typically fetch category data and populate the form
+                    // For demonstration, we'll just show the modal
+                    editCategoryModal.style.display = 'block';
+                });
+            });
+            
+            // Delete Category Modal
+            const deleteCategoryBtns = document.querySelectorAll('.delete-category-btn');
+            const deleteCategoryModal = document.getElementById('delete-category-modal');
+            const deleteCategoryForm = document.getElementById('delete-category-form');
+            
+            deleteCategoryBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const categoryId = this.getAttribute('data-id');
+                    deleteCategoryForm.action = `/admin/delete-category/${categoryId}/`;
+                    deleteCategoryModal.style.display = 'block';
+                });
+            });
+        }
+        
+        // Call the category modal initialization function after the main initModals function
+        document.addEventListener('DOMContentLoaded', function() {
+            // The existing initialization code will run first
+            
+            // Then initialize our additional modals
+            initAdditionalModals();
+            initCategoryModals();
+        });
+    </script>
+    <script>
+        // Additional modal functionality for the new sections
+        function initAdditionalModals() {
+            // View Message Modal
+            const viewMessageBtns = document.querySelectorAll('.view-message-btn');
+            const viewMessageModal = document.getElementById('view-message-modal');
+            const deleteMessageConfirmBtn = document.getElementById('delete-message-confirm');
+            
+            viewMessageBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const messageId = this.getAttribute('data-id');
+                    
+                    // Here you would typically fetch message data and populate the modal
+                    // For demonstration, we'll just show the modal with placeholder data
+                    document.getElementById('message-username').textContent = 'Username';
+                    document.getElementById('message-timestamp').textContent = 'Timestamp';
+                    document.getElementById('message-content').textContent = 'Message content goes here...';
+                    
+                    // Set up delete confirmation button
+                    deleteMessageConfirmBtn.setAttribute('data-id', messageId);
+                    
+                    viewMessageModal.style.display = 'block';
+                });
+            });
+            
+            // Delete Message Modal
+            const deleteMessageBtns = document.querySelectorAll('.delete-message-btn');
+            const deleteMessageModal = document.getElementById('delete-message-modal');
+            const deleteMessageForm = document.getElementById('delete-message-form');
+            
+            deleteMessageBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const messageId = this.getAttribute('data-id');
+                    deleteMessageForm.action = `/admin/delete-message/${messageId}/`;
+                    deleteMessageModal.style.display = 'block';
+                });
+            });
+            
+            // Delete Message from View Modal
+            if (deleteMessageConfirmBtn) {
+                deleteMessageConfirmBtn.addEventListener('click', function() {
+                    const messageId = this.getAttribute('data-id');
+                    deleteMessageForm.action = `/admin/delete-message/${messageId}/`;
+                    viewMessageModal.style.display = 'none';
+                    deleteMessageModal.style.display = 'block';
+                });
+            }
+            
+            // Add Deal Modal
+            const addDealBtn = document.getElementById('add-deal-btn');
+            const addDealModal = document.getElementById('add-deal-modal');
+            
+            if (addDealBtn) {
+                addDealBtn.addEventListener('click', function() {
+                    addDealModal.style.display = 'block';
+                });
+            }
+            
+            // Edit Deal Modal
+            const editDealBtns = document.querySelectorAll('.edit-deal-btn');
+            const editDealModal = document.getElementById('edit-deal-modal');
+            const editDealForm = document.getElementById('edit-deal-form');
+            
+            editDealBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const dealId = this.getAttribute('data-id');
+                    editDealForm.action = `/admin/edit-deal/${dealId}/`;
+                    
+                    // Here you would typically fetch deal data and populate the form
+                    // For demonstration, we'll just show the modal
+                    editDealModal.style.display = 'block';
+                });
+            });
+            
+            // Delete Deal Modal
+            const deleteDealBtns = document.querySelectorAll('.delete-deal-btn');
+            const deleteDealModal = document.getElementById('delete-deal-modal');
+            const deleteDealForm = document.getElementById('delete-deal-form');
+            
+            deleteDealBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const dealId = this.getAttribute('data-id');
+                    deleteDealForm.action = `/admin/delete-deal/${dealId}/`;
+                    deleteDealModal.style.display = 'block';
+                });
+            });
+            
+            // View Cart Modal
+            const viewCartBtns = document.querySelectorAll('.view-cart-btn');
+            const viewCartModal = document.getElementById('view-cart-modal');
+            const deleteCartConfirmBtn = document.getElementById('delete-cart-confirm');
+            
+            viewCartBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const cartId = this.getAttribute('data-id');
+                    
+                    // Here you would typically fetch cart data and populate the modal
+                    // For demonstration, we'll just show the modal with placeholder data
+                    document.getElementById('cart-username').textContent = 'Username';
+                    document.getElementById('cart-added-at').textContent = 'Added at';
+                    document.getElementById('cart-product-name').textContent = 'Product Name';
+                    document.getElementById('cart-product-price').textContent = 'Rs 99.99';
+                    document.getElementById('cart-quantity').textContent = '2';
+                    document.getElementById('cart-total').textContent = 'Rs 199.98';
+                    
+                    // Set up delete confirmation button
+                    deleteCartConfirmBtn.setAttribute('data-id', cartId);
+                    
+                    viewCartModal.style.display = 'block';
+                });
+            });
+            
+            // Delete Cart Modal
+            const deleteCartBtns = document.querySelectorAll('.delete-cart-btn');
+            const deleteCartModal = document.getElementById('delete-cart-modal');
+            const deleteCartForm = document.getElementById('delete-cart-form');
+            
+            deleteCartBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const cartId = this.getAttribute('data-id');
+                    deleteCartForm.action = `/admin/delete-cart/${cartId}/`;
+                    deleteCartModal.style.display = 'block';
+                });
+            });
+            
+            // Delete Cart from View Modal
+            if (deleteCartConfirmBtn) {
+                deleteCartConfirmBtn.addEventListener('click', function() {
+                    const cartId = this.getAttribute('data-id');
+                    deleteCartForm.action = `/admin/delete-cart/${cartId}/`;
+                    viewCartModal.style.display = 'none';
+                    deleteCartModal.style.display = 'block';
+                });
+            }
+        }
+        
+        // Call the additional modal initialization function after the main initModals function
+        document.addEventListener('DOMContentLoaded', function() {
+            // The existing initialization code will run first
+            
+            // Then initialize our additional modals
+            initAdditionalModals();
+        });
+    </script>
+{% comment %} orders  {% endcomment %}
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all status select elements
+            const statusSelects = document.querySelectorAll('.status-select');
+            
+            // Add change event listener to each select
+            statusSelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    // Get the form containing this select
+                    const form = this.closest('.status-update-form');
+                    
+                    // Update the select styling based on new value
+                    const newStatus = this.value;
+                    this.className = 'status-select px-2 py-1 text-xs rounded-full border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none';
+                    
+                    if (newStatus === 'Delivered') {
+                        this.classList.add('bg-green-100', 'text-green-800', 'dark:bg-green-900', 'dark:text-green-200');
+                    } else if (newStatus === 'Shipped') {
+                        this.classList.add('bg-yellow-100', 'text-yellow-800', 'dark:bg-yellow-900', 'dark:text-yellow-200');
+                    } else if (newStatus === 'Pending') {
+                        this.classList.add('bg-blue-100', 'text-blue-800', 'dark:bg-blue-900', 'dark:text-blue-200');
+                    }
+                    
+                    // Submit the form
+                    form.submit();
+                });
+            });
+        });
+    </script>
+{% comment %} user details update {% endcomment %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Edit User Modal
+            const editUserModal = document.getElementById('edit-user-modal');
+            const editUserForm = document.getElementById('edit-user-form');
+            const editUserBtns = document.querySelectorAll('.edit-user-btn');
+            const closeBtn = document.querySelector('#edit-user-modal .close');
+            const cancelBtn = document.querySelector('#edit-user-modal .cancel-btn');
+        
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            
+            // Determine the base URL from the current page URL
+            function getBaseUrl() {
+                // If your site is at example.com/myapp/, this will return '/myapp'
+                const pathParts = window.location.pathname.split('/');
+                if (pathParts.length > 2 && pathParts[1] !== '') {
+                    return '/' + pathParts[1];
+                }
+                return '';
+            }
+        
+            // Open modal and load user data when edit button is clicked
+            editUserBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-id');
+                    console.log('Editing user with ID:', userId);
+                    
+                    const baseUrl = getBaseUrl();
+                    
+                    // Set the form action URL
+                    editUserForm.action = `${baseUrl}/admin/update-user/${userId}/`;
+                    
+                    // Show the modal first with a loading message
+                    editUserModal.style.display = 'block';
+                    
+                    // Log the URL we're fetching from
+                    const fetchUrl = `${baseUrl}/admin/get-user-data/${userId}/`;
+                    console.log('Fetching from URL:', fetchUrl);
+                    
+                    // Fetch user data with CSRF token
+                    fetch(fetchUrl, {
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Data received:', data);
+                        if (data.status === 'success') {
+                            // Populate form fields with user data
+                            document.getElementById('edit_username').value = data.data.username || '';
+                            document.getElementById('edit_email').value = data.data.email || '';
+                            document.getElementById('edit_first_name').value = data.data.first_name || '';
+                            document.getElementById('edit_last_name').value = data.data.last_name || '';
+                            document.getElementById('edit_bio').value = data.data.bio || '';
+                            document.getElementById('edit_wallet_balance').value = data.data.wallet_balance || 0;
+                            document.getElementById('edit_points').value = data.data.points || 0;
+                            document.getElementById('edit_is_verified').checked = data.data.is_verified || false;
+                        } else {
+                            console.error('Error in response:', data);
+                            alert('Error loading user data: ' + (data.message || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                        alert('Error loading user data: ' + error.message);
+                    });
+                });
+            });
+        
+            // Close modal when close button is clicked
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    editUserModal.style.display = 'none';
+                });
+            }
+        
+            // Close modal when cancel button is clicked
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function() {
+                    editUserModal.style.display = 'none';
+                });
+            }
+        
+            // Close modal when clicking outside of it
+            window.addEventListener('click', function(event) {
+                if (event.target === editUserModal) {
+                    editUserModal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+{% comment %} for search bar  {% endcomment %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all search forms in the dashboard
+            const searchForms = document.querySelectorAll('form[role="search"], form.search-form');
+            
+            // Add event listeners to each search form
+            searchForms.forEach(form => {
+                // Make sure the form has the correct method and action
+                if (!form.getAttribute('method')) {
+                    form.setAttribute('method', 'get');
+                }
+                
+                // Ensure the form submits to the correct URL based on the current page
+                if (!form.getAttribute('action')) {
+                    const currentSection = getCurrentSection();
+                    if (currentSection) {
+                        form.setAttribute('action', `/admin_${currentSection}/`);
+                    }
+                }
+                
+                // Add a submit event listener
+                form.addEventListener('submit', function(e) {
+                    // Prevent empty searches if that's desired
+                    const searchInput = form.querySelector('input[name="search"]');
+                    if (searchInput && searchInput.value.trim() === '' && !hasOtherFilters(form)) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+                
+                // Add clear button functionality to search inputs
+                const searchInput = form.querySelector('input[name="search"]');
+                if (searchInput) {
+                    // Add a clear button if the input has a value
+                    searchInput.addEventListener('input', function() {
+                        updateClearButton(this);
+                    });
+                    
+                    // Check if there's an existing value on page load
+                    updateClearButton(searchInput);
+                }
+            });
+            
+            // Function to get the current section
+            function getCurrentSection() {
+                // Try to determine the current section from the URL
+                const path = window.location.pathname;
+                if (path.includes('admin_')) {
+                    return path.split('admin_')[1].replace(/\//g, '');
+                }
+                
+                // If not in URL, try to get from active page content
+                const visiblePage = document.querySelector('.page-content:not(.hidden)');
+                if (visiblePage) {
+                    const pageId = visiblePage.id;
+                    if (pageId) {
+                        return pageId.replace('-page', '');
+                    }
+                }
+                
+                // Default to dashboard
+                return 'dashboard';
+            }
+            
+            // Function to check if the form has other filters besides search
+            function hasOtherFilters(form) {
+                const selects = form.querySelectorAll('select');
+                for (let select of selects) {
+                    if (select.value) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            // Function to update the clear button for a search input
+            function updateClearButton(input) {
+                const clearButton = input.parentNode.querySelector('.clear-search');
+                if (input.value && !clearButton) {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'clear-search absolute right-8 top-3 text-gray-400 hover:text-gray-600';
+                    button.innerHTML = '<i class="fas fa-times-circle"></i>';
+                    button.addEventListener('click', function() {
+                        input.value = '';
+                        this.remove();
+                        // Focus back on the input
+                        input.focus();
+                    });
+                    input.parentNode.appendChild(button);
+                } else if (!input.value && clearButton) {
+                    clearButton.remove();
+                }
+            }
+            
+            // Pre-fill search inputs based on URL parameters
+            function prefillSearchInputs() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const searchParam = urlParams.get('search');
+                const statusParam = urlParams.get('status');
+                const ratingParam = urlParams.get('rating');
+                
+                if (searchParam) {
+                    const searchInputs = document.querySelectorAll('input[name="search"]');
+                    searchInputs.forEach(input => {
+                        input.value = searchParam;
+                        updateClearButton(input);
+                    });
+                }
+                
+                if (statusParam) {
+                    const statusSelects = document.querySelectorAll('select[name="status"]');
+                    statusSelects.forEach(select => {
+                        select.value = statusParam;
+                    });
+                }
+                
+                if (ratingParam) {
+                    const ratingSelects = document.querySelectorAll('select[name="rating"]');
+                    ratingSelects.forEach(select => {
+                        select.value = ratingParam;
+                    });
+                }
+            }
+            
+            // Call this function on page load
+            prefillSearchInputs();
+        });
+    </script>
+
+    <script>
+        // Existing JavaScript
+        
+        // Handle withdrawal dropdown toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            // For desktop dropdown
+            const withdrawalLinks = document.querySelectorAll('.group > a');
+            withdrawalLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (this.parentElement.classList.contains('group') && this.nextElementSibling) {
+                        e.preventDefault();
+                        this.nextElementSibling.classList.toggle('hidden');
+                    }
+                });
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                withdrawalLinks.forEach(link => {
+                    if (!link.contains(e.target) && link.nextElementSibling) {
+                        link.nextElementSibling.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    </script>
+
+    </body>
+</html>

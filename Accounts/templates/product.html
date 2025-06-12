@@ -1,0 +1,443 @@
+{% load custom_filters %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="theme-color" content="#2C5F2D" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>{% block title %}Agro Nepal - Store{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+   
+</head>
+<body>
+    
+{% if messages %}
+            <div class="fixed top-4 right-4 z-50 w-full max-w-md">
+                {% for message in messages %}
+                    <div class="bg-white border-l-4 border-indigo-500 text-indigo-700 p-4 mb-3 rounded-lg shadow-lg animate-fade-in-down flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <span>{{ message }}</span>
+                        <button class="ml-auto text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+<a href="/deals" class="absolute top-4 right-4 inline-block bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">
+        Wholesale Deals
+    </a>
+
+
+<!-- Product Section with Enhanced Design -->
+<section id="products" class="py-20 bg-gray-50">
+    <div class="container mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+
+        <!-- Enhanced Filter Section -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-12 transition-all duration-300 hover:shadow-2xl border border-gray-100 transform hover:-translate-y-1">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+                <div class="w-full md:w-auto">
+                    <label for="category-filter" class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <div class="relative">
+                        <select id="category-filter" class="w-full md:w-64 appearance-none px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition-all pr-10 shadow-sm">
+                            <option value="">All Categories</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="w-full md:w-auto">
+                    <label for="search-box" class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        </div>
+                        <input type="text" id="search-box" class="w-full md:w-64 pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm" placeholder="Search products..." onkeyup="liveSearch()">
+                    </div>
+                </div>
+                
+                <div class="w-full md:w-auto mt-4 md:mt-0">
+                    <label class="block text-sm font-medium text-gray-700 mb-2 opacity-0">Action</label>
+                    <button onclick="applyFilters()" class="w-full md:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:-translate-y-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+                        Apply Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Product Count and Sort -->
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-10 bg-white p-4 rounded-xl shadow-md">
+            <p class="text-gray-600 mb-4 sm:mb-0 font-medium">
+                Showing <span class="font-bold text-indigo-600">{{ products|length }}</span> products
+            </p>
+            
+            <div class="flex items-center">
+                <label for="sort-by" class="mr-2 text-sm text-gray-600 font-medium">Sort by:</label>
+                <div class="relative">
+                    <select id="sort-by" class="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-2.5 pr-8 appearance-none shadow-sm" onchange="sortProducts(this.value)">
+                        <option value="featured">Featured</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="rating">Highest Rated</option>
+                        <option value="newest">Newest</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Product Grid -->
+<div id="productGrid" class="max-w-screen-xl mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 mb-16 px-2 md:px-4">
+    {% for product in products %}
+    <div class="product-card group bg-white rounded-md overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full border border-gray-100 relative">
+        <div class="relative">
+            <!-- Wishlist Button (Daraz-style) -->
+            <button class="absolute top-2 right-2 z-20 bg-white/80 hover:bg-white p-1 rounded-full shadow-sm transition-all duration-300 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 w-8 h-8 flex items-center justify-center" data-product-id="{{ product.id }}" onclick="toggleWishlist(this)" style="width: 30px; height: 30px; padding: 0;">
+                {% if product.id in liked_products %}
+                    <!-- Red Heart (if the product is liked by the current user) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="none">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="red"/>
+                    </svg>
+                {% else %}
+                    <!-- Empty Heart (if the product is not liked by the current user) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="none">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="black" fill="none" stroke-width="2"/>
+                    </svg>
+                {% endif %}
+            </button>
+        
+
+
+            <script>
+                function toggleWishlist(button) {
+                    var productId = button.getAttribute('data-product-id');
+                    
+                    fetch(`/toggle-wishlist/${productId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',  // Add CSRF token for security
+                        },
+                        body: JSON.stringify({
+                            'product_id': productId,
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        var icon = button.querySelector('svg');
+                        if (data.status === 'added') {
+                            // Set red heart (added state)
+                            icon.outerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="none">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="red"/>
+                            </svg>`;
+                            alert(data.message);
+                        } else if (data.status === 'removed') {
+                            // Set empty heart (removed state)
+                            icon.outerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="none">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="black" fill="none" stroke-width="2"/>
+                            </svg>`;
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            </script>
+
+            <!-- Sale Badge (Daraz-style) -->
+            {% if product.discount_amount > 0 %}
+            <div class="absolute top-0 left-0 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 z-10">
+                {% with discount_percent=product.discount_amount|mul:100|div:product.price %}
+                -{{ discount_percent|floatformat:0 }}%
+                {% endwith %}
+            </div>
+            {% endif %}
+            
+            <!-- Product Image (Reduced Height) -->
+            <div class="overflow-hidden h-32 sm:h-40 bg-gray-50">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-contain object-center transform group-hover:scale-105 transition-transform duration-500 ease-in-out">
+            </div>
+
+            <!-- Quick View Overlay (Daraz-style) -->
+            <div class="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <a href="{% url 'product_detail' product.id %}" class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
+                    <button class="bg-white text-gray-800 px-2 py-1 rounded text-xs font-medium hover:bg-indigo-600 hover:text-white transition-colors duration-300 shadow-md">
+                        Quick View
+                    </button>
+                </a>
+            </div>
+    </div>
+
+        <!-- Product Info (Daraz-style with reduced padding) -->
+        <div class="p-2 flex flex-col justify-between flex-grow">
+            <!-- Product Name (Reduced height) -->
+            <h3 class="text-xs sm:text-sm font-medium text-gray-800 mb-0.5 line-clamp-2 h-7 sm:h-8">{{ product.name }}</h3>
+            
+            <!-- Price and Discount (Compact) -->
+            <div class="mb-0.5">
+                {% if product.discount_amount > 0 %}
+                <div class="flex items-center">
+                    <span class="text-xs sm:text-sm font-bold text-red-500">Rs{{ product.get_discounted_price }}</span>
+                    <span class="text-xs text-gray-500 line-through ml-1">Rs{{ product.price }}</span>
+                </div>
+                {% else %}
+                <span class="text-xs sm:text-sm font-bold text-gray-900">Rs{{ product.price }}</span>
+                {% endif %}
+            </div>
+            
+
+            <!-- Enhanced Rating Display -->
+            {% with product.reviews.all as reviews %}
+            {% if reviews %}
+            {% with product.get_rating_count as review_count %}
+            <div class="flex items-center mb-1">
+                <div class="flex text-yellow-400">
+                    {% with ''|center:5 as range %}
+                    {% for _ in range %}
+                        {% if forloop.counter <= product.get_average_rating|floatformat:0|add:"0" %}
+                        {% comment %} <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> {% endcomment %}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+
+                        {% endif %}
+                    {% endfor %}
+                    {% endwith %}
+                </div>
+                <span class="text-xs text-gray-500 ml-1">({{ review_count }})</span>
+                <span class="text-xs font-medium text-gray-700 ml-2">{{ product.get_average_rating|floatformat:1 }}</span>
+            </div>
+            {% endwith %}
+            {% elif reviews %}
+            <span>No ratings and reviews </span>
+            {% endif %}
+            {% endwith %}
+            <!-- Combined Tags Row (Compact) -->
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs text-teal-600 bg-teal-50 px-1 py-0.5 rounded">Free Shipping</span>
+                <span class="text-xs text-gray-500 truncate">{{ product.category.name }}</span>
+            </div>
+
+            <!-- Stock Status -->
+            <div class="mb-1.5">
+                {% if product.stock > 0 %}
+                <div class="text-xs text-green-600 font-medium">
+                    In Stock
+                </div>
+                {% else %}
+                <div class="text-xs text-red-600 font-medium">
+                    Out of Stock
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-2">
+                <!-- Add to Cart Button -->
+                <button onclick="window.location.href='{% url 'add_to_cart' product.id %}'"
+                class="p-1 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-medium transition-all duration-300 shadow-sm flex items-center justify-center"
+                style="width: 20px; height: 20px;">
+                <i class="fas fa-shopping-cart text-white" style="font-size: 10px;"></i>
+            </button>
+            
+
+                
+                <!-- Buy Now Button with Text -->
+                <button onclick="window.location.href='{% url 'order' product.id %}'"
+                    {% if product.stock <= 0 %}disabled{% endif %}
+                    class="flex-1 py-1 px-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded text-xs font-medium transition-all duration-300 {% if product.stock <= 0 %}opacity-50 cursor-not-allowed{% endif %} shadow-sm flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6"/>
+                        <path d="M12 8v8"/>
+                        <path d="m8 12 4-4 4 4"/>
+                    </svg>
+                    Buy Now
+                </button>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full py-12 flex flex-col items-center justify-center text-center bg-white rounded-lg shadow-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-300 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M8 15h8"/><path d="M9 9h.01"/><path d="M15 9h.01"/>
+        </svg>
+        <h3 class="text-lg font-bold text-gray-700 mb-2">No Products Found</h3>
+        <p class="text-gray-500 max-w-md mb-3">We couldn't find any products matching your criteria. Try adjusting your filters or search terms.</p>
+        <button onclick="resetFilters()" class="px-3 py-1.5 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors shadow-md">
+            Reset Filters
+        </button>
+    </div>
+    {% endfor %}
+</div>
+
+       
+
+        <!-- Enhanced Pagination -->
+        <div class="flex justify-center items-center space-x-2 bg-white p-4 rounded-xl shadow-md">
+            {% if products.has_previous %}
+            <a href="?page=1{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" 
+               class="flex items-center justify-center px-4 py-2 bg-white text-indigo-600 border border-gray-300 rounded-lg hover:bg-indigo-50 transition-colors shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/></svg>
+                First
+            </a>
+            <a href="?page={{ products.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" 
+               class="flex items-center justify-center px-4 py-2 bg-white text-indigo-600 border border-gray-300 rounded-lg hover:bg-indigo-50 transition-colors shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                Previous
+            </a>
+            {% endif %}
+            
+            <div class="flex space-x-1">
+                {% with ''|center:products.paginator.num_pages as range %}
+                {% for _ in range %}
+                    {% with forloop.counter as page_num %}
+                    {% if page_num == products.number %}
+                    <span class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-medium shadow-md">
+                        {{ page_num }}
+                    </span>
+                    {% elif page_num > products.number|add:"-3" and page_num < products.number|add:"3" %}
+                    <a href="?page={{ page_num }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" 
+                       class="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
+                        {{ page_num }}
+                    </a>
+                    {% endif %}
+                    {% endwith %}
+                {% endfor %}
+                {% endwith %}
+            </div>
+            
+            {% if products.has_next %}
+            <a href="?page={{ products.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" 
+               class="flex items-center justify-center px-4 py-2 bg-white text-indigo-600 border border-gray-300 rounded-lg hover:bg-indigo-50 transition-colors shadow-sm">
+                Next
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </a>
+            <a href="?page={{ products.paginator.num_pages }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" 
+               class="flex items-center justify-center px-4 py-2 bg-white text-indigo-600 border border-gray-300 rounded-lg hover:bg-indigo-50 transition-colors shadow-sm">
+                Last
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m13 17 5-5-5-5"/><path d="m6 17 5-5-5-5"/></svg>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<!-- JavaScript for Filters & Search -->
+<script>
+    function applyFilters() {
+        const category = document.getElementById('category-filter').value;
+        const searchQuery = document.getElementById('search-box').value.trim();
+        const sortBy = document.getElementById('sort-by').value;
+        let url = `/product/?`;
+
+        if (category) url += `category=${category}&`;
+        if (searchQuery) url += `search=${searchQuery}&`;
+        if (sortBy && sortBy !== 'featured') url += `sort=${sortBy}&`;
+
+        window.location.href = url;
+    }
+
+    function resetFilters() {
+        window.location.href = '/product/';
+    }
+
+    function liveSearch() {
+        const query = document.getElementById("search-box").value.toLowerCase();
+        document.querySelectorAll(".product-card").forEach(product => {
+            const name = product.querySelector("h3").innerText.toLowerCase();
+            product.style.display = name.includes(query) ? "block" : "none";
+        });
+    }
+
+    function sortProducts(sortBy) {
+        const productGrid = document.getElementById('productGrid');
+        const products = Array.from(productGrid.querySelectorAll('.product-card'));
+        
+        products.sort((a, b) => {
+            switch(sortBy) {
+                case 'price-low':
+                    return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+                case 'price-high':
+                    return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+                case 'rating':
+                    return parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating);
+                case 'newest':
+                    return parseInt(b.dataset.date) - parseInt(a.dataset.date);
+                default:
+                    return 0;
+            }
+        });
+        
+        // Clear and re-append sorted products
+        productGrid.innerHTML = '';
+        products.forEach(product => {
+            productGrid.appendChild(product);
+        });
+    }
+    
+    // Initialize animation on scroll if available
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof AOS !== 'undefined') {
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: true
+            });
+        }
+        
+        // Add smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    });
+    
+    // Add animation classes
+    document.head.insertAdjacentHTML('beforeend', `
+        <style>
+            @keyframes blob {
+                0% { transform: scale(1); }
+                33% { transform: scale(1.1); }
+                66% { transform: scale(0.9); }
+                100% { transform: scale(1); }
+            }
+            .animate-blob {
+                animation: blob 7s infinite;
+            }
+            .animation-delay-2000 {
+                animation-delay: 2s;
+            }
+            .animation-delay-4000 {
+                animation-delay: 4s;
+            }
+        </style>
+    `);
+</script>
+
+</body>
+</html>

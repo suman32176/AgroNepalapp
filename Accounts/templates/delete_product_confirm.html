@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirm Delete Product{% endblock %}
+
+{% block content %}
+<div class="container max-w-4xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-4">Confirm Delete</h1>
+            
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-red-700">
+                            You are about to delete the product "<strong>{{ product.name }}</strong>". This action cannot be undone.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gray-100 p-4 rounded-lg mb-6">
+                <h3 class="font-semibold text-gray-700 mb-2">Product Information:</h3>
+                <div class="flex flex-wrap items-center">
+                    {% if product.image %}
+                    <div class="w-24 h-24 mr-4 mb-2">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover rounded">
+                    </div>
+                    {% endif %}
+                    <div class="flex-1">
+                        <p><strong>Name:</strong> {{ product.name }}</p>
+                        <p><strong>Category:</strong> {{ product.category.name }}</p>
+                        <p><strong>Price:</strong> ${{ product.price }}</p>
+                        <p><strong>Stock:</strong> {{ product.stock }} units</p>
+                        <p><strong>Created:</strong> {{ product.created_at|date:"F j, Y" }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <form method="post" class="flex items-center space-x-4">
+                {% csrf_token %}
+                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                    Confirm Delete
+                </button>
+                {% if request.user.profile.show_request_manager_btn %}
+                <a href="{% url 'coadmin_products' %}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                    Cancel
+                </a>
+                {% else %}
+                <a href="{% url 'product' %}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                    Cancel
+                </a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

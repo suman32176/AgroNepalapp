@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    {% if request.user.is_authenticated %}
+        {{request.user}}
+        <a href="{% url 'logout_attempt' %}" class="hover:text-gray-800 text-red-600">Logout</a>
+    {% else %}
+        <a href="{% url 'login_attempt' %}" class="hover:text-gray-800 text-green-600">Login</a>
+    {% endif %}
+{% endblock content %}

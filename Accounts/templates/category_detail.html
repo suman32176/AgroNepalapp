@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if messages %}
+            <div class="fixed top-4 right-4 z-50 w-full max-w-md">
+                {% for message in messages %}
+                    <div class="bg-white border-l-4 border-indigo-500 text-indigo-700 p-4 mb-3 rounded-lg shadow-lg animate-fade-in-down flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <span>{{ message }}</span>
+                        <button class="ml-auto text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+<!-- Category Detail Hero Section -->
+<section class="relative py-16 bg-gradient-to-r from-primary to-primary/90 text-light overflow-hidden">
+    <!-- Decorative Elements -->
+    <div class="absolute inset-0 overflow-hidden opacity-10">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-accent rounded-full mix-blend-multiply filter blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-secondary rounded-full mix-blend-multiply filter blur-3xl"></div>
+    </div>
+    
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="max-w-3xl mx-auto">
+            <nav class="flex mb-6" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="{% url 'home' %}" class="text-light/80 hover:text-accent">
+                            <i class="fas fa-home mr-2"></i>
+                            Home
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-light/50 mx-2 text-sm"></i>
+                            <a href="{% url 'categories' %}" class="text-light/80 hover:text-accent">
+                                Categories
+                            </a>
+                        </div>
+                    </li>
+                    <li aria-current="page">
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-light/50 mx-2 text-sm"></i>
+                            <span class="text-light">{{ category.name }}</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            
+            <h1 class="text-4xl md:text-5xl font-serif font-bold mb-4">{{ category.name }}</h1>
+            {% if category.description %}
+            <p class="text-xl text-light/80">{{ category.description }}</p>
+            {% endif %}
+            
+            <div class="mt-6 flex items-center">
+                <span class="bg-accent/20 text-accent px-3 py-1 rounded-full text-sm font-medium">
+                    {{ products.count }} Products
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Wave Separator -->
+    <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-0">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" class="w-full h-12 text-light">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="currentColor"></path>
+        </svg>
+    </div>
+</section>
+
+<!-- Filter and Sort Section -->
+<section class="py-8 bg-light border-b">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <!-- Filter Options -->
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="text-gray-700 font-medium">Filter:</span>
+                <a href="?filter=all" class="px-4 py-2 rounded-lg bg-primary text-light text-sm hover:bg-primary/90 transition-colors duration-300">
+                    All
+                </a>
+                <a href="?filter=in_stock" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-800 text-sm hover:bg-secondary hover:text-dark transition-colors duration-300">
+                    In Stock
+                </a>
+                <a href="?filter=best_selling" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-800 text-sm hover:bg-secondary hover:text-dark transition-colors duration-300">
+                    Best Selling
+                </a>
+            </div>
+            
+            <!-- Sort Options -->
+            <div class="flex items-center gap-2">
+                <span class="text-gray-700 font-medium">Sort by:</span>
+                <select id="sort-options" class="bg-white border border-gray-300 text-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                    <option value="newest">Newest</option>
+                    <option value="price_low">Price: Low to High</option>
+                    <option value="price_high">Price: High to Low</option>
+                    <option value="popular">Most Popular</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Products Grid -->
+<section class="py-16 bg-light">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for product in products %}
+            <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden h-full flex flex-col group">
+                <!-- Product Image -->
+                <div class="relative overflow-hidden">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110">
+                    
+                    <!-- Quick View Overlay -->
+                    <div class="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <a href="{% url 'product_detail' product.id %}" class="bg-white text-primary rounded-full p-3 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                    
+                    <!-- Stock Badge -->
+                    {% if product.stock > 0 %}
+                    <div class="absolute top-3 right-3">
+                        <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full">In Stock</span>
+                    </div>
+                    {% else %}
+                    <div class="absolute top-3 right-3">
+                        <span class="bg-red-100 text-red-800 text-xs font-bold px-2 py-1 rounded-full">Out of Stock</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Product Info -->
+                <div class="p-6 flex-grow flex flex-col">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-primary transition-colors duration-300">{{ product.name }}</h3>
+                    
+                    <p class="text-sm text-gray-600 mb-4 line-clamp-2 flex-grow">{{ product.description|truncatechars:120 }}</p>
+                    
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="text-xl font-bold text-primary">Rs. {{ product.price }}</span>
+                        
+                        <div class="flex items-center text-xs text-gray-500">
+                            <i class="fas fa-shopping-cart mr-1"></i>
+                            <span>{{ product.sold }} sold</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Add to Cart Button -->
+                <div class="p-6 pt-0">
+                    <form method="POST" action="{% url 'add_to_cart' product.id %}">
+                        {% csrf_token %}
+                        <button type="submit" {% if product.stock == 0 %}disabled{% endif %} 
+                            class="w-full py-3 rounded-lg flex items-center justify-center transition-colors duration-300 {% if product.stock > 0 %}bg-secondary hover:bg-accent text-dark{% else %}bg-gray-200 text-gray-500 cursor-not-allowed{% endif %}">
+                            <i class="fas fa-shopping-cart mr-2"></i>
+                            <span>Add to Cart</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-16">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-full mb-4">
+                    <i class="fas fa-box-open text-primary text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-primary mb-2">No Products Available</h3>
+                <p class="text-gray-600 mb-8">We don't have any products in this category at the moment.</p>
+                <a href="{% url 'categories' %}" class="inline-block bg-primary text-light px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors duration-300">
+                    Browse Other Categories
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Related Categories -->
+{% if related_categories %}
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-serif font-bold text-primary mb-8">Related Categories</h2>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for related in related_categories %}
+            <a href="{% url 'category_detail' related.id %}" class="group">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden hover-grow transition-all duration-300 h-full flex flex-col relative">
+                    <!-- Category Image (using first product image or placeholder) -->
+                    <div class="relative h-40 overflow-hidden">
+                        {% if related.products.first.image %}
+                        <img src="{{ related.products.first.image.url }}" alt="{{ related.name }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        {% else %}
+                        <div class="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                            <i class="fas fa-seedling text-primary text-4xl"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Category Info -->
+                    <div class="p-4 flex-grow flex flex-col">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1 group-hover:text-primary transition-colors duration-300">{{ related.name }}</h3>
+                        
+                        <div class="mt-auto flex items-center justify-between">
+                            <span class="text-sm text-primary font-medium">{{ related.product_count }} Products</span>
+                            <span class="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">Explore</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle sort options
+        const sortSelect = document.getElementById('sort-options');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function() {
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('sort', this.value);
+                window.location.href = currentUrl.toString();
+            });
+            
+            // Set the current sort option
+            const urlParams = new URLSearchParams(window.location.search);
+            const sortParam = urlParams.get('sort');
+            if (sortParam) {
+                sortSelect.value = sortParam;
+            }
+        }
+    });
+</script>
+
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .hover-grow {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .hover-grow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+</style>
+{% endblock %}
+

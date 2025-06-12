@@ -1,0 +1,837 @@
+{% extends "base.html" %}
+{% block content %}
+{% if messages %}
+            <div class="fixed top-4 right-4 z-50 w-full max-w-md">
+                {% for message in messages %}
+                    <div class="bg-white border-l-4 border-indigo-500 text-indigo-700 p-4 mb-3 rounded-lg shadow-lg animate-fade-in-down flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <span>{{ message }}</span>
+                        <button class="ml-auto text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
+    <!-- Decorative Elements with improved animations -->
+    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none opacity-20">
+        <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-gradient-to-br from-pink-200 to-purple-200 blur-3xl animate-pulse-slow"></div>
+        <div class="absolute top-1/3 -left-24 w-80 h-80 rounded-full bg-gradient-to-br from-blue-200 to-cyan-200 blur-3xl animate-pulse-slower"></div>
+        <div class="absolute bottom-0 right-1/4 w-64 h-64 rounded-full bg-gradient-to-br from-yellow-200 to-orange-200 blur-3xl animate-pulse-medium"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Page Header with enhanced animation -->
+        <div class="mb-10 animate-fade-in-down" style="animation-duration: 0.5s;">
+            <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-violet-600 mb-2">
+                Your Orders
+            </h1>
+            <p class="text-gray-600 max-w-3xl">Track and manage all your orders in one place. View order status, details, and history.</p>
+        </div>
+
+        <!-- Order Stats with improved hover effects and animations -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <!-- Total Orders -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-white/50 relative overflow-hidden group transition-all duration-300 hover:translate-y-[-5px] hover:shadow-xl animate-fade-in" style="animation-delay: 0.1s;">
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="flex items-center relative z-10">
+                    <div class="p-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white mr-4 shadow-md group-hover:scale-110 transition-transform duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Total Orders</p>
+                        <p class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-600 order-count">
+                            {{ orders|length }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Orders -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-white/50 relative overflow-hidden group transition-all duration-300 hover:translate-y-[-5px] hover:shadow-xl animate-fade-in" style="animation-delay: 0.2s;">
+                <div class="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="flex items-center relative z-10">
+                    <div class="p-3 rounded-full bg-gradient-to-r from-amber-500 to-yellow-600 text-white mr-4 shadow-md group-hover:scale-110 transition-transform duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Pending</p>
+                        <p class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-yellow-600 order-count">
+                            {{ pending_orders }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipped Orders -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-white/50 relative overflow-hidden group transition-all duration-300 hover:translate-y-[-5px] hover:shadow-xl animate-fade-in" style="animation-delay: 0.3s;">
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="flex items-center relative z-10">
+                    <div class="p-3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-600 text-white mr-4 shadow-md group-hover:scale-110 transition-transform duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Shipped</p>
+                        <p class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-600 order-count">
+                            {{ shipped_orders }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivered Orders -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-white/50 relative overflow-hidden group transition-all duration-300 hover:translate-y-[-5px] hover:shadow-xl animate-fade-in" style="animation-delay: 0.4s;">
+                <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-green-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="flex items-center relative z-10">
+                    <div class="p-3 rounded-full bg-gradient-to-r from-emerald-500 to-green-600 text-white mr-4 shadow-md group-hover:scale-110 transition-transform duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Delivered</p>
+                        <p class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-green-600 order-count">
+                            {{ delivered_orders }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if orders %}
+        <!-- Order List with improved staggered animations -->
+        <div class="space-y-6">
+            {% for order in orders %}
+            <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden border border-white/50 transition-all duration-300 hover:shadow-xl group animate-fade-in-up" 
+    style="animation-delay: {{ forloop.counter|add:4 }}00ms;"
+    data-order-id="{{ order.id }}"
+    data-product-name="{{ order.product.name }}"
+    data-product-image="{{ order.product.image.url }}"
+    data-order-date="{{ order.created_at|date:'M d, Y' }}"
+    data-order-status="{{ order.get_status_display }}"
+    data-quantity="{{ order.quantity }}"
+    data-total-price="{{ order.total_price|floatformat:2 }}"
+    data-shipping-address="{{ order.street_address }}, {{ order.city }}, {{ order.province }}">
+                <div class="md:flex">
+                    <!-- Order Status Indicator with improved pulse animation for pending -->
+                    <div class="w-2 flex-shrink-0 
+                            {% if order.status == 'pending' %} bg-yellow-500 animate-pulse-fast
+                            {% elif order.status == 'processing' %} bg-orange-500
+                            {% elif order.status == 'shipped' %} bg-blue-500 
+                            {% elif order.status == 'delivered' %} bg-green-500 
+                            {% else %} bg-red-500 {% endif %}">
+                    </div>
+
+                    <!-- Order Content -->
+                    <div class="flex-1 p-6">
+                        <div class="md:flex justify-between items-start">
+                            <!-- Order Info -->
+                            <div class="mb-4 md:mb-0">
+                                <div class="flex items-center">
+                                    <h3 class="text-xl font-bold text-gray-800">Order #{{ order.id }}</h3>
+                                    <span class="ml-3 px-3 py-1 text-xs font-semibold rounded-full 
+                                            {% if order.status == 'pending' %} bg-yellow-100 text-yellow-800 
+                                            {% elif order.status == 'processing' %} bg-orange-100 text-orange-800 
+                                            {% elif order.status == 'shipped' %} bg-blue-100 text-blue-800 
+                                            {% elif order.status == 'delivered' %} bg-green-100 text-green-800 
+                                            {% else %} bg-red-100 text-red-800 {% endif %}">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    <span class="inline-block mr-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        {{ order.created_at|date:"M d, Y" }}
+                                    </span>
+                                    <span class="inline-block">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        {{ order.created_at|time:"H:i A" }}
+                                    </span>
+                                </p>
+                            </div>
+
+                            <!-- Order Price with enhanced shadow -->
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Total Amount</p>
+                                <p class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 drop-shadow-md">
+                                    Rs. {{ order.total_price|floatformat:2 }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 border-t border-gray-200 pt-4">
+                            <div class="md:flex justify-between items-center">
+                                <!-- Product Details with enhanced image container -->
+                                <div class="flex items-center mb-4 md:mb-0">
+                                    <div class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-gray-100 shadow-sm group-hover:shadow transition-all duration-300">
+                                        <img src="{{ order.product.image.url }}" alt="{{ order.product.name }}" class="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-500">
+                                    </div>
+                                    <div class="ml-4">
+                                        <h4 class="text-lg font-medium text-gray-800">{{ order.product.name }}</h4>
+                                        <p class="text-sm text-gray-500">Quantity: {{ order.quantity }}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons with improved hover effects -->
+                                <div class="flex flex-wrap gap-3">
+                                    <!-- View Details Button -->
+                                    <button type="button" class="view-details-btn inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 hover:scale-105"
+                                        data-order-id="{{ order.id }}"
+                                        data-product-name="{{ order.product.name }}"
+                                        data-product-image="{{ order.product.image.url }}"
+                                        data-order-date="{{ order.created_at|date:'M d, Y' }}"
+                                        data-order-status="{{ order.get_status_display }}"
+                                        data-quantity="{{ order.quantity }}"
+                                        data-total-price="{{ order.total_price|floatformat:2 }}"
+                                        data-shipping-address="{{ order.street_address }}, {{ order.city }}, {{ order.province }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                        View Details
+                                    </button>
+
+                                    {% if order.status == 'pending' %}
+                                    <form method="post" action="{% url 'cancel_order' order.id %}" class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit" onclick="return confirm('Are you sure you want to cancel this order?')" 
+                                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-300 hover:scale-105">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                            Cancel Order
+                                        </button>
+                                    </form>
+                                    {% endif %}
+
+                                    {% if order.status == 'delivered' %}
+                                    <a href="{% url 'product_detail' order.product.id %}?write_review=true" 
+                                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-300 hover:scale-105">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                        </svg>
+                                        Write Review
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Progress with improved transitions and animations -->
+                        {% if order.status != 'cancelled' %}
+                        <div class="mt-6 pt-4">
+                            <div class="relative">
+                                <!-- Progress Bar with smoother animation -->
+                                <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200">
+                                    <div class="
+                                            {% if order.status == 'pending' %} w-1/4 
+                                            {% elif order.status == 'processing' %} w-2/4
+                                            {% elif order.status == 'shipped' %} w-3/4 
+                                            {% elif order.status == 'delivered' %} w-full 
+                                            {% else %} w-0 {% endif %}
+                                            shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-1000 ease-in-out">
+                                    </div>
+                                </div>
+
+                                <!-- Progress Steps with improved animations -->
+                                <div class="flex justify-between">
+                                    <div class="text-center">
+                                        <div class="
+                                                rounded-full h-8 w-8 flex items-center justify-center mb-1 transition-all duration-500
+                                                {% if order.status == 'pending' or order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}
+                                                    bg-blue-600 text-white
+                                                {% else %}
+                                                    bg-gray-300 text-gray-500
+                                                {% endif %}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                        <div class="text-xs font-medium transition-colors duration-500
+                                                {% if order.status == 'pending' or order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}
+                                                    text-blue-600
+                                                {% else %}
+                                                    text-gray-500
+                                                {% endif %}">
+                                            Confirmed
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center">
+                                        <div class="
+                                                rounded-full h-8 w-8 flex items-center justify-center mb-1 transition-all duration-500
+                                                {% if order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}
+                                                    bg-blue-600 text-white
+                                                {% else %}
+                                                    bg-gray-300 text-gray-500
+                                                {% endif %}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                            </svg>
+                                        </div>
+                                        <div class="text-xs font-medium transition-colors duration-500
+                                                {% if order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}
+                                                    text-blue-600
+                                                {% else %}
+                                                    text-gray-500
+                                                {% endif %}">
+                                            Processing
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center">
+                                        <div class="
+                                                rounded-full h-8 w-8 flex items-center justify-center mb-1 transition-all duration-500
+                                                {% if order.status == 'shipped' or order.status == 'delivered' %}
+                                                    bg-blue-600 text-white
+                                                {% else %}
+                                                    bg-gray-300 text-gray-500
+                                                {% endif %}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                                            </svg>
+                                        </div>
+                                        <div class="text-xs font-medium transition-colors duration-500
+                                                {% if order.status == 'shipped' or order.status == 'delivered' %}
+                                                    text-blue-600
+                                                {% else %}
+                                                    text-gray-500
+                                                {% endif %}">
+                                            Shipped
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center">
+                                        <div class="
+                                                rounded-full h-8 w-8 flex items-center justify-center mb-1 transition-all duration-500
+                                                {% if order.status == 'delivered' %}
+                                                    bg-blue-600 text-white
+                                                {% else %}
+                                                    bg-gray-300 text-gray-500
+                                                {% endif %}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                            </svg>
+                                        </div>
+                                        <div class="text-xs font-medium transition-colors duration-500
+                                                {% if order.status == 'delivered' %}
+                                                    text-blue-600
+                                                {% else %}
+                                                    text-gray-500
+                                                {% endif %}">
+                                            Delivered
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Shipping Address with improved hover effect -->
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <div class="flex items-start group/address">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mt-0.5 mr-2 group-hover/address:text-blue-500 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-700 group-hover/address:text-blue-600 transition-colors duration-300">Shipping Address</p>
+                                    <p class="text-sm text-gray-500 mt-1">{{ order.street_address }}, {{ order.city }}, {{ order.province }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination with enhanced hover effects -->
+        {% if page_obj.has_other_pages %}
+        <div class="mt-8 flex justify-center">
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-300">
+                    <span class="sr-only">Previous</span>
+                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+                {% else %}
+                <span class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400">
+                    <span class="sr-only">Previous</span>
+                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </span>
+                {% endif %}
+
+                {% for i in page_obj.paginator.page_range %}
+                {% if page_obj.number == i %}
+                <a href="#" aria-current="page" class="z-10 bg-gradient-to-r from-blue-600 to-indigo-600 border-blue-600 text-white relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                    {{ i }}
+                </a>
+                {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %} 
+                <a href="?page={{ i }}" class="bg-white border-gray-300 text-gray-500 hover:bg-blue-50 hover:text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-colors duration-300">
+                    {{ i }}
+                </a>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-300">
+                    <span class="sr-only">Next</span>
+                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+                {% else %}
+                <span class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400">
+                    <span class="sr-only">Next</span>
+                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </span>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+        {% else %}
+        <!-- Empty State with improved animation -->
+        <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-10 border border-white/50 text-center animate-fade-in-up">
+            <div class="inline-flex items-center justify-center h-24 w-24 rounded-full bg-blue-100 text-blue-600 mb-6 animate-bounce" style="animation-duration: 2s;">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">No Orders Yet</h3>
+            <p class="text-gray-600 mb-6 max-w-md mx-auto">You haven't placed any orders yet. Browse our products and place your first order today!</p>
+            <a href="{% url 'product' %}" class="inline-flex items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 hover:scale-105">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                Browse Products
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Order Details Modal with improved animations -->
+<div id="orderDetailsModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay with improved transition -->
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity duration-300" aria-hidden="true"></div>
+        
+        <!-- Modal panel with improved animation -->
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" id="modalContent">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                            Order Details
+                        </h3>
+                        
+                        <div class="mt-4 border-t border-gray-200 pt-4">
+                            <div class="flex items-center mb-6">
+                                <div class="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-gray-100 shadow-sm">
+                                    <img id="modalProductImage" src="/placeholder.svg" alt="Product Image" class="h-full w-full object-cover object-center">
+                                </div>
+                                <div class="ml-4">
+                                    <h4 id="modalProductName" class="text-lg font-medium text-gray-800"></h4>
+                                    <p id="modalOrderDate" class="text-sm text-gray-500 mt-1"></p>
+                                    <span id="modalOrderStatus" class="px-2 py-1 text-xs font-semibold rounded-full"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Order ID:</span>
+                                    <span id="modalOrderId" class="font-medium"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Quantity:</span>
+                                    <span id="modalQuantity" class="font-medium"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Total Price:</span>
+                                    <span id="modalTotalPrice" class="font-medium text-blue-600"></span>
+                                </div>
+                                <div class="pt-3 border-t border-gray-200">
+                                    <span class="text-gray-600">Shipping Address:</span>
+                                    <p id="modalShippingAddress" class="font-medium mt-1"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" id="closeModalBtn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-base font-medium text-white hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm transition-all duration-300 hover:scale-105">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Improved JavaScript for Modal Functionality and Animations -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add enhanced CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInDown {
+                from { opacity: 0; transform: translateY(-20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            @keyframes fadeInUp {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes pulse-slow {
+                0%, 100% { opacity: 0.8; }
+                50% { opacity: 0.4; }
+            }
+            @keyframes pulse-slower {
+                0%, 100% { opacity: 0.7; }
+                50% { opacity: 0.3; }
+            }
+            @keyframes pulse-medium {
+                0%, 100% { opacity: 0.9; }
+                50% { opacity: 0.5; }
+            }
+            @keyframes pulse-fast {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.7; }
+            }
+            .animate-fade-in-down {
+                animation: fadeInDown 0.5s ease-out forwards;
+            }
+            .animate-fade-in {
+                animation: fadeIn 0.5s ease-out forwards;
+            }
+            .animate-fade-in-up {
+                animation: fadeInUp 0.5s ease-out forwards;
+            }
+            .animate-pulse-slow {
+                animation: pulse-slow 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+            .animate-pulse-slower {
+                animation: pulse-slower 12s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+            .animate-pulse-medium {
+                animation: pulse-medium 10s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+            .animate-pulse-fast {
+                animation: pulse-fast 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Get all "View Details" buttons
+        const viewDetailsButtons = document.querySelectorAll('.view-details-btn');
+        const modal = document.getElementById('orderDetailsModal');
+        const modalContent = document.getElementById('modalContent');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        
+        // Add click event listener to each button
+        viewDetailsButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Get data from data attributes
+                const orderId = this.getAttribute('data-order-id');
+                const productName = this.getAttribute('data-product-name');
+                const productImage = this.getAttribute('data-product-image');
+                const orderDate = this.getAttribute('data-order-date');
+                const orderStatus = this.getAttribute('data-order-status');
+                const quantity = this.getAttribute('data-quantity');
+                const totalPrice = this.getAttribute('data-total-price');
+                const shippingAddress = this.getAttribute('data-shipping-address');
+                
+                // Set modal content
+                document.getElementById('modalOrderId').textContent = orderId;
+                document.getElementById('modalProductName').textContent = productName;
+                document.getElementById('modalProductImage').src = productImage;
+                document.getElementById('modalOrderDate').textContent = orderDate;
+                document.getElementById('modalQuantity').textContent = quantity;
+                document.getElementById('modalTotalPrice').textContent = 'Rs. ' + totalPrice;
+                document.getElementById('modalShippingAddress').textContent = shippingAddress;
+                
+                // Set order status with appropriate styling
+                const statusElement = document.getElementById('modalOrderStatus');
+                statusElement.textContent = orderStatus;
+                
+                // Reset all status classes first
+                statusElement.classList.remove(
+                    'bg-yellow-100', 'text-yellow-800', 
+                    'bg-orange-100', 'text-orange-800',
+                    'bg-blue-100', 'text-blue-800', 
+                    'bg-green-100', 'text-green-800', 
+                    'bg-red-100', 'text-red-800'
+                );
+                
+                // Add appropriate status classes
+                if (orderStatus === 'Pending') {
+                    statusElement.classList.add('bg-yellow-100', 'text-yellow-800');
+                } else if (orderStatus === 'Processing') {
+                    statusElement.classList.add('bg-orange-100', 'text-orange-800');
+                } else if (orderStatus === 'Shipped') {
+                    statusElement.classList.add('bg-blue-100', 'text-blue-800');
+                } else if (orderStatus === 'Delivered') {
+                    statusElement.classList.add('bg-green-100', 'text-green-800');
+                } else {
+                    statusElement.classList.add('bg-red-100', 'text-red-800');
+                }
+                
+                // Show modal with enhanced animation
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modalContent.classList.add('opacity-100', 'translate-y-0', 'sm:scale-100');
+                    modalContent.classList.remove('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
+                }, 10);
+            });
+        });
+        
+        // Close modal when clicking the close button
+        closeModalBtn.addEventListener('click', function() {
+            modalContent.classList.remove('opacity-100', 'translate-y-0', 'sm:scale-100');
+            modalContent.classList.add('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modalContent.classList.remove('opacity-100', 'translate-y-0', 'sm:scale-100');
+                modalContent.classList.add('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+                modalContent.classList.remove('opacity-100', 'translate-y-0', 'sm:scale-100');
+                modalContent.classList.add('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+        });
+        
+        // Auto-refresh order status every 60 seconds
+        function refreshOrderStatus() {
+            fetch(window.location.href, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                // Create a temporary element to parse the HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                
+                // Find all order elements in the current page and the fetched page
+                const currentOrders = document.querySelectorAll('[data-order-id]');
+                
+                currentOrders.forEach(order => {
+                    const orderId = order.getAttribute('data-order-id');
+                    const fetchedOrder = tempDiv.querySelector(`[data-order-id="${orderId}"]`);
+                    
+                    if (fetchedOrder) {
+                        // Update the status if it has changed
+                        const currentStatus = order.getAttribute('data-order-status');
+                        const newStatus = fetchedOrder.getAttribute('data-order-status');
+                        
+                        if (currentStatus !== newStatus) {
+                            // Update the status display
+                            order.setAttribute('data-order-status', newStatus);
+                            
+                            // Find and update the status badge
+                            const statusBadge = order.closest('.bg-white').querySelector('[class*="bg-"][class*="text-"]');
+                            if (statusBadge) {
+                                // Remove all status classes
+                                statusBadge.classList.remove(
+                                    'bg-yellow-100', 'text-yellow-800',
+                                    'bg-orange-100', 'text-orange-800',
+                                    'bg-blue-100', 'text-blue-800',
+                                    'bg-green-100', 'text-green-800',
+                                    'bg-red-100', 'text-red-800'
+                                );
+                                
+                                // Add appropriate status classes based on new status
+                                if (newStatus === 'Pending') {
+                                    statusBadge.classList.add('bg-yellow-100', 'text-yellow-800');
+                                } else if (newStatus === 'Processing') {
+                                    statusBadge.classList.add('bg-orange-100', 'text-orange-800');
+                                } else if (newStatus === 'Shipped') {
+                                    statusBadge.classList.add('bg-blue-100', 'text-blue-800');
+                                } else if (newStatus === 'Delivered') {
+                                    statusBadge.classList.add('bg-green-100', 'text-green-800');
+                                } else {
+                                    statusBadge.classList.add('bg-red-100', 'text-red-800');
+                                }
+                                
+                                statusBadge.textContent = newStatus;
+                                
+                                // Update progress bar and indicators
+                                const progressBar = order.closest('.bg-white').querySelector('.overflow-hidden.h-2 > div');
+                                if (progressBar) {
+                                    progressBar.classList.remove('w-1/4', 'w-2/4', 'w-3/4', 'w-full', 'w-0');
+                                    if (newStatus === 'Pending') {
+                                        progressBar.classList.add('w-1/4');
+                                    } else if (newStatus === 'Processing') {
+                                        progressBar.classList.add('w-2/4');
+                                    } else if (newStatus === 'Shipped') {
+                                        progressBar.classList.add('w-3/4');
+                                    } else if (newStatus === 'Delivered') {
+                                        progressBar.classList.add('w-full');
+                                    } else {
+                                        progressBar.classList.add('w-0');
+                                    }
+                                }
+                                
+                                
+                                const steps = order.closest('.bg-white').querySelectorAll('.rounded-full.h-8.w-8');
+                                if (steps.length >= 4) {
+                                    
+                                    steps.forEach((step, index) => {
+                                        step.classList.remove('bg-blue-600', 'text-white');
+                                        step.classList.add('bg-gray-300', 'text-gray-500');
+                                        
+                                        const stepLabel = step.nextElementSibling;
+                                        if (stepLabel) {
+                                            stepLabel.classList.remove('text-blue-600');
+                                            stepLabel.classList.add('text-gray-500');
+                                        }
+                                    });
+                                    
+                                    
+                                    if (newStatus === 'Pending') {
+                                        steps[0].classList.remove('bg-gray-300', 'text-gray-500');
+                                        steps[0].classList.add('bg-blue-600', 'text-white');
+                                        steps[0].nextElementSibling.classList.remove('text-gray-500');
+                                        steps[0].nextElementSibling.classList.add('text-blue-600');
+                                    } else if (newStatus === 'Processing') {
+                                        for (let i = 0; i <= 1; i++) {
+                                            steps[i].classList.remove('bg-gray-300', 'text-gray-500');
+                                            steps[i].classList.add('bg-blue-600', 'text-white');
+                                            steps[i].nextElementSibling.classList.remove('text-gray-500');
+                                            steps[i].nextElementSibling.classList.add('text-blue-600');
+                                        }
+                                    } else if (newStatus === 'Shipped') {
+                                        for (let i = 0; i <= 2; i++) {
+                                            steps[i].classList.remove('bg-gray-300', 'text-gray-500');
+                                            steps[i].classList.add('bg-blue-600', 'text-white');
+                                            steps[i].nextElementSibling.classList.remove('text-gray-500');
+                                            steps[i].nextElementSibling.classList.add('text-blue-600');
+                                        }
+                                    } else if (newStatus === 'Delivered') {
+                                        for (let i = 0; i <= 3; i++) {
+                                            steps[i].classList.remove('bg-gray-300', 'text-gray-500');
+                                            steps[i].classList.add('bg-blue-600', 'text-white');
+                                            steps[i].nextElementSibling.classList.remove('text-gray-500');
+                                            steps[i].nextElementSibling.classList.add('text-blue-600');
+                                        }
+                                    }
+                                }
+                                
+                                
+                                const notification = document.createElement('div');
+                                notification.className = 'fixed top-4 right-4 z-50 bg-white border-l-4 border-green-500 text-green-700 p-4 rounded-lg shadow-lg animate-fade-in-down flex items-center';
+                                notification.innerHTML = `
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    <span>Order #${orderId} status updated to ${newStatus}</span>
+                                    <button class="ml-auto text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                `;
+                                document.body.appendChild(notification);
+                                
+                                
+                                setTimeout(() => {
+                                    notification.remove();
+                                }, 5000);
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error refreshing order status:', error));
+        }
+        
+        
+        function updateOrderCounts() {
+            let totalOrders = 0;
+            let pendingOrders = 0;
+            let shippedOrders = 0;
+            let deliveredOrders = 0;
+            
+            
+            const orderItems = document.querySelectorAll('[data-order-id]');
+            
+            orderItems.forEach(order => {
+                totalOrders++;
+                const status = order.getAttribute('data-order-status');
+                
+                if (status === 'Pending') {
+                    pendingOrders++;
+                } else if (status === 'Shipped') {
+                    shippedOrders++;
+                } else if (status === 'Delivered') {
+                    deliveredOrders++;
+                }
+            });
+            
+            
+            const countsElements = document.querySelectorAll('.order-count');
+            if (countsElements.length >= 4) {
+                countsElements[0].textContent = totalOrders;
+                countsElements[1].textContent = pendingOrders;
+                countsElements[2].textContent = shippedOrders;
+                countsElements[3].textContent = deliveredOrders;
+            }
+        }
+
+        
+        setInterval(refreshOrderStatus, 60000);
+    });
+
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        updateOrderCounts();
+        
+     
+        const originalRefreshOrderStatus = window.refreshOrderStatus;
+        window.refreshOrderStatus = function() {
+            if (originalRefreshOrderStatus) {
+                originalRefreshOrderStatus();
+            }
+            setTimeout(updateOrderCounts, 500); 
+        };
+    });
+</script>
+{% endblock %}

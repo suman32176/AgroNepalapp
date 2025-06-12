@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% if messages %}
+            <div class="fixed top-4 right-4 z-50 w-full max-w-md">
+                {% for message in messages %}
+                    <div class="bg-white border-l-4 border-indigo-500 text-indigo-700 p-4 mb-3 rounded-lg shadow-lg animate-fade-in-down flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <span>{{ message }}</span>
+                        <button class="ml-auto text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+<div class="container mx-auto px-4 py-10">
+    <h1 class="text-3xl font-extrabold text-gray-800 mb-6 pb-2 border-b-4 border-blue-500 inline-block">
+        🛒 Shopping Cart
+    </h1>
+
+    <div class="grid lg:grid-cols-3 gap-8">
+        <!-- 🏷️ Cart Items Section -->
+        <div class="lg:col-span-2">
+            {% if cart_items %}
+            <div class="bg-white shadow-lg rounded-lg p-6 border">
+                <div class="hidden md:grid grid-cols-5 gap-4 mb-4 text-gray-600 font-semibold text-sm">
+                    <div class="col-span-2">Product</div>
+                    <div>Price</div>
+                    <div>Quantity</div>
+                    <div>Subtotal</div>
+                </div>
+
+                <div id="cart-items" class="space-y-6">
+                    {% for item in cart_items %}
+                    <div id="cart-item-{{ item.id }}" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center p-4 rounded-lg shadow-md bg-gray-50 relative">
+                        <!-- ❌ Remove Button -->
+                        <button onclick="removeFromCart('{{ item.id }}')" class="absolute top-2 right-2 text-gray-400 hover:text-red-600 transition">
+                            ❌
+                        </button>
+
+                        <!-- 📸 Product Image & Details -->
+                        <div class="col-span-2 flex items-center space-x-4">
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="w-24 h-24 object-cover rounded-md shadow-md">
+                            <div>
+                                <h3 class="font-semibold text-gray-800">{{ item.product.name }}</h3>
+                                <p class="text-sm text-gray-500">{{ item.product.category.name }}</p>
+                            </div>
+                        </div>
+
+                        <!-- 💲 Price -->
+                        <div class="text-lg font-medium text-gray-700">
+                            Rs. {{ item.product.price|floatformat:2 }}
+                        </div>
+
+                        <!-- 🔢 Quantity Selector -->
+                        <div class="flex items-center space-x-2">
+                            <button onclick="updateQuantity('{{ item.id }}', -1)" class="bg-gray-200 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-300 transition">-</button>
+                            <input type="text" id="quantity-{{ item.id }}" value="{{ item.quantity }}" class="w-12 text-center border border-gray-300 rounded-md" onchange="updateQuantityManual('{{ item.id }}', this.value)">
+                            <button onclick="updateQuantity('{{ item.id }}', 1)" class="bg-gray-200 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-300 transition">+</button>
+                        </div>
+
+                        <!-- 🏷️ Subtotal -->
+                        <div id="subtotal-{{ item.id }}" class="text-lg font-semibold text-green-600">
+                            Rs. {{ item.total_price|floatformat:2 }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Cancel Button (Clear Cart) -->
+                <div class="mt-6 flex justify-between">
+                    <button id="cancel-button" onclick="clearCart()" class="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition shadow-md">
+                        ❌ Cancel Order
+                    </button>
+                    <a href="/" class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition shadow-md">
+                        🛍️ Continue Shopping
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-10">
+                <p class="text-gray-600 text-lg mb-4">Your cart is empty 😞</p>
+                <a href="/" class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition shadow-md">
+                    🛍️ Continue Shopping
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- 📊 Cart Totals -->
+        <div class="lg:col-span-1">
+            <div class="bg-white shadow-lg rounded-lg p-6 border">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">💰 Cart Summary</h2>
+                <div class="space-y-4">
+                    <div class="flex justify-between py-2 border-b">
+                        <span class="text-gray-600">Subtotal</span>
+                        <span id="cart-subtotal" class="font-medium">Rs. {{ cart_total|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b">
+                        <span class="text-gray-600">Shipping</span>
+                        <span id="shipping-cost" class="font-medium">Rs. {{ shipping_cost|default:"0.00" }}</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b text-xl font-semibold">
+                        <span>Total</span>
+                        <span id="cart-total">Rs. {{ total_with_shipping|floatformat:2 }}</span>
+                    </div>
+                    <a href="{% url 'cart_checkout' %}" class="block w-full px-6 py-3 text-center bg-green-600 text-white rounded-md hover:bg-green-700 transition shadow-md">
+                        ✅ Proceed to Checkout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ JavaScript for Quantity Update and Cart Actions -->
+<script>
+    // Function to update quantity when + or - buttons are clicked
+    function updateQuantity(itemId, change) {
+        let quantityInput = document.getElementById('quantity-' + itemId);
+        let currentValue = parseInt(quantityInput.value);
+        let newQuantity = currentValue + change;
+
+        if (newQuantity >= 1) {
+            quantityInput.value = newQuantity;
+            updateCartInDatabase(itemId, newQuantity);
+        }
+    }
+    
+    // Function to update quantity when manually changed
+    function updateQuantityManual(itemId, newValue) {
+        let newQuantity = parseInt(newValue);
+        
+        if (isNaN(newQuantity) || newQuantity < 1) {
+            // Reset to 1 if invalid input
+            document.getElementById('quantity-' + itemId).value = 1;
+            newQuantity = 1;
+        }
+        
+        updateCartInDatabase(itemId, newQuantity);
+    }
+    
+    // Function to send update to database
+    function updateCartInDatabase(itemId, newQuantity) {
+        // Show loading indicator
+        const subtotalElement = document.getElementById('subtotal-' + itemId);
+        const originalContent = subtotalElement.innerHTML;
+        subtotalElement.innerHTML = '<span class="text-gray-500">Updating...</span>';
+        
+        fetch(`/update_cart/${itemId}/`, {
+            method: 'POST',
+            headers: { 
+                'X-CSRFToken': '{{ csrf_token }}', 
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({ quantity: newQuantity })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Update the UI with new values
+                document.getElementById('subtotal-' + itemId).innerText = "Rs. " + data.subtotal.toFixed(2);
+                document.getElementById('cart-subtotal').innerText = "Rs. " + data.cart_total.toFixed(2);
+                document.getElementById('shipping-cost').innerText = "Rs. " + data.shipping_cost.toFixed(2);
+                document.getElementById('cart-total').innerText = "Rs. " + data.total_with_shipping.toFixed(2);
+                
+                // Add a brief highlight effect to show the value has changed
+                subtotalElement.classList.add('bg-green-100');
+                setTimeout(() => {
+                    subtotalElement.classList.remove('bg-green-100');
+                }, 500);
+            } else {
+                // Restore original content on error
+                subtotalElement.innerHTML = originalContent;
+                alert('Error updating cart: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Restore original content on error
+            subtotalElement.innerHTML = originalContent;
+            alert('An error occurred while updating the cart. Please try again.');
+        });
+    }
+
+    // Function to remove item from cart
+    function removeFromCart(itemId) {
+        if (confirm('Are you sure you want to remove this item from your cart?')) {
+            fetch(`/remove_from_cart/${itemId}/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Add fade-out animation
+                    const itemElement = document.getElementById('cart-item-' + itemId);
+                    itemElement.style.transition = 'opacity 0.5s ease';
+                    itemElement.style.opacity = '0';
+                    
+                    // Remove the item after animation completes
+                    setTimeout(() => {
+                        itemElement.remove();
+                        
+                        // Update cart totals
+                        document.getElementById('cart-subtotal').innerText = "Rs. " + data.cart_total.toFixed(2);
+                        document.getElementById('shipping-cost').innerText = "Rs. " + data.shipping_cost.toFixed(2);
+                        document.getElementById('cart-total').innerText = "Rs. " + data.total_with_shipping.toFixed(2);
+                        
+                        // If cart is empty, reload the page to show empty cart message
+                        if (data.cart_total === 0) {
+                            location.reload();
+                        }
+                    }, 500);
+                } else {
+                    alert('Error removing item: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while removing the item. Please try again.');
+            });
+        }
+    }
+    
+    // Function to clear the entire cart
+    function clearCart() {
+        if (confirm('Are you sure you want to cancel your order and clear your cart?')) {
+            fetch('/clear_cart/', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Add a fade-out animation to all cart items
+                    const cartItems = document.querySelectorAll('#cart-items > div');
+                    cartItems.forEach(item => {
+                        item.style.transition = 'opacity 0.5s ease';
+                        item.style.opacity = '0';
+                    });
+                    
+                    // Reload after animation completes
+                    setTimeout(() => {
+                        location.reload();
+                    }, 500);
+                } else {
+                    alert('Error clearing cart: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while clearing the cart. Please try again.');
+            });
+        }
+    }
+</script>
+
+{% if messages %}
+<div class="fixed bottom-4 right-4 z-50">
+    {% for message in messages %}
+    <div class="p-4 shadow-md rounded-md mb-2 {% if message.tags == 'success' %}bg-green-100 border-l-4 border-green-500{% elif message.tags == 'error' %}bg-red-100 border-l-4 border-red-500{% else %}bg-blue-100 border-l-4 border-blue-500{% endif %} animate-fade-in-up">
+        <p class="text-sm font-medium">{{ message }}</p>
+    </div>
+    {% endfor %}
+</div>
+<script>
+    // Auto-hide messages after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            const messages = document.querySelectorAll('.animate-fade-in-up');
+            messages.forEach(function(message) {
+                message.style.transition = 'all 0.5s ease';
+                message.style.opacity = '0';
+                message.style.transform = 'translateY(10px)';
+                setTimeout(function() {
+                    message.remove();
+                }, 500);
+            });
+        }, 5000);
+    });
+</script>
+{% endif %}
+
+<style>
+    /* Add these animations if you don't have them in your CSS */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animate-fade-in-up {
+        animation: fadeInUp 0.3s ease-out forwards;
+    }
+    
+    /* Transition for highlighting changes */
+    #cart-items .text-green-600,
+    #cart-subtotal,
+    #shipping-cost,
+    #cart-total {
+        transition: background-color 0.3s ease;
+    }
+</style>
+{% endblock %}

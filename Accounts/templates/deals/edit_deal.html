@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Wholesale Opportunity - {{ deal.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Edit Wholesale Opportunity</h1>
+    
+    <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Basic Information Section -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Basic Information</h2>
+                
+                <div class="mb-4">
+                    <label for="{{ form.title.id_for_label }}" class="block text-gray-700 font-medium mb-2">Title</label>
+                    {{ form.title|add_class:"w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" }}
+                    {% if form.title.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.title.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-4">
+                    <label for="{{ form.description.id_for_label }}" class="block text-gray-700 font-medium mb-2">Description</label>
+                    {{ form.description|add_class:"w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" }}
+                    {% if form.description.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.description.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Wholesale Terms Section -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Wholesale Terms</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="{{ form.min_order.id_for_label }}" class="block text-gray-700 font-medium mb-2">Minimum Order Quantity</label>
+                        {{ form.min_order|add_class:"w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" }}
+                        <p class="text-sm text-gray-500 mt-1">{{ form.min_order.help_text }}</p>
+                        {% if form.min_order.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.min_order.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label for="{{ form.lead_time.id_for_label }}" class="block text-gray-700 font-medium mb-2">Lead Time</label>
+                        {{ form.lead_time|add_class:"w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" }}
+                        <p class="text-sm text-gray-500 mt-1">{{ form.lead_time.help_text }}</p>
+                        {% if form.lead_time.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.lead_time.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="{{ form.origin.id_for_label }}" class="block text-gray-700 font-medium mb-2">Country/Region of Origin</label>
+                        {{ form.origin|add_class:"w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" }}
+                        <p class="text-sm text-gray-500 mt-1">{{ form.origin.help_text }}</p>
+                        {% if form.origin.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.origin.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label for="{{ form.shipping_terms.id_for_label }}" class="block text-gray-700 font-medium mb-2">Shipping Terms</label>
+                        {{ form.shipping_terms|add_class:"w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" }}
+                        <p class="text-sm text-gray-500 mt-1">{{ form.shipping_terms.help_text }}</p>
+                        {% if form.shipping_terms.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.shipping_terms.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="{{ form.certifications.id_for_label }}" class="block text-gray-700 font-medium mb-2">Certifications & Compliance</label>
+                    {{ form.certifications|add_class:"w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" }}
+                    <p class="text-sm text-gray-500 mt-1">{{ form.certifications.help_text }}</p>
+                    {% if form.certifications.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.certifications.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Shipping Destinations Section -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Shipping Destinations</h2>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                    <div class="flex items-center">
+                        {{ form.ship_domestic|add_class:"h-5 w-5 text-primary focus:ring-primary border-gray-300 rounded mr-2" }}
+                        <label for="{{ form.ship_domestic.id_for_label }}" class="text-gray-700">Domestic</label>
+                    </div>
+                    <div class="flex items-center">
+                        {{ form.ship_international|add_class:"h-5 w-5 text-primary focus:ring-primary border-gray-300 rounded mr-2" }}
+                        <label for="{{ form.ship_international.id_for_label }}" class="text-gray-700">International</label>
+                    </div>
+                    <div class="flex items-center">
+                        {{ form.ship_north_america|add_class:"h-5 w-5 text-primary focus:ring-primary border-gray-300 rounded mr-2" }}
+                        <label for="{{ form.ship_north_america.id_for_label }}" class="text-gray-700">North America</label>
+                    </div>
+                    <div class="flex items-center">
+                        {{ form.ship_europe|add_class:"h-5 w-5 text-primary focus:ring-primary border-gray-300 rounded mr-2" }}
+                        <label for="{{ form.ship_europe.id_for_label }}" class="text-gray-700">Europe</label>
+                    </div>
+                    <div class="flex items-center">
+                        {{ form.ship_asia|add_class:"h-5 w-5 text-primary focus:ring-primary border-gray-300 rounded mr-2" }}
+                        <label for="{{ form.ship_asia.id_for_label }}" class="text-gray-700">Asia</label>
+                    </div>
+                    <div class="flex items-center">
+                        {{ form.ship_australia|add_class:"h-5 w-5 text-primary focus:ring-primary border-gray-300 rounded mr-2" }}
+                        <label for="{{ form.ship_australia.id_for_label }}" class="text-gray-700">Australia/Oceania</label>
+                    </div>
+                    <div class="flex items-center">
+                        {{ form.ship_africa|add_class:"h-5 w-5 text-primary focus:ring-primary border-gray-300 rounded mr-2" }}
+                        <label for="{{ form.ship_africa.id_for_label }}" class="text-gray-700">Africa</label>
+                    </div>
+                    <div class="flex items-center">
+                        {{ form.ship_south_america|add_class:"h-5 w-5 text-primary focus:ring-primary border-gray-300 rounded mr-2" }}
+                        <label for="{{ form.ship_south_america.id_for_label }}" class="text-gray-700">South America</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Image Upload Section -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Product Image</h2>
+                
+                <div class="mb-6">
+                    <label for="{{ form.image.id_for_label }}" class="block text-gray-700 font-medium mb-2">Opportunity Image</label>
+                    <div class="mb-2">
+                        <p class="text-sm text-gray-600 mb-2">Current image:</p>
+                        <img src="{{ deal.image.url }}" alt="{{ deal.title }}" class="max-h-48 rounded-lg border border-gray-200">
+                    </div>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center" id="imageDropArea">
+                        <input type="file" id="{{ form.image.id_for_label }}" name="{{ form.image.html_name }}" class="hidden" accept="image/*">
+                        <div id="preview" class="hidden mb-4">
+                            <img id="imagePreview" class="max-h-48 mx-auto rounded-lg" alt="New image preview">
+                        </div>
+                        <label for="{{ form.image.id_for_label }}" class="cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <p class="mt-2 text-gray-600">Click to upload a new image or drag and drop</p>
+                            <p class="text-sm text-gray-500 mt-1">PNG, JPG, GIF up to 5MB</p>
+                        </label>
+                    </div>
+                    {% if form.image.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.image.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Form Actions -->
+            <div class="flex justify-end">
+                <a href="{% url 'deal_detail' deal.pk %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium mr-3 transition-colors">
+                    Cancel
+                </a>
+                <button type="submit" class="bg-primary hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    Update Wholesale Opportunity
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageInput = document.getElementById('{{ form.image.id_for_label }}');
+        const imagePreview = document.getElementById('imagePreview');
+        const preview = document.getElementById('preview');
+        const dropArea = document.getElementById('imageDropArea');
+        
+        // Handle file selection
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+        
+        // Handle drag and drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            dropArea.classList.add('border-primary');
+        }
+        
+        function unhighlight() {
+            dropArea.classList.remove('border-primary');
+        }
+        
+        dropArea.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            imageInput.files = files;
+            
+            if (files && files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(files[0]);
+            }
+        }
+    });
+</script>
+{% endblock %}

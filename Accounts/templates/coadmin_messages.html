@@ -1,0 +1,408 @@
+{% extends 'coadmin_base.html' %}
+{% load static %}
+
+{% block page_title %}Messages Management{% endblock %}
+
+{% block dashboard_content %}
+<!-- Page header with enhanced styling -->
+<header class="mb-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+                Deal Messages
+            </h1>
+            <p class="mt-2 text-gray-600 max-w-3xl">
+                Manage customer communications related to wholesale deals and respond to inquiries efficiently.
+            </p>
+        </div>
+    </div>
+</header>
+
+<!-- Enhanced filters section with better UI -->
+<div class="bg-white rounded-xl shadow-md mb-8 overflow-hidden">
+    <div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+        <h2 class="text-lg font-medium text-gray-800 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            Filter Messages
+        </h2>
+    </div>
+    <form method="get" action="{% url 'coadmin_messages' %}" class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+                <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search Messages</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <input type="text" id="search" name="q" value="{{ search_query }}" placeholder="Search by content or username" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+            </div>
+            <div>
+                <label for="deal" class="block text-sm font-medium text-gray-700 mb-1">Deal</label>
+                <select id="deal" name="deal" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <option value="">All Deals</option>
+                    {% for d in all_deals %}
+                    <option value="{{ d.id }}" {% if deal_filter == d.id|stringformat:"i" %}selected{% endif %}>{{ d.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select id="status" name="status" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <option value="all" {% if status_filter == 'all' or not status_filter %}selected{% endif %}>All Messages</option>
+                    <option value="unread" {% if status_filter == 'unread' %}selected{% endif %}>Unread</option>
+                    <option value="read" {% if status_filter == 'read' %}selected{% endif %}>Read</option>
+                </select>
+            </div>
+        </div>
+        <div class="mt-6 flex justify-end">
+            <a href="{% url 'coadmin_messages' %}" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Reset
+            </a>
+            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                Apply Filters
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Enhanced two-column layout for conversations -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Conversations list with improved UI -->
+    <div class="lg:col-span-1">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden h-full flex flex-col">
+            <div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-800 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                    </svg>
+                    Active Conversations
+                </h3>
+            </div>
+            <div class="overflow-y-auto flex-grow" style="max-height: 600px;">
+                <ul class="divide-y divide-gray-200">
+                    {% for conversation in conversations %}
+                    <li class="conversation-item" data-user-id="{{ conversation.user.id }}" data-deal-id="{{ conversation.deal.id }}">
+                        <a href="{% url 'coadmin_messages' %}?deal={{ conversation.deal.id }}&user={{ conversation.user.id }}" class="block hover:bg-gray-50 transition-colors duration-150 {% if conversation.unread_count > 0 %}bg-indigo-50 border-l-4 border-indigo-500{% endif %} {% if selected_user.id == conversation.user.id and selected_deal.id == conversation.deal.id %}bg-indigo-100{% endif %}">
+                            <div class="px-6 py-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0">
+                                            {% if conversation.user.profile.image %}
+                                            <img class="h-12 w-12 rounded-full object-cover border-2 {% if conversation.unread_count > 0 %}border-indigo-500{% else %}border-gray-200{% endif %}" src="{{ conversation.user.profile.image.url }}" alt="{{ conversation.user.username }}">
+                                            {% else %}
+                                            <div class="h-12 w-12 rounded-full {% if conversation.unread_count > 0 %}bg-indigo-200 text-indigo-600{% else %}bg-gray-200 text-gray-600{% endif %} flex items-center justify-center border-2 {% if conversation.unread_count > 0 %}border-indigo-500{% else %}border-gray-200{% endif %}">
+                                                <span class="font-medium text-lg">{{ conversation.user.username|make_list|first|upper }}</span>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="ml-4">
+                                            <p class="text-sm font-medium {% if conversation.unread_count > 0 %}text-indigo-900{% else %}text-gray-900{% endif %}">
+                                                {{ conversation.user.username }}
+                                            </p>
+                                            <p class="text-xs {% if conversation.unread_count > 0 %}text-indigo-600{% else %}text-gray-500{% endif %} truncate max-w-[150px]">
+                                                {{ conversation.deal.title }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="ml-2 flex-shrink-0 flex flex-col items-end">
+                                        <p class="text-xs {% if conversation.unread_count > 0 %}text-indigo-600 font-medium{% else %}text-gray-500{% endif %}">
+                                            {{ conversation.last_message_time|date:"M d, Y" }}
+                                        </p>
+                                        {% if conversation.unread_count > 0 %}
+                                        <span class="mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            {{ conversation.unread_count }} new
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% if conversation.last_message %}
+                                <div class="mt-2 text-xs {% if conversation.unread_count > 0 %}text-indigo-600{% else %}text-gray-500{% endif %} truncate">
+                                    {{ conversation.last_message }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </a>
+                    </li>
+                    {% empty %}
+                    <li class="px-6 py-8 text-center">
+                        <div class="flex flex-col items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            <p class="text-gray-500 text-lg font-medium mb-1">No conversations found</p>
+                            <p class="text-gray-400 text-sm">Check back later for new messages</p>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages panel with improved UI -->
+    <div class="lg:col-span-2">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden h-full flex flex-col">
+            {% if selected_user and selected_deal %}
+            <!-- Conversation header -->
+            <div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            {% if selected_user.profile.image %}
+                            <img class="h-12 w-12 rounded-full object-cover border-2 border-indigo-500" src="{{ selected_user.profile.image.url }}" alt="{{ selected_user.username }}">
+                            {% else %}
+                            <div class="h-12 w-12 rounded-full bg-indigo-200 flex items-center justify-center border-2 border-indigo-500">
+                                <span class="text-lg font-medium text-indigo-600">{{ selected_user.username|make_list|first|upper }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                                {{ selected_user.username }}
+                                {% if selected_user.is_verified %}
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                {% endif %}
+                            </h3>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                                </svg>
+                                <span>{{ selected_deal.title }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <a href="{% url 'deal_detail' selected_deal.id %}" class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-150">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                            View Deal
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message list with improved UI -->
+            <div class="flex-1 p-6 overflow-y-auto bg-gradient-to-b from-gray-50 to-white" style="max-height: 500px;" id="message-container">
+                <div class="space-y-4">
+                    {% for message in messages_list %}
+                    <div class="flex {% if message.sender == request.user %}justify-end{% else %}justify-start{% endif %} message-item">
+                        <div class="flex {% if message.sender == request.user %}flex-row-reverse{% endif %} items-end">
+                            <div class="flex-shrink-0 {% if message.sender == request.user %}ml-2{% else %}mr-2{% endif %}">
+                                {% if message.sender.profile.image %}
+                                <img class="h-8 w-8 rounded-full object-cover" src="{{ message.sender.profile.image.url }}" alt="{{ message.sender.username }}">
+                                {% else %}
+                                <div class="h-8 w-8 rounded-full {% if message.sender == request.user %}bg-indigo-200 text-indigo-600{% else %}bg-gray-200 text-gray-600{% endif %} flex items-center justify-center">
+                                    <span class="font-medium text-xs">{{ message.sender.username|make_list|first|upper }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="rounded-2xl px-4 py-2 max-w-md {% if message.sender == request.user %}bg-indigo-600 text-white{% else %}bg-gray-100 text-gray-800{% endif %} shadow-sm">
+                                <p class="text-sm">
+                                    {{ message.message }}
+                                </p>
+                                <p class="mt-1 text-xs {% if message.sender == request.user %}text-indigo-100{% else %}text-gray-500{% endif %} text-right">
+                                    {{ message.timestamp|date:"M d, Y H:i" }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="py-12 text-center">
+                        <div class="flex flex-col items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            <p class="text-gray-500 text-lg font-medium mb-1">No messages yet</p>
+                            <p class="text-gray-400 text-sm">Start the conversation by sending a message below</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Message input form -->
+            <div class="border-t border-gray-200 p-4 bg-gray-50">
+                <form method="post" action="{% url 'send_deal_message' %}" class="flex items-end space-x-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="deal_id" value="{{ selected_deal.id }}">
+                    <input type="hidden" name="user_id" value="{{ selected_user.id }}">
+                    <div class="flex-grow">
+                        <label for="message" class="sr-only">Message</label>
+                        <div class="relative rounded-lg shadow-sm">
+                            <textarea id="message" name="message" rows="2" class="block w-full pr-10 sm:text-sm border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 resize-none" placeholder="Type your message here..."></textarea>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-150">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                        Send
+                    </button>
+                </form>
+            </div>
+            {% else %}
+            <!-- No conversation selected state -->
+            <div class="flex flex-col items-center justify-center h-full p-8 text-center">
+                <div class="bg-indigo-100 rounded-full p-6 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">No Conversation Selected</h3>
+                <p class="text-gray-500 max-w-md mb-6">Select a conversation from the list to view messages and respond to customer inquiries about wholesale deals.</p>
+                {% if conversations %}
+                <p class="text-sm text-indigo-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+                    </svg>
+                    Select a conversation from the left
+                </p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Quick actions card -->
+<div class="mt-8 bg-white rounded-xl shadow-md overflow-hidden">
+    <div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+        <h2 class="text-lg font-medium text-gray-800 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Quick Actions
+        </h2>
+    </div>
+    <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="{% url 'coadmin_messages' %}?status=unread" class="flex items-center p-4 bg-red-50 rounded-lg hover:bg-red-100 transition-colors duration-150">
+                <div class="flex-shrink-0 bg-red-500 rounded-md p-2 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-900">Unread Messages</h3>
+                    <p class="text-xs text-gray-500">View all unread messages</p>
+                </div>
+            </a>
+            <a href="{% url 'coadmin_deals' %}" class="flex items-center p-4 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors duration-150">
+                <div class="flex-shrink-0 bg-amber-500 rounded-md p-2 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-900">Manage Deals</h3>
+                    <p class="text-xs text-gray-500">View and update wholesale deals</p>
+                </div>
+            </a>
+            <a href="{% url 'add_deal' %}" class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors duration-150">
+                <div class="flex-shrink-0 bg-green-500 rounded-md p-2 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-900">Create New Deal</h3>
+                    <p class="text-xs text-gray-500">Add a new wholesale deal</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for enhanced interactions -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Scroll to bottom of message container on load
+        const messageContainer = document.getElementById('message-container');
+        if (messageContainer) {
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+        
+        // Add fade-in animation to message items
+        const messageItems = document.querySelectorAll('.message-item');
+        messageItems.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.animation = `fadeIn 0.3s ease-in-out forwards ${index * 0.05}s`;
+        });
+
+        // Add animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Auto-resize textarea
+        const textarea = document.querySelector('textarea[name="message"]');
+        if (textarea) {
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+                // Limit to 150px max height
+                if (this.scrollHeight > 150) {
+                    this.style.height = '150px';
+                    this.style.overflowY = 'auto';
+                } else {
+                    this.style.overflowY = 'hidden';
+                }
+            });
+            
+            // Focus textarea if conversation is selected
+            if (document.querySelector('[data-user-id]')) {
+                textarea.focus();
+            }
+        }
+        
+        // Mark messages as read when viewed
+        const conversationItems = document.querySelectorAll('.conversation-item');
+        conversationItems.forEach(item => {
+            const userId = item.dataset.userId;
+            const dealId = item.dataset.dealId;
+            
+            if (userId && dealId) {
+                const selectedUserId = "{{ selected_user.id|default:'' }}";
+                const selectedDealId = "{{ selected_deal.id|default:'' }}";
+                
+                if (userId === selectedUserId && dealId === selectedDealId) {
+                    // Send AJAX request to mark messages as read
+                    fetch(`{% url 'mark_messages_read' %}?user=${userId}&deal=${dealId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

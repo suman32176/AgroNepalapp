@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Page header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                Notifications
+            </h1>
+            <p class="mt-2 text-gray-600 max-w-3xl">Stay updated with important information about your orders, products, and more.</p>
+        </div>
+
+        <!-- Notification controls -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+            <div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-lg font-medium text-gray-800 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    Your Notifications
+                </h2>
+                <form action="{% url 'mark_all_notifications_read' %}" method="post" id="mark-all-form">
+                    {% csrf_token %}
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Mark All as Read
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Notifications list -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            {% if notifications %}
+            <ul class="divide-y divide-gray-200">
+                {% for notification in notifications %}
+                <li class="hover:bg-gray-50 transition-colors duration-150 notification-item{% if not notification.is_read %} bg-blue-50{% endif %}" data-id="{{ notification.id }}">
+                    <div class="px-6 py-5">
+                        <div class="flex items-start">
+                            <!-- Notification icon based on type -->
+                            <div class="flex-shrink-0">
+                                {% if notification.notification_type == 'order' %}
+                                <div class="h-10 w-10 rounded-full bg-primary bg-opacity-20 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                    </svg>
+                                </div>
+                                {% elif notification.notification_type == 'product' %}
+                                <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                                    </svg>
+                                </div>
+                                {% elif notification.notification_type == 'deal' %}
+                                <div class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                                    </svg>
+                                </div>
+                                {% else %}
+                                <div class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Notification content -->
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-lg font-medium text-gray-900">{{ notification.title }}</h3>
+                                    <span class="text-sm text-gray-500">{{ notification.created_at|timesince }} ago</span>
+                                </div>
+                                <p class="mt-1 text-gray-600">{{ notification.message }}</p>
+                                
+                                <div class="mt-3 flex">
+                                    {% if notification.link %}
+                                    <a href="{{ notification.link }}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-accent transition-colors duration-200">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                        </svg>
+                                        View Details
+                                    </a>
+                                    {% endif %}
+                                    
+                                    {% if not notification.is_read %}
+                                    <form method="post" action="{% url 'mark_notification_read' notification.id %}" class="mark-read-form ml-2">
+                                        {% csrf_token %}
+                                        <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-primary transition-colors duration-200">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            Mark as Read
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Read/Unread indicator -->
+                            {% if not notification.is_read %}
+                            <div class="ml-4 flex-shrink-0">
+                                <span class="inline-flex h-3 w-3 bg-primary rounded-full"></span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            
+            <!-- Pagination -->
+            {% if notifications.has_other_pages %}
+            <div class="bg-white px-6 py-4 border-t border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div class="hidden sm:block">
+                        <p class="text-sm text-gray-700">
+                            Showing <span class="font-medium">{{ notifications.start_index }}</span> to <span class="font-medium">{{ notifications.end_index }}</span> of <span class="font-medium">{{ notifications.paginator.count }}</span> notifications
+                        </p>
+                    </div>
+                    <div class="flex-1 flex justify-center sm:justify-end">
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            {% if notifications.has_previous %}
+                            <a href="?page={{ notifications.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <span class="sr-only">Previous</span>
+                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                            {% endif %}
+                            
+                            {% for i in notifications.paginator.page_range %}
+                                {% if notifications.number == i %}
+                                <span class="relative inline-flex items-center px-4 py-2 border border-primary bg-primary bg-opacity-10 text-sm font-medium text-primary">
+                                    {{ i }}
+                                </span>
+                                {% elif i > notifications.number|add:'-3' and i < notifications.number|add:'3' %}
+                                <a href="?page={{ i }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                    {{ i }}
+                                </a>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if notifications.has_next %}
+                            <a href="?page={{ notifications.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <span class="sr-only">Next</span>
+                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% else %}
+            <div class="px-6 py-10 text-center">
+                <div class="flex flex-col items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    <p class="text-gray-500 text-lg font-medium mb-1">No notifications yet</p>
+                    <p class="text-gray-400 text-sm mb-4">You're all caught up! Check back later for updates.</p>
+                    <a href="{% url 'home' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent">
+                        Return to Home
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for enhanced interactions -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mark as read functionality with AJAX
+        const markReadForms = document.querySelectorAll('.mark-read-form');
+        markReadForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formAction = this.getAttribute('action');
+                const notificationItem = this.closest('.notification-item');
+                
+                fetch(formAction, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': this.querySelector('input[name="csrfmiddlewaretoken"]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Remove the unread indicator and background
+                        notificationItem.classList.remove('bg-blue-50');
+                        const indicator = notificationItem.querySelector('.flex-shrink-0 span');
+                        if (indicator) indicator.remove();
+                        
+                        // Remove the "Mark as Read" button
+                        this.remove();
+                        
+                        // Update the unread count in the navbar if it exists
+                        const navCountElement = document.querySelector('#notification-count');
+                        if (navCountElement) {
+                            const currentCount = parseInt(navCountElement.textContent);
+                            if (currentCount > 0) {
+                                navCountElement.textContent = currentCount - 1;
+                                if (currentCount - 1 === 0) {
+                                    navCountElement.classList.add('hidden');
+                                }
+                            }
+                        }
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+        
+        // Mark all as read functionality with AJAX
+        const markAllForm = document.getElementById('mark-all-form');
+        if (markAllForm) {
+            markAllForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                fetch(this.getAttribute('action'), {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': this.querySelector('input[name="csrfmiddlewaretoken"]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Remove all unread indicators and backgrounds
+                        document.querySelectorAll('.notification-item').forEach(item => {
+                            item.classList.remove('bg-blue-50');
+                            const indicator = item.querySelector('.flex-shrink-0 span');
+                            if (indicator) indicator.remove();
+                        });
+                        
+                        // Remove all "Mark as Read" buttons
+                        document.querySelectorAll('.mark-read-form').forEach(form => {
+                            form.remove();
+                        });
+                        
+                        // Update the unread count in the navbar to 0
+                        const navCountElement = document.querySelector('#notification-count');
+                        if (navCountElement) {
+                            navCountElement.textContent = '0';
+                            navCountElement.classList.add('hidden');
+                        }
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        }
+    });
+</script>
+{% endblock %} 

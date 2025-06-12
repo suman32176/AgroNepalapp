@@ -1,0 +1,2105 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="theme-color" content="#2C5F2D" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>{% block title %}Agro Nepal - Premium Agricultural Solutions{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2C5F2D',
+                        secondary: '#97BC62',
+                        accent: '#FED766',
+                        dark: '#1A1A1A',
+                        light: '#F5F5F5',
+                        vip: '#FF6B6B',
+                        vipBg: '#FFE0E0',
+                        vipText: '#9C0000'
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s infinite',
+                        'pulse-slow': 'pulse 3s infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+        /* Fix for Android Chrome bottom navigation bar overlap */
+        @supports (-webkit-touch-callout: none) {
+            .chat-fixed-button {
+                bottom: 80px;
+            }
+        }
+
+        /* Fix for Android input zoom */
+        input, select, textarea {
+            font-size: 16px !important;
+        }
+
+        /* Improve tap target sizes for mobile */
+        .mobile-tap-target {
+            min-height: 48px;
+            min-width: 48px;
+        }
+
+        /* Fix for Android overscroll behavior */
+        html, body {
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Prevent pull-to-refresh on Android Chrome */
+        body {
+            overflow-y: scroll;
+            height: 100%;
+        }
+
+        /* Improve scrolling performance */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hover-grow {
+            transition: transform 0.3s ease;
+        }
+
+        .hover-grow:hover {
+            transform: scale(1.05);
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Navbar animation */
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: #FED766;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Mobile menu animation */
+        .mobile-menu-enter {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, opacity: 0.3s ease;
+        }
+
+        .mobile-menu-enter.mobile-menu-enter-active {
+            max-height: 500px;
+            opacity: 1;
+        }
+
+        /* Chat message animations */
+        .message-bubble {
+            animation: fadeIn 0.3s ease-out;
+            word-break: break-word;
+        }
+
+        /* Chat typing indicator */
+        .typing-indicator {
+            display: none;
+            padding: 8px;
+            margin-top: 8px;
+        }
+
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background-color: #9CA3AF;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 3px;
+            animation: typing 1s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
+        }
+
+        /* Quick emoji hover effect */
+        .quick-emoji {
+            transition: all 0.2s ease;
+            border-radius: 8px;
+        }
+        
+        .quick-emoji:hover {
+            transform: scale(1.2);
+            background-color: #F3F4F6;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 8px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #97BC62;
+            border-radius: 8px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2C5F2D;
+        }
+
+        /* Notification badge animation */
+        @keyframes notification-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .notification-badge {
+            animation: notification-pulse 1.5s infinite;
+        }
+
+        /* Tooltip styling */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 120px;
+            background-color: #2C5F2D;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* VIP message styling */
+        .vip-badge {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);
+            margin-left: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .vip-message {
+            background: linear-gradient(135deg, #FFE0E0, #FFF5F5);
+            border-left: 3px solid #FF6B6B;
+            color: #9C0000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 5px rgba(255, 107, 107, 0.5);
+            }
+            to {
+                box-shadow: 0 0 15px rgba(255, 107, 107, 0.8);
+            }
+        }
+
+        .vip-glow {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 640px) {
+            .mobile-footer-grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .mobile-menu-item {
+                padding: 0.75rem 0;
+            }
+
+            .mobile-chat-container {
+                height: 85vh;
+                width: 95vw;
+                margin: 0 auto;
+            }
+
+            .mobile-chat-messages {
+                max-height: 60vh;
+            }
+
+            /* Bottom navigation for mobile */
+            .mobile-bottom-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: #2C5F2D;
+                display: flex;
+                justify-content: space-around;
+                padding: 0.5rem 0;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+                z-index: 40;
+            }
+
+            .mobile-bottom-nav a {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 0.5rem;
+                color: rgba(255,255,255,0.7);
+                font-size: 0.75rem;
+            }
+
+            .mobile-bottom-nav a.active {
+                color: #FED766;
+            }
+
+            .mobile-bottom-nav i {
+                font-size: 1.25rem;
+                margin-bottom: 0.25rem;
+            }
+
+            /* Adjust padding for content to account for bottom nav */
+            .has-bottom-nav {
+                padding-bottom: 4rem;
+            }
+        }
+</style>
+</head>
+
+{% if request.user.is_authenticated and not request.user.profile.is_verified %}
+<style>
+  #verify-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(5px);
+    background-color: rgba(255, 255, 255, 0.6);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #verify-box {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    text-align: center;
+  }
+</style>
+
+<div id="verify-overlay">
+    {% if messages %}
+        <div class="fixed top-4 right-4 z-50 w-full max-w-md">
+            {% for message in messages %}
+                <div class="bg-white border-l-4 border-indigo-500 text-indigo-700 p-4 mb-3 rounded-lg shadow-lg animate-fade-in-down flex items-center">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    <span>{{ message }}</span>
+                    <button class="ml-auto text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+  
+    <div id="verify-box">
+        <h4>Please verify your account</h4>
+        <div class="mt-4">
+            <a href="{% url 'resend_verification' %}" 
+               class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-lg shadow transition-all duration-300 transform hover:scale-105 hover:shadow-yellow-200/50">
+                <i class="fas fa-envelope-open-text mr-2"></i> Verify Account
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+
+<body class="bg-light text-dark font-sans has-bottom-nav">
+    <!-- Navigation Bar -->
+    <nav class="bg-gradient-to-r from-primary to-primary/90 text-light shadow-xl sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Desktop Navigation -->
+            <div class="flex justify-between items-center py-4">
+                <!-- Brand Logo -->
+                <a href="/" class="flex items-center space-x-2 group">
+                    <div class="bg-accent rounded-full p-2 transform group-hover:rotate-12 transition-transform duration-300">
+                        <i class="fas fa-leaf text-primary text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-serif font-bold text-accent group-hover:text-white transition duration-300">
+                        Agro Nepal
+                    </span>
+                </a>
+
+                <!-- Mobile Menu Button -->
+                <button class="lg:hidden focus:outline-none bg-primary/30 hover:bg-primary/50 p-2 rounded-lg transition-colors duration-300 mobile-tap-target" 
+                        onclick="document.getElementById('navbar').classList.toggle('hidden')">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+
+                <!-- Navbar Links -->
+                <div id="navbar" class="hidden lg:flex items-center space-x-6">
+                    <div class="flex items-center space-x-1 md:space-x-6">
+                        <a href="/" class="nav-link px-3 py-2 rounded-lg hover:bg-primary/30 transition duration-300 flex items-center space-x-1">
+                            <i class="fas fa-home text-accent"></i>
+                            <span>Home</span>
+                        </a>
+                        <a href="/job" class="nav-link px-3 py-2 rounded-lg hover:bg-primary/30 transition duration-300 flex items-center space-x-1">
+                            <i class="fas fa-briefcase text-accent"></i>
+                            <span>Jobs</span>
+                        </a>
+                        <a href="/categories" class="nav-link px-3 py-2 rounded-lg hover:bg-primary/30 transition duration-300 flex items-center space-x-1">
+                            <i class="fas fa-tags text-accent"></i>
+                            <span>Categories</span>
+                        </a>
+                        <a href="/product" class="nav-link px-3 py-2 rounded-lg hover:bg-primary/30 transition duration-300 flex items-center space-x-1">
+                            <i class="fas fa-store text-xl text-accent"></i>
+
+                            <span>Shop</span>
+                        </a>
+                        <a href="/order_details" class="nav-link px-3 py-2 rounded-lg hover:bg-primary/30 transition duration-300 flex items-center space-x-1">
+                            <i class="fas fa-truck text-accent"></i>
+                            <span>Orders</span>
+                        </a>
+                        
+                        {% if request.user.is_superuser %}
+                        <a href="/admin_dashboard/dashboard/" class="nav-link px-3 py-2 rounded-lg hover:bg-primary/30 transition duration-300 flex items-center space-x-1">
+                            <i class="fas fa-tachometer-alt text-accent"></i>
+                            <span>Admin Dashboard </span>
+                        </a>
+                        {% elif request.user.profile.show_request_manager_btn %}
+                        <a href="{% url 'coadmin_dashboard' %}" class="nav-link px-3 py-2 rounded-lg hover:bg-primary/30 transition duration-300 flex items-center space-x-1">
+                            <i class="fas fa-tachometer-alt text-accent"></i>
+                            <span> coadmin Dashboard </span>
+                        </a>
+                        {% else %}
+                        <a href="/seller/" class="nav-link px-3 py-2 rounded-lg hover:bg-primary/30 transition duration-300 flex items-center space-x-1">
+                            <i class="fas fa-tachometer-alt text-accent"></i>
+                            <span>Dashboard</span>
+                        </a> 
+                        {% endif %}
+
+                        
+                    </div>
+
+                    <div class="flex items-center space-x-4 pl-4 border-l border-white/20">
+                        <!-- Cart with Animated Dropdown -->
+                        <div class="relative mr-2">
+                            <a href="/cart" id="cart-link" class="relative p-2 rounded-full bg-primary/30 hover:bg-primary/50 transition duration-300 block tooltip mobile-tap-target">
+                                <i class="fas fa-shopping-cart text-lg text-accent"></i>
+                                {% if cart_count %}
+                                <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+                                    {{ cart_count }}
+                                </span>
+                                {% endif %}
+                                <span class="tooltip-text">View Cart</span>
+                            </a>
+                                       
+                            <!-- Cart Dropdown -->
+                            <div id="cart-dropdown" class="absolute z-50 right-0 mt-2 w-80 origin-top-right rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-200 hidden overflow-hidden">
+                                <div class="p-3">
+                                    <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                                        <i class="fas fa-shopping-cart text-gray-600 mr-2"></i> Your Cart
+                                    </h3>
+                                </div>
+                                {% if cart_items %}
+                                <div class="max-h-64 overflow-y-auto divide-y divide-gray-200">
+                                    {% for item in cart_items %}
+                                    <div class="p-3 hover:bg-gray-50 transition-colors duration-150">
+                                        <div class="flex items-center">
+                                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="h-12 w-12 object-cover rounded-md">
+                                            <div class="ml-3 flex-1">
+                                                <p class="text-sm font-medium text-gray-900 truncate">{{ item.product.name }}</p>
+                                                <p class="text-xs text-gray-500">{{ item.quantity }} × Rs. {{ item.product.price|floatformat:2 }}</p>
+                                            </div>
+                                            <form method="POST" action="{% url 'remove_from_cart' item.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="text-red-500 hover:text-red-700 transition-colors duration-150">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="p-3 bg-gray-50">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <span class="text-sm text-gray-700">Total:</span>
+                                        <span class="font-semibold">Rs. {{ cart_total|floatformat:2 }}</span>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <a href="{% url 'cart' %}"
+                                            class="block w-full py-2 px-4 rounded-md shadow-sm text-sm font-medium text-center text-white bg-secondary hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                            VIEW CART
+                                        </a>
+                                        <a href="{% url 'cart_checkout' %}"
+                                            class="block w-full py-2 px-4 rounded-md shadow-sm text-sm font-medium text-center text-white bg-primary hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                            CHECKOUT
+                                        </a>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="p-5 flex flex-col items-center justify-center">
+                                    <i class="fas fa-shopping-cart text-4xl text-gray-400 mb-3"></i>
+                                    <p class="opacity-75">Your cart is empty 🛒</p>
+                                    <a href="/"
+                                        class="mt-3 w-full py-2 px-4 rounded-md shadow-sm text-sm font-medium text-center text-white bg-primary hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                        Continue Shopping
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Notification Bell -->
+                        <div class="relative mr-2">
+                            <a href="{% url 'notifications_list' %}" id="notification-link" class="relative p-2 rounded-full bg-primary/30 hover:bg-primary/50 transition duration-300 block tooltip mobile-tap-target">
+                                <i class="fas fa-bell text-lg text-accent"></i>
+                                {% if unread_notifications %}
+                                <span id="notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center {% if unread_notifications == 0 %}hidden{% endif %}">
+                                    {{ unread_notifications }}
+                                </span>
+                                {% endif %}
+                                <span class="tooltip-text">Notifications</span>
+                            </a>
+                            
+                            <!-- Notification Dropdown -->
+                            <div id="notification-dropdown" class="absolute z-50 right-0 mt-2 w-80 origin-top-right rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-200 hidden overflow-hidden">
+                                <div class="p-3 flex justify-between items-center">
+                                    <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                                        <i class="fas fa-bell text-gray-600 mr-2"></i> Notifications
+                                    </h3>
+                                    {% if unread_notifications %}
+                                    <form id="mark-all-dropdown-form" action="{% url 'mark_all_notifications_read' %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="text-xs text-primary hover:text-secondary transition-colors duration-150">
+                                            Mark all as read
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                                <div class="max-h-64 overflow-y-auto divide-y divide-gray-200" id="notification-list">
+                                    <!-- This will be populated via JavaScript -->
+                                    <div class="p-5 text-center text-gray-500" id="notification-loading">
+                                        <i class="fas fa-spinner fa-spin mr-2"></i> Loading notifications...
+                                    </div>
+                                </div>
+                                <div class="p-3 bg-gray-50 text-center">
+                                    <a href="{% url 'notifications_list' %}" class="inline-block w-full py-2 px-4 rounded-md shadow-sm text-sm font-medium text-center text-white bg-primary hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                        View All Notifications
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Authentication Links -->
+                        {% if user.is_authenticated %}
+                        <div class="flex items-center space-x-3">
+                            <a href="/profile" class="flex items-center space-x-2 bg-primary/30 hover:bg-primary/50 px-3 py-2 rounded-lg transition duration-300 tooltip">
+                                <img src="{{ user.profile.profile_picture.url }}" alt="Profile" 
+                                    class="w-8 h-8 rounded-full border-2 border-accent object-cover">
+                                <span class="font-medium">{{ user.username }}</span>
+                                <span class="tooltip-text">View Profile</span>
+                            </a>
+                            
+                        </div>
+                        {% else %}
+                        <a href="{% url 'login_attempt' %}" class="bg-accent/90 hover:bg-accent text-primary px-4 py-2 rounded-lg transition duration-300 font-medium flex items-center space-x-2">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span>Login</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Navigation Menu -->
+            <div id="navbar" class="hidden lg:hidden pb-4 mobile-menu-enter">
+                <div class="flex flex-col space-y-2 mt-2 border-t border-white/10 pt-4">
+                    <a href="/" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-primary/30 transition duration-300 mobile-menu-item">
+                        <i class="fas fa-home text-accent w-6"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="/job" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-primary/30 transition duration-300 mobile-menu-item">
+                        <i class="fas fa-briefcase text-accent w-6"></i>
+                        <span>Jobs</span>
+                    </a>
+                    <a href="/categories" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-primary/30 transition duration-300 mobile-menu-item">
+                        <i class="fas fa-tags text-accent w-6"></i>
+                        <span>Categories</span>
+                    </a>
+                    <a href="/product" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-primary/30 transition duration-300 mobile-menu-item">
+                        <i class="fas fa-seedling text-accent w-6"></i>
+                        <span>Products</span>
+                    </a>
+                    <a href="/order_details" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-primary/30 transition duration-300 mobile-menu-item">
+                        <i class="fas fa-truck text-accent w-6"></i>
+                        <span>Orders</span>
+                    </a>
+                    <a href="/chat" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-primary/30 transition duration-300 mobile-menu-item">
+                        <i class="fas fa-comments text-accent w-6"></i>
+                        <span>Chat</span>
+                    </a>
+                    <a href="/cart" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-primary/30 transition duration-300 mobile-menu-item">
+                        <div class="relative">
+                            <i class="fas fa-shopping-cart text-accent w-6"></i>
+                            {% if cart_count %}
+                            <span class="absolute -top-1 -right-1 bg-accent text-primary rounded-full text-xs w-5 h-5 flex items-center justify-center font-bold notification-badge">
+                                {{ cart_count }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        <span>Cart</span>
+                    </a>
+
+                    <div class="border-t border-white/10 my-2 pt-2">
+                        {% if user.is_authenticated %}
+                        <div class="flex flex-col space-y-2">
+                            <a href="/profile" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-primary/30 transition duration-300 mobile-menu-item">
+                                <img src="{{ user.profile.profile_picture.url }}" alt="Profile" 
+                                    class="w-8 h-8 rounded-full border-2 border-accent">
+                                <span>Profile</span>
+                            </a>
+                            <a href="{% url 'logout_attempt' %}" class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-red-500/20 hover:bg-red-500/40 text-red-200 transition duration-300 mobile-menu-item">
+                                <i class="fas fa-sign-out-alt w-6"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                        {% else %}
+                        <a href="{% url 'login_attempt' %}" class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-accent/90 hover:bg-accent text-primary transition duration-300 font-medium mobile-menu-item">
+                            <i class="fas fa-sign-in-alt w-6"></i>
+                            <span>Login</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    {% block content %}
+        
+    {% endblock %}
+
+    <!-- Chat Button -->
+    <div class="fixed bottom-5 right-5 z-40 chat-fixed-button">
+        <button class="bg-accent text-primary p-4 rounded-full shadow-lg hover:bg-secondary hover-grow transition duration-300 relative mobile-tap-target"
+                data-modal-target="chatModal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-chat-dots"
+                viewBox="0 0 16 16">
+                <path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2" />
+                <path d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9 9 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.4 10.4 0 0 1-.524 2.318l-.003.011a11 11 0 0 1-.244.637c-.079.186.074.394.273.362a22 22 0 0 0 .693-.125m.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6-3.004 6-7 6a8 8 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a11 11 0 0 0 .398-2" />
+            </svg>
+            <!-- Notification badge - show when there are unread messages -->
+            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center notification-badge" id="chat-notification" style="display: none;">
+                <span id="unread-count">1</span>
+            </span>
+        </button>
+    </div>
+
+    <!-- Chat Modal -->
+    <div id="chatModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-light rounded-lg shadow-2xl max-w-4xl w-full h-[600px] flex flex-col sm:h-[600px] mobile-chat-container">
+            <!-- Chat Header -->
+            <div class="flex justify-between items-center border-b border-gray-200 p-4 bg-primary text-white rounded-t-lg">
+                <div class="flex items-center space-x-2">
+                    <div class="bg-accent rounded-full p-2">
+                        <i class="fas fa-comments text-primary"></i>
+                    </div>
+                    <h5 class="text-xl font-serif font-semibold">Agro Nepal Chat</h5>
+                </div>
+                <button id="closeModal" class="text-white hover:text-accent transition-colors mobile-tap-target">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Chat Content Area -->
+            <div class="flex-1 flex overflow-hidden">
+                <!-- Global Chat Section -->
+                <div id="globalChatSection" class="flex-1 flex flex-col h-full">
+                    <!-- Messages Container -->
+                    <div id="globalChatMessages" class="flex-1 overflow-y-auto p-4 space-y-4 mobile-chat-messages">
+                        {% for chat_message in chat_messages %}
+                        <div class="flex {% if chat_message.user == user %}justify-end{% else %}justify-start{% endif %} mb-4">
+                            <!-- User Avatar -->
+                            <div class="flex {% if chat_message.user == user %}flex-row-reverse{% else %}flex-row{% endif %} items-start gap-2">
+                                <div class="flex-shrink-0">
+                                    {% if chat_message.user.profile.profile_picture %}
+                                        <img src="{{ chat_message.user.profile.profile_picture.url }}" alt="{{ chat_message.user.username }}" 
+                                            class="w-8 h-8 rounded-full object-cover border-2 {% if chat_message.user == user %}border-primary{% else %}border-secondary{% endif %}">
+                                    {% else %}
+                                        <div class="w-8 h-8 rounded-full {% if chat_message.user == user %}bg-primary text-white{% else %}bg-secondary text-dark{% endif %} flex items-center justify-center text-xs font-bold uppercase">
+                                            {{ chat_message.user.username|slice:":1" }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Message Content -->
+                                <div class="max-w-[70%]">
+                                    {% if chat_message.user != user %}
+                                    <span class="text-xs font-medium text-gray-500 mb-1 ml-1 block">
+                                        {{ chat_message.user.username }}
+                                        {% if chat_message.user.is_staff %}
+                                        <span class="vip-badge">Admin</span>
+                                        {% endif %}
+                                    </span>
+                                    {% endif %}
+                                    <div class="rounded-lg p-3 {% if chat_message.user.is_staff and chat_message.user != user %}vip-message{% elif chat_message.user == user %}bg-primary text-light{% else %}bg-secondary text-dark{% endif %} shadow-md message-bubble">
+                                        <p class="text-sm">{{ chat_message.message }}</p>
+                                    </div>
+                                    <span class="text-xs text-gray-500 mt-1 {% if chat_message.user == user %}text-right{% else %}text-left{% endif %} block">
+                                        {{ chat_message.timestamp|date:"H:i" }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                       
+                    </div>
+                    
+                    <!-- Global Chat Input -->
+                    <div class="border-t border-gray-200 p-4 bg-gray-50">
+                        <div class="flex items-center gap-2">
+                            <button id="globalEmojiButton" class="p-2 text-gray-500 hover:text-primary hover:bg-gray-100 rounded-full transition-colors mobile-tap-target">
+                                <i class="far fa-smile text-xl"></i>
+                            </button>
+                            <input type="text" id="chat-message-input"
+                                class="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                                placeholder="Type a message...">
+                            <button id="chat-message-submit" class="bg-primary text-light p-3 rounded-full hover:bg-secondary hover-grow transition duration-300 flex items-center justify-center mobile-tap-target">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                </svg>
+                            </button>
+                        </div>
+                        <!-- Quick Emoji Bar -->
+                        <div class="mt-2 flex space-x-2 overflow-x-auto py-2 px-1 -mx-1 hidden" id="emojiBar">
+                            {% for emoji in "😀😂❤️👍👏🔥🎉🤔😍🙏👌😊🥰😎🤩😢🎂🚀🌱🌿🍀🌾🌻🐱💃🐶🎶🎸🍎🍕🍔🌈💥💎🌟✨🎁💌📱👑💡🌞⏳🚗🏀🎧🎨🖼️🏖️⚡" %}
+                                <span class="quick-emoji cursor-pointer hover:bg-gray-100 p-1 rounded-md transition-colors">{{ emoji }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Sound -->
+    <audio id="message-sound" preload="auto">
+        <source src="{% static 'notification.mp3' %}" type="audio/mpeg">
+    </audio>
+
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-bottom-nav lg:hidden">
+        <a href="/" class="{% if request.path == '/' %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="/product" class="{% if '/product' in request.path %}active{% endif %}">
+            <i class="fas fa-store"></i>
+            <span>Shop</span>
+        </a>
+        <a href="/categories" class="{% if '/categories' in request.path %}active{% endif %}">
+            <i class="fas fa-tags"></i>
+            <span>Categories</span>
+        </a>
+        <a href="/cart" class="{% if '/cart' in request.path %}active{% endif %}">
+            <div class="relative">
+                <i class="fas fa-shopping-cart"></i>
+                {% if cart_count %}
+                <span class="absolute -top-2 -right-2 bg-accent text-primary rounded-full text-xs w-4 h-4 flex items-center justify-center font-bold notification-badge">
+                    {{ cart_count }}
+                </span>
+                {% endif %}
+            </div>
+            <span>Cart</span>
+        </a>
+        <a href="/profile" class="{% if '/profile' in request.path %}active{% endif %}">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get current user ID
+            const userId = '{{ user.id }}';
+            
+            // Initialize Pusher
+            const pusher = new Pusher('6875f5a5d3cde707946d', { cluster: 'ap2' });
+            const globalChannel = pusher.subscribe('chat');
+            const adminChannel = pusher.subscribe('admin-chat');
+            
+            // DOM Elements
+            const chatModal = document.getElementById('chatModal');
+            const closeModalButton = document.getElementById('closeModal');
+            const chatButton = document.querySelector('[data-modal-target="chatModal"]');
+            const chatNotification = document.getElementById('chat-notification');
+            
+            // Chat Elements
+            const globalChatMessages = document.getElementById('globalChatMessages');
+            const messageInput = document.getElementById('chat-message-input');
+            const messageSubmit = document.getElementById('chat-message-submit');
+            const emojiButton = document.getElementById('globalEmojiButton');
+            const emojiBar = document.getElementById('emojiBar');
+            const messageSound = document.getElementById('message-sound');
+            const typingIndicators = document.querySelectorAll('.typing-indicator');
+            
+            // Quick emoji elements
+            const quickEmojis = document.querySelectorAll('.quick-emoji');
+            
+            // Debug function
+            function debug(message, obj = null) {
+                console.log(`[DEBUG] ${message}`, obj || '');
+            }
+            
+            // Initialize sound
+            debug('Setting up audio');
+            messageSound.load();
+            
+            // Improved sound playing function with fallbacks
+            function playSound() {
+                debug('Attempting to play sound');
+                
+                // Reset the audio element
+                messageSound.pause();
+                messageSound.currentTime = 0;
+                
+                // Create a promise to play the sound
+                const playPromise = messageSound.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => {
+                            debug('Sound played successfully');
+                        })
+                        .catch(error => {
+                            debug('Sound play error:', error);
+                            
+                            // Fallback method 1: Try again with user interaction
+                            if (error.name === 'NotAllowedError') {
+                                debug('Sound blocked by browser, will try on next user interaction');
+                                
+                                // Add one-time event listener for user interaction
+                                const playOnInteraction = function() {
+                                    messageSound.play().catch(e => debug('Second attempt failed:', e));
+                                    document.removeEventListener('click', playOnInteraction);
+                                    document.removeEventListener('keydown', playOnInteraction);
+                                };
+                                
+                                document.addEventListener('click', playOnInteraction, { once: true });
+                                document.addEventListener('keydown', playOnInteraction, { once: true });
+                            }
+                            
+                            // Fallback method 2: Create a new Audio object
+                            try {
+                                debug('Trying alternative audio method');
+                                const alternativeSound = new Audio('{% static "notification.mp3" %}');
+                                alternativeSound.volume = 1.0;
+                                alternativeSound.play().catch(e => debug('Alternative method failed:', e));
+                            } catch (e) {
+                                debug('All sound methods failed:', e);
+                            }
+                        });
+                }
+            }
+            
+            // Scroll to bottom of chat
+            function scrollToBottom(element) {
+                element.scrollTop = element.scrollHeight;
+            }
+            
+            // Scroll to bottom initially
+            scrollToBottom(globalChatMessages);
+            
+            // Toggle emoji bar
+            emojiButton.addEventListener('click', function() {
+                emojiBar.classList.toggle('hidden');
+            });
+            
+            // Quick emoji selection
+            quickEmojis.forEach(emoji => {
+                emoji.addEventListener('click', () => {
+                    messageInput.value += emoji.textContent;
+                    messageInput.focus();
+                    emojiBar.classList.add('hidden');
+                    debug('Quick emoji selected:', emoji.textContent);
+                });
+            });
+            
+            // Send message function
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (message) {
+                    debug('Sending message:', message);
+                    
+                    fetch('/send_message/', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json', 
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({ 'message': message, 'chat_type': 'global' })
+                    }).then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    }).then(data => {
+                        messageInput.value = '';  // Clear input after sending
+                        debug('Message sent successfully:', data);
+                        
+                        // Hide emoji bar after sending
+                        emojiBar.classList.add('hidden');
+                    }).catch(error => {
+                        console.error('Error sending message:', error);
+                        debug('Error sending message:', error);
+                        
+                        // Show error to user
+                        alert('Failed to send message. Please try again.');
+                    });
+                }
+            }
+            
+            // Listen for global messages from Pusher
+            globalChannel.bind('message', function(data) {
+                debug('Received message from Pusher:', data);
+                
+                // Play sound when receiving message (if not from current user)
+                if (data.username !== '{{ user.username }}') {
+                    playSound();
+                    
+                    // Show notification if chat is not open
+                    if (chatModal.classList.contains('hidden')) {
+                        chatNotification.style.display = 'flex';
+                        
+                        // Increment unread count
+                        const unreadCount = document.getElementById('unread-count');
+                        unreadCount.textContent = parseInt(unreadCount.textContent) + 1;
+                    }
+                }
+                
+                // Create message element
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `flex ${data.username === '{{ user.username }}' ? 'justify-end' : 'justify-start'} mb-4 fade-in`;
+                
+                // Get first letter of username for avatar fallback
+                const firstLetter = data.username ? data.username.charAt(0).toUpperCase() : '?';
+                
+                // Check if message is from admin
+                const isAdmin = data.is_staff || false;
+                
+                let avatarHTML = '';
+                if (data.profile_picture) {
+                    avatarHTML = `
+                        <img src="${data.profile_picture}" alt="${data.username}" 
+                            class="w-8 h-8 rounded-full object-cover border-2 ${data.username === '{{ user.username }}' ? 'border-primary' : isAdmin ? 'border-vip' : 'border-secondary'}">
+                    `;
+                } else {
+                    avatarHTML = `
+                        <div class="w-8 h-8 rounded-full ${data.username === '{{ user.username }}' ? 'bg-primary text-white' : isAdmin ? 'bg-vip text-white' : 'bg-secondary text-dark'} flex items-center justify-center text-xs font-bold uppercase">
+                            ${firstLetter}
+                        </div>
+                    `;
+                }
+                
+                messageDiv.innerHTML = `
+                    <div class="flex ${data.username === '{{ user.username }}' ? 'flex-row-reverse' : 'flex-row'} items-start gap-2">
+                        <div class="flex-shrink-0">
+                            ${avatarHTML}
+                        </div>
+                        
+                        <div class="max-w-[70%]">
+                            ${data.username !== '{{ user.username }}' ? `
+                                <span class="text-xs font-medium text-gray-500 mb-1 ml-1 block">
+                                    ${data.username}
+                                    ${isAdmin ? '<span class="vip-badge">Admin</span>' : ''}
+                                </span>` : ''}
+                            <div class="rounded-lg p-3 ${isAdmin && data.username !== '{{ user.username }}' ? 'vip-message' : data.username === '{{ user.username }}' ? 'bg-primary text-light' : 'bg-secondary text-dark'} shadow-md message-bubble ${isAdmin && data.username !== '{{ user.username }}' ? 'vip-glow' : ''}">
+                                <p class="text-sm">${data.message}</p>
+                            </div>
+                            <span class="text-xs text-gray-500 mt-1 ${data.username === '{{ user.username }}' ? 'text-right' : 'text-left'} block">
+                                ${new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                            </span>
+                        </div>
+                    </div>
+                `;
+                
+                globalChatMessages.appendChild(messageDiv);
+                scrollToBottom(globalChatMessages);
+                
+                debug('Message added to chat');
+            });
+            
+            // Listen for admin messages from Pusher (now displayed in global chat)
+            adminChannel.bind('message', function(data) {
+                debug('Received admin message from Pusher:', data);
+                
+                // Only process messages for this user
+                if (data.user_id == userId) {
+                    // Play sound
+                    playSound();
+                    
+                    // Show notification if chat is not open
+                    if (chatModal.classList.contains('hidden')) {
+                        chatNotification.style.display = 'flex';
+                        
+                        // Increment unread count
+                        const unreadCount = document.getElementById('unread-count');
+                        unreadCount.textContent = parseInt(unreadCount.textContent) + 1;
+                    }
+                    
+                    // Create admin message element for global chat
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'flex justify-start mb-4 fade-in';
+                    
+                    const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
+                    messageDiv.innerHTML = `
+                        <div class="flex flex-row items-start gap-2">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 rounded-full bg-vip text-white flex items-center justify-center text-xs font-bold">
+                                    <i class="fas fa-headset"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="max-w-[70%]">
+                                <span class="text-xs font-medium text-gray-500 mb-1 ml-1 block">
+                                    Admin Support
+                                    <span class="vip-badge">VIP</span>
+                                </span>
+                                <div class="rounded-lg p-3 vip-message shadow-md message-bubble vip-glow">
+                                    <p class="text-sm">${data.message}</p>
+                                </div>
+                                <span class="text-xs text-gray-500 mt-1 text-left block">
+                                    ${currentTime}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    globalChatMessages.appendChild(messageDiv);
+                    scrollToBottom(globalChatMessages);
+                    
+                    debug('Admin message added to global chat');
+                }
+            });
+            
+            // Send message on button click or Enter key press
+            messageSubmit.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', e => {
+                if (e.key === 'Enter') sendMessage();
+            });
+            
+            // Open/close chat modal
+            chatButton.addEventListener('click', () => {
+                chatModal.classList.remove('hidden');
+                
+                // Reset notification when opening chat
+                chatNotification.style.display = 'none';
+                document.getElementById('unread-count').textContent = '0';
+                
+                // Scroll to bottom of chat
+                scrollToBottom(globalChatMessages);
+            });
+            
+            closeModalButton.addEventListener('click', () => {
+                chatModal.classList.add('hidden');
+            });
+            
+            // Close modal when clicking outside
+            chatModal.addEventListener('click', (e) => {
+                if (e.target === chatModal) {
+                    chatModal.classList.add('hidden');
+                }
+            });
+            
+            // Mobile menu animation
+            const mobileMenu = document.getElementById('navbar');
+            document.querySelector('button[onclick="document.getElementById(\'navbar\').classList.toggle(\'hidden\')"]').addEventListener('click', function() {
+                if (mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.remove('hidden');
+                    setTimeout(() => {
+                        mobileMenu.classList.add('mobile-menu-enter-active');
+                    }, 10);
+                } else {
+                    mobileMenu.classList.remove('mobile-menu-enter-active');
+                    setTimeout(() => {
+                        mobileMenu.classList.add('hidden');
+                    }, 300);
+                }
+            });
+            
+            // Typing indicator functionality
+            let typingTimeout;
+            
+            messageInput.addEventListener('input', () => {
+                // Show typing indicator to other users
+                // This would require server implementation
+                debug('User typing in chat');
+                
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    debug('User stopped typing');
+                }, 2000);
+            });
+            
+            // Fix for Android 100vh issue
+            function setMobileHeight() {
+                // First we get the viewport height and we multiply it by 1% to get a value for a vh unit
+                let vh = window.innerHeight * 0.01;
+                // Then we set the value in the --vh custom property to the root of the document
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
+            
+            // Set the height initially and on resize
+            setMobileHeight();
+            window.addEventListener('resize', setMobileHeight);
+            
+            // Fix for Android soft keyboard issues
+            const inputs = document.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    // On mobile, when keyboard appears, adjust the chat container
+                    if (window.innerWidth < 640) {
+                        const chatContainer = document.querySelector('.mobile-chat-container');
+                        if (chatContainer) {
+                            chatContainer.style.height = '50vh';
+                        }
+                    }
+                });
+                
+                input.addEventListener('blur', () => {
+                    // Reset height when keyboard disappears
+                    if (window.innerWidth < 640) {
+                        const chatContainer = document.querySelector('.mobile-chat-container');
+                        if (chatContainer) {
+                            chatContainer.style.height = '85vh';
+                        }
+                    }
+                });
+            });
+            
+            debug('Chat application fully initialized');
+            
+            // Add active class to current page in bottom nav
+            const currentPath = window.location.pathname;
+            const bottomNavLinks = document.querySelectorAll('.mobile-bottom-nav a');
+            bottomNavLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (currentPath === href || (href !== '/' && currentPath.includes(href))) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+
+    <!-- Cart Dropdown Script -->
+    {% comment %} <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cartLink = document.getElementById('cart-link');
+            const cartDropdown = document.getElementById('cart-dropdown');
+            
+            if (cartLink && cartDropdown) {
+                let isOpen = false;
+                
+                cartLink.addEventListener('click', function(e) {
+                    // Only show dropdown if we're clicking the cart icon (not the View Cart link)
+                    if (e.target.closest('a') === this && !e.target.closest('.tooltip-text')) {
+                        e.preventDefault();
+                        isOpen = !isOpen;
+                        
+                        if (isOpen) {
+                            cartDropdown.classList.remove('hidden');
+                            // Close notification dropdown if open
+                            if (notificationDropdown && !notificationDropdown.classList.contains('hidden')) {
+                                notificationDropdown.classList.add('hidden');
+                                notificationOpen = false;
+                            }
+                        } else {
+                            cartDropdown.classList.add('hidden');
+                        }
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (isOpen && !cartLink.contains(e.target) && !cartDropdown.contains(e.target)) {
+                        cartDropdown.classList.add('hidden');
+                        isOpen = false;
+                    }
+                });
+            }
+        });
+    </script> {% endcomment %}
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+  // Get current user info
+  const userId = "{{ user.id }}"
+  const currentUsername = "{{ user.username }}"
+
+  // Initialize Pusher
+  const pusher = new Pusher("6875f5a5d3cde707946d", { cluster: "ap2" })
+  const globalChannel = pusher.subscribe("chat")
+  const adminChannel = pusher.subscribe("admin-chat")
+
+  // DOM Elements
+  const chatModal = document.getElementById("chatModal")
+  const closeModalButton = document.getElementById("closeModal")
+  const chatButton = document.querySelector('[data-modal-target="chatModal"]')
+  const chatNotification = document.getElementById("chat-notification")
+
+  // Chat Elements
+  const globalChatMessages = document.getElementById("globalChatMessages")
+  const messageInput = document.getElementById("chat-message-input")
+  const messageSubmit = document.getElementById("chat-message-submit")
+  const emojiButton = document.getElementById("globalEmojiButton")
+  const emojiBar = document.getElementById("emojiBar")
+  const messageSound = document.getElementById("message-sound")
+
+  // Quick emoji elements
+  const quickEmojis = document.querySelectorAll(".quick-emoji")
+
+  // Debug function
+  function debug(message, obj = null) {
+    console.log(`[DEBUG] ${message}`, obj || "")
+  }
+
+  // Initialize sound
+  debug("Setting up audio")
+  messageSound.load()
+
+  // Improved sound playing function with fallbacks
+  function playSound() {
+    debug("Attempting to play sound")
+
+    // Reset the audio element
+    messageSound.pause()
+    messageSound.currentTime = 0
+
+    // Create a promise to play the sound
+    const playPromise = messageSound.play()
+
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          debug("Sound played successfully")
+        })
+        .catch((error) => {
+          debug("Sound play error:", error)
+
+          // Fallback method 1: Try again with user interaction
+          if (error.name === "NotAllowedError") {
+            debug("Sound blocked by browser, will try on next user interaction")
+
+            // Add one-time event listener for user interaction
+            const playOnInteraction = () => {
+              messageSound.play().catch((e) => debug("Second attempt failed:", e))
+              document.removeEventListener("click", playOnInteraction)
+              document.removeEventListener("keydown", playOnInteraction)
+            }
+
+            document.addEventListener("click", playOnInteraction, { once: true })
+            document.addEventListener("keydown", playOnInteraction, { once: true })
+          }
+
+          // Fallback method 2: Create a new Audio object
+          try {
+            debug("Trying alternative audio method")
+            const alternativeSound = new Audio('{% static "notification.mp3" %}')
+            alternativeSound.volume = 1.0
+            alternativeSound.play().catch((e) => debug("Alternative method failed:", e))
+          } catch (e) {
+            debug("All sound methods failed:", e)
+          }
+        })
+    }
+  }
+
+  // Scroll to bottom of chat
+  function scrollToBottom(element) {
+    element.scrollTop = element.scrollHeight
+  }
+
+  // Scroll to bottom initially
+  scrollToBottom(globalChatMessages)
+
+  // Function to create and append message to chat
+  function appendMessage(
+    username,
+    message,
+    timestamp = null,
+    isOwnMessage = false,
+    isAdmin = false,
+    profilePicture = null,
+  ) {
+    debug("Appending message:", { username, message, isOwnMessage, isAdmin })
+
+    // Create message element
+    const messageDiv = document.createElement("div")
+    messageDiv.className = `flex ${isOwnMessage ? "justify-end" : "justify-start"} mb-4 fade-in`
+
+    // Get first letter of username for avatar fallback
+    const firstLetter = username ? username.charAt(0).toUpperCase() : "?"
+
+    let avatarHTML = ""
+    if (profilePicture) {
+      avatarHTML = `
+                <img src="${profilePicture}" alt="${username}" 
+                    class="w-8 h-8 rounded-full object-cover border-2 ${isOwnMessage ? "border-primary" : isAdmin ? "border-vip" : "border-secondary"}">
+            `
+    } else {
+      avatarHTML = `
+                <div class="w-8 h-8 rounded-full ${isOwnMessage ? "bg-primary text-white" : isAdmin ? "bg-vip text-white" : "bg-secondary text-dark"} flex items-center justify-center text-xs font-bold uppercase">
+                    ${isAdmin ? '<i class="fas fa-headset"></i>' : firstLetter}
+                </div>
+            `
+    }
+
+    // Format timestamp
+    const timeString = timestamp
+      ? new Date(timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      : new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+
+    messageDiv.innerHTML = `
+            <div class="flex ${isOwnMessage ? "flex-row-reverse" : "flex-row"} items-start gap-2">
+                <div class="flex-shrink-0">
+                    ${avatarHTML}
+                </div>
+                
+                <div class="max-w-[70%]">
+                    ${
+                      !isOwnMessage
+                        ? `
+                        <span class="text-xs font-medium text-gray-500 mb-1 ml-1 block">
+                            ${username}
+                            ${isAdmin ? '<span class="vip-badge">Admin</span>' : ""}
+                        </span>`
+                        : ""
+                    }
+                    <div class="rounded-lg p-3 ${isAdmin && !isOwnMessage ? "vip-message" : isOwnMessage ? "bg-primary text-light" : "bg-secondary text-dark"} shadow-md message-bubble ${isAdmin && !isOwnMessage ? "vip-glow" : ""}">
+                        <p class="text-sm">${message}</p>
+                    </div>
+                    <span class="text-xs text-gray-500 mt-1 ${isOwnMessage ? "text-right" : "text-left"} block">
+                        ${timeString}
+                    </span>
+                </div>
+            </div>
+        `
+
+    globalChatMessages.appendChild(messageDiv)
+    scrollToBottom(globalChatMessages)
+
+    debug("Message added to chat")
+  }
+
+  // Toggle emoji bar
+  emojiButton.addEventListener("click", () => {
+    emojiBar.classList.toggle("hidden")
+  })
+
+  // Quick emoji selection
+  quickEmojis.forEach((emoji) => {
+    emoji.addEventListener("click", () => {
+      messageInput.value += emoji.textContent
+      messageInput.focus()
+      emojiBar.classList.add("hidden")
+      debug("Quick emoji selected:", emoji.textContent)
+    })
+  })
+
+  // Updated send message function
+  function sendMessage() {
+    const message = messageInput.value.trim()
+    if (message) {
+      debug("Sending message:", message)
+
+      // *** KEY FIX: Immediately add the message to the chat for the sender ***
+      appendMessage(currentUsername, message, null, true, false, "{{ user.profile.profile_picture.url }}")
+
+      // Clear input immediately
+      messageInput.value = ""
+
+      // Play sound when sending message
+      playSound()
+
+      // Hide emoji bar after sending
+      emojiBar.classList.add("hidden")
+
+      fetch("/send_message/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}",
+        },
+        body: JSON.stringify({ message: message, chat_type: "global" }),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok")
+          }
+          return response.json()
+        })
+        .then((data) => {
+          debug("Message sent successfully:", data)
+        })
+        .catch((error) => {
+          console.error("Error sending message:", error)
+          debug("Error sending message:", error)
+
+          // Show error to user and remove the message that was added optimistically
+          alert("Failed to send message. Please try again.")
+
+          // Remove the last message (the one we just added)
+          const lastMessage = globalChatMessages.lastElementChild
+          if (lastMessage) {
+            lastMessage.remove()
+          }
+        })
+    }
+  }
+
+  // Updated Pusher message handler - only show messages from OTHER users
+  globalChannel.bind("message", (data) => {
+    debug("Received message from Pusher:", data)
+
+    // *** KEY FIX: Only display messages from other users (avoid duplicates) ***
+    if (data.username !== currentUsername) {
+      // Play sound when receiving message from others
+      playSound()
+
+      // Show notification if chat is not open
+      if (chatModal.classList.contains("hidden")) {
+        chatNotification.style.display = "flex"
+
+        // Increment unread count
+        const unreadCount = document.getElementById("unread-count")
+        unreadCount.textContent = Number.parseInt(unreadCount.textContent) + 1
+      }
+
+      // Check if message is from admin
+      const isAdmin = data.is_staff || false
+
+      // Add message to chat
+      appendMessage(data.username, data.message, data.timestamp, false, isAdmin, data.profile_picture)
+    }
+  })
+
+  // Listen for admin messages from Pusher (now displayed in global chat)
+  adminChannel.bind("message", (data) => {
+    debug("Received admin message from Pusher:", data)
+
+    // Only process messages for this user and not from current user
+    if (data.user_id == userId && data.username !== currentUsername) {
+      // Play sound
+      playSound()
+
+      // Show notification if chat is not open
+      if (chatModal.classList.contains("hidden")) {
+        chatNotification.style.display = "flex"
+
+        // Increment unread count
+        const unreadCount = document.getElementById("unread-count")
+        unreadCount.textContent = Number.parseInt(unreadCount.textContent) + 1
+      }
+
+      // Add admin message to global chat
+      appendMessage("Admin Support", data.message, null, false, true, null)
+    }
+  })
+
+  // Send message on button click or Enter key press
+  messageSubmit.addEventListener("click", sendMessage)
+  messageInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      sendMessage()
+    }
+  })
+
+  // Open/close chat modal
+  chatButton.addEventListener("click", () => {
+    chatModal.classList.remove("hidden")
+
+    // Reset notification when opening chat
+    chatNotification.style.display = "none"
+    document.getElementById("unread-count").textContent = "0"
+
+    // Scroll to bottom of chat
+    scrollToBottom(globalChatMessages)
+  })
+
+  closeModalButton.addEventListener("click", () => {
+    chatModal.classList.add("hidden")
+  })
+
+  // Close modal when clicking outside
+  chatModal.addEventListener("click", (e) => {
+    if (e.target === chatModal) {
+      chatModal.classList.add("hidden")
+    }
+  })
+
+  // Handle Pusher connection events
+  pusher.connection.bind("connected", () => {
+    debug("Connected to Pusher")
+  })
+
+  pusher.connection.bind("error", (err) => {
+    debug("Pusher connection error:", err)
+  })
+
+  // Typing indicator functionality
+  let typingTimeout
+
+  messageInput.addEventListener("input", () => {
+    debug("User typing in chat")
+
+    clearTimeout(typingTimeout)
+    typingTimeout = setTimeout(() => {
+      debug("User stopped typing")
+    }, 2000)
+  })
+
+  debug("Chat application fully initialized")
+})
+
+    </script>
+    <!-- Notification Scripts -->
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const notificationLink = document.getElementById('notification-link');
+    const notificationDropdown = document.getElementById('notification-dropdown');
+    const notificationList = document.getElementById('notification-list');
+    const markAllForm = document.getElementById('mark-all-dropdown-form');
+    
+    let notificationOpen = false;
+    let notificationsLoaded = false;
+    
+    if (notificationLink && notificationDropdown) {
+        notificationLink.addEventListener('click', function(e) {
+            // Only show dropdown if we're clicking the bell icon (not the Notifications link)
+            if (e.target.closest('a') === this && !e.target.closest('.tooltip-text')) {
+                e.preventDefault();
+                notificationOpen = !notificationOpen;
+                
+                if (notificationOpen) {
+                    notificationDropdown.classList.remove('hidden');
+                    
+                    // Close cart dropdown if open
+                    const cartDropdown = document.getElementById('cart-dropdown');
+                    if (cartDropdown && !cartDropdown.classList.contains('hidden')) {
+                        cartDropdown.classList.add('hidden');
+                        // Reset cart dropdown state if needed
+                    }
+                    
+                    // Load notifications if not already loaded
+                    if (!notificationsLoaded) {
+                        loadNotifications();
+                    }
+                } else {
+                    notificationDropdown.classList.add('hidden');
+                }
+            }
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (notificationOpen && !notificationLink.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                notificationDropdown.classList.add('hidden');
+                notificationOpen = false;
+            }
+        });
+        
+        // Handle mark all as read in dropdown
+        if (markAllForm) {
+            markAllForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get CSRF token
+                const csrfToken = getCsrfToken();
+                if (!csrfToken) {
+                    console.error('CSRF token not found');
+                    return;
+                }
+                
+                fetch(this.getAttribute('action'), {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrfToken
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Update UI to show all as read
+                        const notificationItems = notificationList.querySelectorAll('.notification-item');
+                        notificationItems.forEach(item => {
+                            const unreadIndicator = item.querySelector('.unread-indicator');
+                            if (unreadIndicator) {
+                                unreadIndicator.remove();
+                            }
+                            item.classList.remove('bg-blue-50');
+                            
+                            const markReadBtn = item.querySelector('.mark-read-btn');
+                            if (markReadBtn) {
+                                markReadBtn.remove();
+                            }
+                        });
+                        
+                        // Update notification count
+                        const countBadge = document.getElementById('notification-count');
+                        if (countBadge) {
+                            countBadge.textContent = '0';
+                            countBadge.classList.add('hidden');
+                        }
+                        
+                        // Hide the mark all as read button
+                        markAllForm.classList.add('hidden');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        }
+    }
+    
+    // Helper function to get CSRF token
+    function getCsrfToken() {
+        // Try multiple methods to get CSRF token
+        let token = null;
+        
+        // Method 1: From form input
+        const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+        if (csrfInput) {
+            token = csrfInput.value;
+        }
+        
+        // Method 2: From meta tag
+        if (!token) {
+            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            if (csrfMeta) {
+                token = csrfMeta.getAttribute('content');
+            }
+        }
+        
+        // Method 3: From cookie (if available)
+        if (!token) {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'csrftoken') {
+                    token = value;
+                    break;
+                }
+            }
+        }
+        
+        return token;
+    }
+    
+    // Function to load notifications via AJAX
+    function loadNotifications() {
+        if (!notificationList) return;
+        
+        // Show loading state
+        notificationList.innerHTML = `
+            <div class="p-5 text-center text-gray-500" id="notification-loading">
+                <i class="fas fa-spinner fa-spin mr-2"></i> Loading notifications...
+            </div>
+        `;
+        
+        fetch('/api/notifications/?limit=5', {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            notificationsLoaded = true;
+            notificationList.innerHTML = ''; // Clear loading indicator
+            
+            if (data.notifications && data.notifications.length > 0) {
+                data.notifications.forEach(notification => {
+                    let iconClass = 'text-gray-600';
+                    let bgClass = 'bg-gray-100';
+                    
+                    // Set icon based on notification type
+                    let iconSvg = '<i class="fas fa-bell"></i>';
+                    if (notification.notification_type === 'order') {
+                        iconSvg = '<i class="fas fa-shopping-bag"></i>';
+                        iconClass = 'text-primary';
+                        bgClass = 'bg-primary bg-opacity-10';
+                    } else if (notification.notification_type === 'product') {
+                        iconSvg = '<i class="fas fa-box"></i>';
+                        iconClass = 'text-indigo-600';
+                        bgClass = 'bg-indigo-100';
+                    } else if (notification.notification_type === 'deal') {
+                        iconSvg = '<i class="fas fa-tag"></i>';
+                        iconClass = 'text-purple-600';
+                        bgClass = 'bg-purple-100';
+                    } else if (notification.notification_type === 'commission') {
+                        iconSvg = '<i class="fas fa-coins"></i>';
+                        iconClass = 'text-green-600';
+                        bgClass = 'bg-green-100';
+                    } else if (notification.notification_type === 'system') {
+                        iconSvg = '<i class="fas fa-cog"></i>';
+                        iconClass = 'text-blue-600';
+                        bgClass = 'bg-blue-100';
+                    }
+                    
+                    const timeAgo = timeSince(new Date(notification.created_at));
+                    
+                    let notificationHtml = `
+                        <div class="p-3 hover:bg-gray-50 transition-colors duration-150 notification-item ${!notification.is_read ? 'bg-blue-50' : ''}">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="h-8 w-8 rounded-full ${bgClass} flex items-center justify-center">
+                                        <span class="${iconClass}">${iconSvg}</span>
+                                    </div>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-sm font-medium text-gray-900 truncate">${notification.title}</p>
+                                        <span class="text-xs text-gray-500">${timeAgo}</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 truncate">${notification.message}</p>
+                                    ${notification.link ? `<a href="${notification.link}" class="mt-1 text-xs text-primary hover:text-primary-dark">View details</a>` : ''}
+                                </div>
+                                ${!notification.is_read ? `<div class="ml-2 flex-shrink-0"><span class="inline-flex h-2 w-2 bg-red-500 rounded-full unread-indicator"></span></div>` : ''}
+                            </div>
+                            ${!notification.is_read ? `
+                            <div class="mt-2 flex justify-end">
+                                <button data-id="${notification.id}" class="text-xs text-primary hover:text-primary-dark mark-read-btn">
+                                    Mark as read
+                                </button>
+                            </div>` : ''}
+                        </div>
+                    `;
+                    
+                    notificationList.innerHTML += notificationHtml;
+                });
+                
+                // Add event listeners to mark as read buttons
+                const markReadButtons = notificationList.querySelectorAll('.mark-read-btn');
+                markReadButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const notificationId = this.getAttribute('data-id');
+                        markNotificationAsRead(notificationId, this);
+                    });
+                });
+            } else {
+                notificationList.innerHTML = `
+                    <div class="p-5 text-center text-gray-500">
+                        <i class="fas fa-bell-slash text-2xl mb-2 block"></i>
+                        <p class="mb-1">No notifications yet</p>
+                        <p class="text-xs">You're all caught up!</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading notifications:', error);
+            notificationList.innerHTML = `
+                <div class="p-5 text-center text-gray-500">
+                    <i class="fas fa-exclamation-triangle text-red-500 mb-2 block"></i>
+                    <p>Failed to load notifications</p>
+                    <button onclick="window.loadNotifications()" class="mt-2 text-xs text-primary hover:text-primary-dark">
+                        Try again
+                    </button>
+                </div>
+            `;
+        });
+    }
+    
+    // Function to mark a notification as read
+    function markNotificationAsRead(notificationId, buttonElement) {
+        const csrfToken = getCsrfToken();
+        
+        if (!csrfToken) {
+            console.error('CSRF token not found');
+            return;
+        }
+        
+        fetch(`/notifications/${notificationId}/mark-read/`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const notificationItem = buttonElement.closest('.notification-item');
+                notificationItem.classList.remove('bg-blue-50');
+                
+                const unreadIndicator = notificationItem.querySelector('.unread-indicator');
+                if (unreadIndicator) {
+                    unreadIndicator.remove();
+                }
+                
+                buttonElement.parentElement.remove();
+                
+                // Update notification count
+                const countBadge = document.getElementById('notification-count');
+                if (countBadge) {
+                    const currentCount = parseInt(countBadge.textContent);
+                    if (currentCount > 0) {
+                        const newCount = currentCount - 1;
+                        countBadge.textContent = newCount;
+                        if (newCount === 0) {
+                            countBadge.classList.add('hidden');
+                            if (markAllForm) {
+                                markAllForm.classList.add('hidden');
+                            }
+                        }
+                    }
+                }
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    
+    // Helper function to format dates as "time ago"
+    function timeSince(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        
+        let interval = Math.floor(seconds / 31536000);
+        if (interval > 1) return interval + " years ago";
+        if (interval === 1) return "1 year ago";
+        
+        interval = Math.floor(seconds / 2592000);
+        if (interval > 1) return interval + " months ago";
+        if (interval === 1) return "1 month ago";
+        
+        interval = Math.floor(seconds / 86400);
+        if (interval > 1) return interval + " days ago";
+        if (interval === 1) return "1 day ago";
+        
+        interval = Math.floor(seconds / 3600);
+        if (interval > 1) return interval + " hours ago";
+        if (interval === 1) return "1 hour ago";
+        
+        interval = Math.floor(seconds / 60);
+        if (interval > 1) return interval + " minutes ago";
+        if (interval === 1) return "1 minute ago";
+        
+        return "just now";
+    }
+    
+    // If the user is logged in, poll for new notifications
+    function checkForNewNotifications() {
+        fetch('/api/notifications/count/', {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const countBadge = document.getElementById('notification-count');
+            if (countBadge && data.count > 0) {
+                countBadge.textContent = data.count;
+                countBadge.classList.remove('hidden');
+                
+                // If the dropdown is open, refresh the notifications
+                if (notificationOpen && notificationsLoaded) {
+                    loadNotifications();
+                }
+                
+                // Show the mark all as read button
+                if (markAllForm) {
+                    markAllForm.classList.remove('hidden');
+                }
+            } else if (countBadge && data.count === 0) {
+                countBadge.classList.add('hidden');
+            }
+        })
+        .catch(error => console.error('Error checking notifications:', error));
+    }
+    
+    // Make functions available globally for retry button
+    window.loadNotifications = loadNotifications;
+    window.markNotificationAsRead = markNotificationAsRead;
+    
+    // Check for new notifications every 30 seconds if user is logged in
+    {% if user.is_authenticated %}
+    // Initial check
+    setTimeout(checkForNewNotifications, 2000);
+    
+    // Set up interval for checking
+    setInterval(checkForNewNotifications, 30000);
+    {% endif %}
+});
+</script>
+
+    {% block footer %}
+    <footer class="bg-gradient-to-b from-gray-900 to-gray-950 text-white pt-16 pb-8 relative">
+        <!-- Back to Top Button -->
+        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <a href="#top" class="bg-primary hover:bg-secondary text-white rounded-full p-3 shadow-lg transition-transform hover:scale-110 flex items-center justify-center mobile-tap-target">
+                <i class="fas fa-chevron-up"></i>
+                <span class="sr-only">Back to top</span>
+            </a>
+        </div>
+
+        <div class="container mx-auto px-6 lg:px-20">
+            <!-- Wave Separator -->
+            <div class="w-full h-12 mb-10 opacity-20">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" class="w-full h-full">
+                    <path fill="#2C5F2D" fill-opacity="1" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,202.7C672,203,768,181,864,181.3C960,181,1056,203,1152,208C1248,213,1344,203,1392,197.3L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                </svg>
+            </div>
+
+            <!-- Footer Grid (Navigation, Support, Newsletter) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 border-b border-gray-800 pb-12 mobile-footer-grid">
+                <!-- Shop Links -->
+                <div class="transform transition duration-500 hover:-translate-y-1">
+                    <div class="flex items-center mb-6">
+                        <i class="fas fa-shopping-bag text-accent text-xl mr-3"></i>
+                        <h3 class="text-xl font-bold">Agro Nepal</h3>
+                    </div>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#" class="flex items-center text-gray-300 hover:text-accent transition-all duration-300 group mobile-tap-target">
+                                <i class="fas fa-chevron-right text-xs text-accent mr-2 opacity-0 group-hover:opacity-100 transition-all"></i>
+                                <span>Home</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center text-gray-300 hover:text-accent transition-all duration-300 group mobile-tap-target">
+                                <i class="fas fa-chevron-right text-xs text-accent mr-2 opacity-0 group-hover:opacity-100 transition-all"></i>
+                                <span>Shop</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center text-gray-300 hover:text-accent transition-all duration-300 group mobile-tap-target">
+                                <i class="fas fa-chevron-right text-xs text-accent mr-2 opacity-0 group-hover:opacity-100 transition-all"></i>
+                                <span>Best Sellers</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center text-gray-300 hover:text-accent transition-all duration-300 group mobile-tap-target">
+                                <i class="fas fa-chevron-right text-xs text-accent mr-2 opacity-0 group-hover:opacity-100 transition-all"></i>
+                                <span>New Arrivals</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center text-gray-300 hover:text-accent transition-all duration-300 group mobile-tap-target">
+                                <i class="fas fa-chevron-right text-xs text-accent mr-2 opacity-0 group-hover:opacity-100 transition-all"></i>
+                                <span>Deals & Discounts</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Customer Support -->
+                <div class="transform transition duration-500 hover:-translate-y-1">
+                    <div class="flex items-center mb-6">
+                        <i class="fas fa-headset text-accent text-xl mr-3"></i>
+                        <h3 class="text-xl font-bold">Customer Support</h3>
+                    </div>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#" class="flex items-center text-gray-300 hover:text-accent transition-all duration-300 group mobile-tap-target">
+                                <i class="fas fa-chevron-right text-xs text-accent mr-2 opacity-0 group-hover:opacity-100 transition-all"></i>
+                                <span>Help Center</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center text-gray-300 hover:text-accent transition-all duration-300 group mobile-tap-target">
+                                <i class="fas fa-chevron-right text-xs text-accent mr-2 opacity-0 group-hover:opacity-100 transition-all"></i>
+                                <span>Returns & Refunds</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center text-gray-300 hover:text-accent transition-all duration-300 group mobile-tap-target">
+                                <i class="fas fa-chevron-right text-xs text-accent mr-2 opacity-0 group-hover:opacity-100 transition-all"></i>
+                                <span>Shipping Info</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center text-gray-300 hover:text-accent transition-all duration-300 group mobile-tap-target">
+                                <i class="fas fa-chevron-right text-xs text-accent mr-2 opacity-0 group-hover:opacity-100 transition-all"></i>
+                                <span>Track Order</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center text-gray-300 hover:text-accent transition-all duration-300 group mobile-tap-target">
+                                <i class="fas fa-chevron-right text-xs text-accent mr-2 opacity-0 group-hover:opacity-100 transition-all"></i>
+                                <span>Contact Us</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter Subscription -->
+                <div class="transform transition duration-500 hover:-translate-y-1">
+                    <div class="flex items-center mb-6">
+                        <i class="fas fa-envelope text-accent text-xl mr-3"></i>
+                        <h3 class="text-xl font-bold">Newsletter</h3>
+                    </div>
+                    <p class="text-gray-400 mb-4">Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.</p>
+                    <div class="relative">
+                        <input type="email" placeholder="Enter your email" 
+                            class="w-full px-4 py-3 bg-gray-800 text-white border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all">
+                        <button class="absolute right-0 top-0 h-full px-4 bg-accent hover:bg-secondary rounded-r-lg flex items-center justify-center transition-colors mobile-tap-target">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="mt-4 flex items-center">
+                        <input type="checkbox" id="consent" class="mr-2 h-4 w-4 accent-accent">
+                        <label for="consent" class="text-xs text-gray-400">I agree to receive promotional emails</label>
+                    </div>
+                </div>
+
+                <!-- Follow Us -->
+                <div class="transform transition duration-500 hover:-translate-y-1">
+                    <div class="flex items-center mb-6">
+                        <i class="fas fa-globe text-accent text-xl mr-3"></i>
+                        <h3 class="text-xl font-bold">Connect With Us</h3>
+                    </div>
+                    <p class="text-gray-400 mb-4">Follow us on social media for news, updates, and inspiration.</p>
+                    <div class="flex space-x-3 mb-6">
+                        <a href="#" class="bg-gray-800 hover:bg-primary w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300 mobile-tap-target">
+                            <i class="fab fa-facebook-f text-lg"></i>
+                        </a>
+                        <a href="#" class="bg-gray-800 hover:bg-primary w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300 mobile-tap-target">
+                            <i class="fab fa-twitter text-lg"></i>
+                        </a>
+                        <a href="#" class="bg-gray-800 hover:bg-primary w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300 mobile-tap-target">
+                            <i class="fab fa-instagram text-lg"></i>
+                        </a>
+                        <a href="#" class="bg-gray-800 hover:bg-primary w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300 mobile-tap-target">
+                            <i class="fab fa-linkedin-in text-lg"></i>
+                        </a>
+                    </div>
+                    <div class="text-gray-400">
+                        <p class="flex items-center mb-2">
+                            <i class="fas fa-map-marker-alt text-accent mr-3"></i>
+                            <span>123 Commerce St, Kathmandu, Nepal</span>
+                        </p>
+                        <p class="flex items-center">
+                            <i class="fas fa-phone-alt text-accent mr-3"></i>
+                            <span>+977 1234 5678</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Methods & Copyright -->
+            <div class="mt-10 flex flex-col md:flex-row items-center justify-between text-sm text-gray-400">
+                <!-- Payment Methods -->
+                <div class="flex items-center space-x-6 mb-6 md:mb-0">
+                    <span class="text-gray-500">We Accept:</span>
+                    <div class="flex space-x-4">
+                        <i class="fab fa-cc-visa text-2xl hover:text-white transition-colors"></i>
+                        <i class="fab fa-cc-mastercard text-2xl hover:text-white transition-colors"></i>
+                        <i class="fab fa-cc-paypal text-2xl hover:text-white transition-colors"></i>
+                        <i class="fab fa-cc-apple-pay text-2xl hover:text-white transition-colors"></i>
+                        <i class="fab fa-bitcoin text-2xl hover:text-white transition-colors"></i>
+                    </div>
+                </div>
+
+                <!-- Copyright -->
+                <p class="mb-6 md:mb-0">© 2025 <span class="text-accent font-medium">Agro Nepal</span>. All rights reserved.</p>
+
+                <!-- Terms & Policy -->
+                <div class="flex space-x-6">
+                    <a href="#" class="hover:text-accent transition-colors">Terms of Service</a>
+                    <a href="#" class="hover:text-accent transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-accent transition-colors">Cookies</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Accent Bar -->
+        <div class="h-1 w-full bg-gradient-to-r from-primary via-secondary to-accent mt-8"></div>
+    </footer>
+    {% endblock %}
+</body>
+</html>

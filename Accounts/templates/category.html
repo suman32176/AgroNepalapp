@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if messages %}
+            <div class="fixed top-4 right-4 z-50 w-full max-w-md">
+                {% for message in messages %}
+                    <div class="bg-white border-l-4 border-indigo-500 text-indigo-700 p-4 mb-3 rounded-lg shadow-lg animate-fade-in-down flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <span>{{ message }}</span>
+                        <button class="ml-auto text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+<!-- Category Page Hero Section -->
+<section class="relative py-16 bg-gradient-to-r from-primary to-primary/90 text-light overflow-hidden">
+    <!-- Decorative Elements -->
+    <div class="absolute inset-0 overflow-hidden opacity-10">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-accent rounded-full mix-blend-multiply filter blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-secondary rounded-full mix-blend-multiply filter blur-3xl"></div>
+    </div>
+    
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="max-w-3xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-serif font-bold mb-4">Agricultural Categories</h1>
+            <p class="text-xl text-light/80">Explore our diverse range of agricultural products organized by category</p>
+            
+            <!-- Search Bar -->
+            <div class="mt-8 max-w-xl mx-auto">
+                <form action="" method="GET" class="flex">
+                    <input type="text" name="q" placeholder="Search for products or categories..." 
+                           class="flex-grow px-4 py-3 rounded-l-lg border-0 focus:ring-2 focus:ring-accent text-dark">
+                    <button type="submit" class="bg-accent hover:bg-secondary text-primary px-6 py-3 rounded-r-lg transition-colors duration-300">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Wave Separator -->
+    <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-0">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" class="w-full h-12 text-light">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="currentColor"></path>
+        </svg>
+    </div>
+</section>
+
+<!-- Category Filter Tabs -->
+<section class="py-8 bg-light">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-wrap items-center justify-center gap-4">
+            <a href="" class="px-6 py-3 rounded-full bg-primary text-light font-medium hover:bg-primary/90 transition-colors duration-300">
+                All Categories
+            </a>
+            
+            {% for category in categories %}
+            <a href="#category-{{ category.id }}" class="px-6 py-3 rounded-full bg-gray-100 text-gray-800 font-medium hover:bg-secondary hover:text-dark transition-colors duration-300">
+                {{ category.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- All Categories Grid -->
+<section class="py-16 bg-light">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col items-center mb-12">
+            <h2 class="text-3xl font-serif font-bold text-primary mb-4">Browse All Categories</h2>
+            <div class="w-24 h-1 bg-accent mb-6 rounded-full"></div>
+            <p class="text-gray-600 text-center max-w-2xl">Discover our comprehensive range of agricultural products organized by category</p>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for category in categories %}
+            <a href="#category-{{ category.id }}" class="group">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden hover-grow transition-all duration-300 h-full flex flex-col relative">
+                    <!-- Category Image (using first product image or placeholder) -->
+                    <div class="relative h-48 overflow-hidden">
+                        {% if category.products.first.image %}
+                        <img src="{{ category.products.first.image.url }}" alt="{{ category.name }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        {% else %}
+                        <div class="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                            <i class="fas fa-seedling text-primary text-4xl"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                            <div class="p-4 w-full">
+                                <span class="text-white text-sm">View Products</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Category Info -->
+                    <div class="p-6 flex-grow flex flex-col">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-primary transition-colors duration-300">{{ category.name }}</h3>
+                        
+                        {% if category.description %}
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ category.description }}</p>
+                        {% endif %}
+                        
+                        <div class="mt-auto flex items-center justify-between">
+                            <span class="text-sm text-primary font-medium">{{ category.products.count }} Products</span>
+                            <span class="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">Explore</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
+                    <i class="fas fa-folder-open text-primary text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-primary mb-2">No Categories Available</h3>
+                <p class="text-gray-600">Check back soon for our product categories!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Category Products Sections -->
+{% for category in categories %}
+<section id="category-{{ category.id }}" class="py-16 {% cycle 'bg-gray-50' 'bg-light' %}">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-8">
+            <div>
+                <div class="inline-block px-4 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full mb-2">
+                    CATEGORY
+                </div>
+                <h2 class="text-3xl font-serif font-bold text-primary">{{ category.name }}</h2>
+                {% if category.description %}
+                <p class="text-gray-600 mt-2 max-w-2xl">{{ category.description }}</p>
+                {% endif %}
+            </div>
+            
+            <a href="{% url 'category_detail' category.id %}" class="mt-4 md:mt-0 inline-flex items-center text-primary hover:text-accent transition-colors duration-300">
+                <span>View All {{ category.name }} Products</span>
+                <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+        
+        <!-- Products Carousel -->
+        <div class="relative">
+            <!-- Navigation Arrows -->
+            <button class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-white p-3 rounded-full shadow-lg text-primary hover:bg-primary hover:text-white transition-colors duration-300 hidden md:block category-prev-btn" data-category="{{ category.id }}">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-white p-3 rounded-full shadow-lg text-primary hover:bg-primary hover:text-white transition-colors duration-300 hidden md:block category-next-btn" data-category="{{ category.id }}">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <!-- Products Slider -->
+            <div class="overflow-hidden category-slider" id="category-slider-{{ category.id }}">
+                <div class="flex transition-transform duration-500 ease-in-out category-track" id="category-track-{{ category.id }}">
+                    {% for product in category.products.all %}
+                    {% if product.is_available %}
+                    <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 flex-shrink-0 px-3">
+                        <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden h-full flex flex-col group">
+                            <!-- Product Image -->
+                            <div class="relative overflow-hidden">
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110">
+                                
+                                <!-- Quick View Overlay -->
+                                <div class="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                    <a href="{% url 'product_detail' product.id %}" class="bg-white text-primary rounded-full p-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
+                                
+                                <!-- Stock Badge -->
+                                {% if product.stock > 0 %}
+                                <div class="absolute top-3 right-3">
+                                    <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full">In Stock</span>
+                                </div>
+                                {% else %}
+                                <div class="absolute top-3 right-3">
+                                    <span class="bg-red-100 text-red-800 text-xs font-bold px-2 py-1 rounded-full">Out of Stock</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Product Info -->
+                            <div class="p-4 flex-grow flex flex-col">
+                                <h3 class="font-bold text-gray-800 mb-1 group-hover:text-primary transition-colors duration-300">{{ product.name }}</h3>
+                                
+                                <p class="text-sm text-gray-600 mb-3 line-clamp-2 flex-grow">{{ product.description|truncatechars:60 }}</p>
+                                
+                                <div class="flex items-center justify-between mt-auto">
+                                    <span class="text-lg font-bold text-primary">Rs. {{ product.price }}</span>
+                                    
+                                    <div class="flex items-center text-xs text-gray-500">
+                                        <i class="fas fa-shopping-cart mr-1"></i>
+                                        <span>{{ product.sold }} sold</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Add to Cart Button -->
+                            <div class="p-4 pt-0">
+                                <form method="POST" action="{% url 'add_to_cart' product.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" {% if product.stock == 0 %}disabled{% endif %} 
+                                        class="w-full py-2 rounded-lg flex items-center justify-center transition-colors duration-300 {% if product.stock > 0 %}bg-secondary hover:bg-accent text-dark{% else %}bg-gray-200 text-gray-500 cursor-not-allowed{% endif %}">
+                                        <i class="fas fa-shopping-cart mr-2"></i>
+                                        <span>Add to Cart</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% empty %}
+                    <div class="w-full text-center py-12">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
+                            <i class="fas fa-box-open text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-primary mb-2">No Products Available</h3>
+                        <p class="text-gray-600">Check back soon for products in this category!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endfor %}
+
+<!-- Newsletter Section -->
+<section class="py-16 bg-primary/5">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="flex flex-col md:flex-row">
+                <div class="md:w-1/2 bg-primary p-8 text-light flex items-center">
+                    <div>
+                        <h3 class="text-2xl font-serif font-bold mb-4">Stay Updated</h3>
+                        <p class="mb-6">Subscribe to our newsletter to receive updates on new products, seasonal farming tips, and exclusive offers.</p>
+                        <div class="flex items-center text-accent">
+                            <i class="fas fa-envelope-open-text text-3xl mr-4"></i>
+                            <span>Join 5,000+ agricultural enthusiasts</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="md:w-1/2 p-8">
+                    <form action="" method="POST" class="space-y-4">
+                        {% csrf_token %}
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                            <input type="text" id="name" name="name" required 
+                                   class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                            <input type="email" id="email" name="email" required 
+                                   class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                        <div class="flex items-start">
+                            <input type="checkbox" id="consent" name="consent" required class="mt-1 mr-2">
+                            <label for="consent" class="text-sm text-gray-600">I agree to receive marketing emails and can unsubscribe at any time.</label>
+                        </div>
+                        <button type="submit" class="w-full bg-accent hover:bg-secondary text-primary font-bold py-3 rounded-lg transition-colors duration-300">
+                            Subscribe Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize all category carousels
+        {% for category in categories %}
+        initCategoryCarousel('{{ category.id }}');
+        {% endfor %}
+        
+        function initCategoryCarousel(categoryId) {
+            const track = document.getElementById(`category-track-${categoryId}`);
+            const prevBtn = document.querySelector(`.category-prev-btn[data-category="${categoryId}"]`);
+            const nextBtn = document.querySelector(`.category-next-btn[data-category="${categoryId}"]`);
+            
+            if (!track || !prevBtn || !nextBtn) return;
+            
+            // Calculate how many items to show based on screen size
+            const getItemsToShow = () => {
+                if (window.innerWidth >= 1024) return 4; // lg
+                if (window.innerWidth >= 768) return 3; // md
+                if (window.innerWidth >= 640) return 2; // sm
+                return 1; // xs
+            };
+            
+            let currentIndex = 0;
+            const items = track.children;
+            const totalItems = items.length;
+            
+            const updateCarousel = () => {
+                const itemsToShow = getItemsToShow();
+                const itemWidth = 100 / itemsToShow;
+                const maxIndex = Math.max(0, totalItems - itemsToShow);
+                
+                // Ensure currentIndex is within bounds
+                currentIndex = Math.min(Math.max(0, currentIndex), maxIndex);
+                
+                // Update transform
+                track.style.transform = `translateX(-${currentIndex * itemWidth}%)`;
+                
+                // Update button states
+                prevBtn.disabled = currentIndex === 0;
+                prevBtn.style.opacity = currentIndex === 0 ? '0.5' : '1';
+                nextBtn.disabled = currentIndex >= maxIndex;
+                nextBtn.style.opacity = currentIndex >= maxIndex ? '0.5' : '1';
+            };
+            
+            // Set initial item widths
+            const setItemWidths = () => {
+                const itemsToShow = getItemsToShow();
+                const itemWidth = 100 / itemsToShow;
+                
+                Array.from(items).forEach(item => {
+                    item.style.width = `${itemWidth}%`;
+                });
+            };
+            
+            // Event listeners
+            prevBtn.addEventListener('click', () => {
+                currentIndex = Math.max(0, currentIndex - 1);
+                updateCarousel();
+            });
+            
+            nextBtn.addEventListener('click', () => {
+                const itemsToShow = getItemsToShow();
+                const maxIndex = Math.max(0, totalItems - itemsToShow);
+                currentIndex = Math.min(maxIndex, currentIndex + 1);
+                updateCarousel();
+            });
+            
+            // Initialize
+            setItemWidths();
+            updateCarousel();
+        }
+        
+        // Handle window resize for all carousels
+        window.addEventListener('resize', () => {
+            {% for category in categories %}
+            const track{{ category.id }} = document.getElementById(`category-track-{{ category.id }}`);
+            if (track{{ category.id }}) {
+                const itemsToShow = (() => {
+                    if (window.innerWidth >= 1024) return 4;
+                    if (window.innerWidth >= 768) return 3;
+                    if (window.innerWidth >= 640) return 2;
+                    return 1;
+                })();
+                
+                const itemWidth = 100 / itemsToShow;
+                Array.from(track{{ category.id }}.children).forEach(item => {
+                    item.style.width = `${itemWidth}%`;
+                });
+                
+                // Reset position
+                track{{ category.id }}.style.transform = 'translateX(0)';
+                
+                // Reset buttons
+                const prevBtn = document.querySelector(`.category-prev-btn[data-category="{{ category.id }}"]`);
+                const nextBtn = document.querySelector(`.category-next-btn[data-category="{{ category.id }}"]`);
+                if (prevBtn) prevBtn.style.opacity = '0.5';
+                if (prevBtn) prevBtn.disabled = true;
+                if (nextBtn) nextBtn.style.opacity = '1';
+                if (nextBtn) nextBtn.disabled = false;
+            }
+            {% endfor %}
+        });
+        
+        // Smooth scroll to category sections
+        document.querySelectorAll('a[href^="#category-"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .hover-grow {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .hover-grow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+</style>
+{% endblock %}
+

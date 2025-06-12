@@ -1,0 +1,553 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if messages %}
+            <div class="fixed top-4 right-4 z-50 w-full max-w-md">
+                {% for message in messages %}
+                    <div class="bg-white border-l-4 border-indigo-500 text-indigo-700 p-4 mb-3 rounded-lg shadow-lg animate-fade-in-down flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <span>{{ message }}</span>
+                        <button class="ml-auto text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+<div class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Form Card -->
+        <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 px-8 py-6">
+                <h2 class="text-3xl font-bold text-white">Co-Admin Registration</h2>
+                <p class="text-blue-100 mt-2">Please complete the form below to register as a co-administrator</p>
+            </div>
+
+            <!-- Add this right after the form header, before any messages or errors -->
+<div class="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+    <div class="flex items-center">
+        <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+            </svg>
+        </div>
+        <div class="ml-3">
+            <p class="text-sm text-blue-700">
+                You are registering as a co-admin with your account: <strong>{{ user.username }}</strong>
+            </p>
+        </div>
+    </div>
+</div>
+<!-- Email field with read-only indication -->
+<div class="space-y-2">
+    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">Email Address <span class="text-red-500">*</span></label>
+    <div class="mt-1 relative">
+        {{ form.email }}
+        {% if form.email.field.widget.attrs.readonly %}
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                </svg>
+            </div>
+        {% endif %}
+    </div>
+    {% if form.email.help_text %}
+        <p class="mt-1 text-xs text-gray-500">{{ form.email.help_text }}</p>
+    {% endif %}
+    {% if form.email.errors %}
+        <p class="mt-2 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+    {% endif %}
+</div>
+            <!-- Form Content -->
+            <div class="p-8">
+                <!-- Messages Section -->
+                {% if messages %}
+                <div class="mb-6">
+                    {% for message in messages %}
+                    <div class="{% if message.tags == 'success' %}bg-green-50 border-l-4 border-green-500{% elif message.tags == 'error' %}bg-red-50 border-l-4 border-red-500{% else %}bg-blue-50 border-l-4 border-blue-500{% endif %} p-4 rounded">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                {% if message.tags == 'success' %}
+                                <svg class="h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                {% elif message.tags == 'error' %}
+                                <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                </svg>
+                                {% else %}
+                                <svg class="h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                </svg>
+                                {% endif %}
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm {% if message.tags == 'success' %}text-green-700{% elif message.tags == 'error' %}text-red-700{% else %}text-blue-700{% endif %}">{{ message }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if form.errors %}
+                <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">There were errors with your submission</h3>
+                            <div class="mt-2 text-sm text-red-700">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    {% if form.non_field_errors %}
+                                        {% for error in form.non_field_errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% for field in form %}
+                                        {% if field.errors %}
+                                            {% for error in field.errors %}
+                                                <li>{{ field.label }}: {{ error }}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data" class="space-y-6" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Form Sections -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        <!-- Personal Information Section -->
+                        <div class="md:col-span-2">
+                            <h3 class="text-lg font-semibold text-gray-800 pb-2 border-b border-gray-200 mb-4">
+                                <span class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                    </svg>
+                                    Personal Information
+                                </span>
+                            </h3>
+                        </div>
+
+                        <!-- Full Name -->
+                        <div class="space-y-2">
+                            <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700">Full Name <span class="text-red-500">*</span></label>
+                            <div class="mt-1 relative">
+                                {{ form.name }}
+                            </div>
+                            {% if form.name.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="space-y-2">
+                            <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">Email Address <span class="text-red-500">*</span></label>
+                            <div class="mt-1 relative">
+                                {{ form.email }}
+                            </div>
+                            {% if form.email.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="space-y-2">
+                            <label for="{{ form.phone_number.id_for_label }}" class="block text-sm font-medium text-gray-700">Phone Number <span class="text-red-500">*</span></label>
+                            <div class="mt-1 relative">
+                                {{ form.phone_number }}
+                            </div>
+                            {% if form.phone_number.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.phone_number.errors.0 }}</p>
+                            {% else %}
+                                <p class="mt-1 text-xs text-gray-500">Format: +1234567890</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Date of Birth -->
+                        <div class="space-y-2">
+                            <label for="{{ form.date_of_birth.id_for_label }}" class="block text-sm font-medium text-gray-700">Date of Birth <span class="text-red-500">*</span></label>
+                            <div class="mt-1 relative">
+                                {{ form.date_of_birth }}
+                            </div>
+                            {% if form.date_of_birth.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.date_of_birth.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Address -->
+                        <div class="md:col-span-2 space-y-2">
+                            <label for="{{ form.address.id_for_label }}" class="block text-sm font-medium text-gray-700">Address <span class="text-red-500">*</span></label>
+                            <div class="mt-1 relative">
+                                {{ form.address }}
+                            </div>
+                            {% if form.address.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.address.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Documents Section -->
+                        <div class="md:col-span-2 pt-4">
+                            <h3 class="text-lg font-semibold text-gray-800 pb-2 border-b border-gray-200 mb-4">
+                                <span class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                                    </svg>
+                                    Required Documents
+                                </span>
+                            </h3>
+                            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded mb-4">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-blue-700">
+                                            You must provide either a DOB certificate OR nationality card (both front and back).
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Profile Photo -->
+                        <div class="space-y-2">
+                            <label for="{{ form.photo.id_for_label }}" class="block text-sm font-medium text-gray-700">Profile Photo <span class="text-red-500">*</span></label>
+                            <div class="mt-1 flex items-center">
+                                <div class="file-input-wrapper w-full">
+                                    <div class="flex items-center justify-center w-full">
+                                        <label for="{{ form.photo.id_for_label }}" class="flex flex-col w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-all duration-200">
+                                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                </svg>
+                                                <p class="pt-1 text-sm text-gray-500 file-name">Upload a photo</p>
+                                                <p class="text-xs text-gray-400">PNG, JPG up to 5MB</p>
+                                            </div>
+                                            {{ form.photo }}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if form.photo.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.photo.errors.0 }}</p>
+                            {% endif %}
+                            <div class="preview-container hidden mt-2">
+                                <p class="text-xs text-gray-500 mb-1">Preview:</p>
+                                <img src="#" alt="Preview" class="photo-preview h-20 w-20 object-cover rounded-lg border border-gray-300">
+                            </div>
+                        </div>
+
+                        <!-- DOB Certificate -->
+                        <div class="space-y-2">
+                            <label for="{{ form.dob_certificate.id_for_label }}" class="flex items-center text-sm font-medium text-gray-700">
+                                DOB Certificate
+                                <span class="ml-1 text-xs text-gray-500">(Optional if nationality card provided)</span>
+                            </label>
+                            <div class="mt-1 flex items-center">
+                                <div class="file-input-wrapper w-full">
+                                    <div class="flex items-center justify-center w-full">
+                                        <label for="{{ form.dob_certificate.id_for_label }}" class="flex flex-col w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-all duration-200">
+                                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                </svg>
+                                                <p class="pt-1 text-sm text-gray-500 file-name">Upload certificate</p>
+                                                <p class="text-xs text-gray-400">PDF, JPG up to 5MB</p>
+                                            </div>
+                                            {{ form.dob_certificate }}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if form.dob_certificate.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.dob_certificate.errors.0 }}</p>
+                            {% endif %}
+                            <div class="doc-preview-container hidden mt-2">
+                                <p class="text-xs text-gray-500 mb-1">File selected</p>
+                                <div class="flex items-center p-2 bg-gray-50 rounded-lg border border-gray-300">
+                                    <svg class="w-5 h-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    <span class="text-sm text-gray-700 doc-name truncate max-w-xs"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nationality Card Section -->
+                        <div class="md:col-span-2 mt-2">
+                            <h4 class="text-md font-medium text-gray-700 mb-2">
+                                Nationality Card 
+                                <span class="ml-1 text-xs text-gray-500">(Optional if DOB certificate provided)</span>
+                            </h4>
+                        </div>
+
+                        <!-- Nationality Card Front -->
+                        <div class="space-y-2">
+                            <label for="{{ form.nationality_card_front.id_for_label }}" class="block text-sm font-medium text-gray-700">Nationality Card (Front)</label>
+                            <div class="mt-1 flex items-center">
+                                <div class="file-input-wrapper w-full">
+                                    <div class="flex items-center justify-center w-full">
+                                        <label for="{{ form.nationality_card_front.id_for_label }}" class="flex flex-col w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-all duration-200">
+                                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path>
+                                                </svg>
+                                                <p class="pt-1 text-sm text-gray-500 file-name">Upload front side</p>
+                                                <p class="text-xs text-gray-400">PNG, JPG up to 5MB</p>
+                                            </div>
+                                            {{ form.nationality_card_front }}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if form.nationality_card_front.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.nationality_card_front.errors.0 }}</p>
+                            {% endif %}
+                            <div class="card-front-preview-container hidden mt-2">
+                                <p class="text-xs text-gray-500 mb-1">Preview:</p>
+                                <img src="#" alt="Card Front Preview" class="card-front-preview h-20 w-full object-cover rounded-lg border border-gray-300">
+                            </div>
+                        </div>
+
+                        <!-- Nationality Card Back -->
+                        <div class="space-y-2">
+                            <label for="{{ form.nationality_card_back.id_for_label }}" class="block text-sm font-medium text-gray-700">Nationality Card (Back)</label>
+                            <div class="mt-1 flex items-center">
+                                <div class="file-input-wrapper w-full">
+                                    <div class="flex items-center justify-center w-full">
+                                        <label for="{{ form.nationality_card_back.id_for_label }}" class="flex flex-col w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-all duration-200">
+                                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path>
+                                                </svg>
+                                                <p class="pt-1 text-sm text-gray-500 file-name">Upload back side</p>
+                                                <p class="text-xs text-gray-400">PNG, JPG up to 5MB</p>
+                                            </div>
+                                            {{ form.nationality_card_back }}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if form.nationality_card_back.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.nationality_card_back.errors.0 }}</p>
+                            {% endif %}
+                            <div class="card-back-preview-container hidden mt-2">
+                                <p class="text-xs text-gray-500 mb-1">Preview:</p>
+                                <img src="#" alt="Card Back Preview" class="card-back-preview h-20 w-full object-cover rounded-lg border border-gray-300">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="mt-6">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="terms" name="terms" type="checkbox" required class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="terms" class="font-medium text-gray-700">I agree to the terms and conditions <span class="text-red-500">*</span></label>
+                                <p class="text-gray-500">By submitting this form, you agree to our <a href="#" class="text-blue-600 hover:text-blue-800">Privacy Policy</a> and <a href="#" class="text-blue-600 hover:text-blue-800">Terms of Service</a>.</p>
+                            </div>
+                        </div>
+                        <div id="terms-error" class="hidden mt-2 text-sm text-red-600">
+                            You must agree to the terms and conditions to proceed.
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-4">
+                        <button type="submit" id="submit-btn" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Submit Registration
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Help Text -->
+        <div class="mt-6 text-center text-sm text-gray-500">
+            Need help with your registration? <a href="#" class="font-medium text-blue-600 hover:text-blue-500">Contact support</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // File input handling
+        const fileInputs = document.querySelectorAll('input[type="file"]');
+        
+        fileInputs.forEach(input => {
+            input.addEventListener('change', function(e) {
+                const fileName = e.target.files[0]?.name;
+                if (fileName) {
+                    const parent = this.closest('.file-input-wrapper');
+                    const textElement = parent.querySelector('.file-name');
+                    if (textElement) {
+                        textElement.textContent = fileName;
+                    }
+                    
+                    // Add a selected class to change appearance
+                    parent.querySelector('label').classList.add('border-blue-500', 'bg-blue-50');
+                    parent.querySelector('svg').classList.remove('text-gray-400');
+                    parent.querySelector('svg').classList.add('text-blue-500');
+                    
+                    // Handle image previews
+                    const file = e.target.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            // Determine which preview to update based on input ID
+                            if (input.id === '{{ form.photo.id_for_label }}') {
+                                const previewContainer = input.closest('.space-y-2').querySelector('.preview-container');
+                                const preview = previewContainer.querySelector('.photo-preview');
+                                preview.src = e.target.result;
+                                previewContainer.classList.remove('hidden');
+                            } else if (input.id === '{{ form.nationality_card_front.id_for_label }}') {
+                                const previewContainer = input.closest('.space-y-2').querySelector('.card-front-preview-container');
+                                const preview = previewContainer.querySelector('.card-front-preview');
+                                preview.src = e.target.result;
+                                previewContainer.classList.remove('hidden');
+                            } else if (input.id === '{{ form.nationality_card_back.id_for_label }}') {
+                                const previewContainer = input.closest('.space-y-2').querySelector('.card-back-preview-container');
+                                const preview = previewContainer.querySelector('.card-back-preview');
+                                preview.src = e.target.result;
+                                previewContainer.classList.remove('hidden');
+                            }
+                        }
+                        
+                        reader.readAsDataURL(file);
+                    } else if (file && input.id === '{{ form.dob_certificate.id_for_label }}') {
+                        // For non-image files like PDFs
+                        const previewContainer = input.closest('.space-y-2').querySelector('.doc-preview-container');
+                        const docName = previewContainer.querySelector('.doc-name');
+                        docName.textContent = file.name;
+                        previewContainer.classList.remove('hidden');
+                    }
+                }
+            });
+        });
+        
+        // Form validation
+        const form = document.querySelector('form');
+        const termsCheckbox = document.getElementById('terms');
+        const termsError = document.getElementById('terms-error');
+        const submitBtn = document.getElementById('submit-btn');
+        
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            // Validate terms checkbox
+            if (!termsCheckbox.checked) {
+                termsError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                termsError.classList.add('hidden');
+            }
+            
+            // Add loading state to button when form is valid
+            if (isValid) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                `;
+            } else {
+                e.preventDefault();
+            }
+        });
+        
+        // Terms checkbox validation
+        termsCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                termsError.classList.add('hidden');
+            }
+        });
+        
+        // File size validation
+        fileInputs.forEach(input => {
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file && file.size > 5 * 1024 * 1024) { // 5MB limit
+                    alert('File size exceeds 5MB limit. Please choose a smaller file.');
+                    this.value = ''; // Clear the input
+                    
+                    // Reset the appearance
+                    const parent = this.closest('.file-input-wrapper');
+                    const textElement = parent.querySelector('.file-name');
+                    const label = parent.querySelector('label');
+                    const svg = parent.querySelector('svg');
+                    
+                    // Reset text and styling
+                    if (textElement) {
+                        if (input.id === '{{ form.photo.id_for_label }}') {
+                            textElement.textContent = 'Upload a photo';
+                        } else if (input.id === '{{ form.dob_certificate.id_for_label }}') {
+                            textElement.textContent = 'Upload certificate';
+                        } else if (input.id === '{{ form.nationality_card_front.id_for_label }}') {
+                            textElement.textContent = 'Upload front side';
+                        } else if (input.id === '{{ form.nationality_card_back.id_for_label }}') {
+                            textElement.textContent = 'Upload back side';
+                        }
+                    }
+                    
+                    // Reset styling
+                    label.classList.remove('border-blue-500', 'bg-blue-50');
+                    svg.classList.add('text-gray-400');
+                    svg.classList.remove('text-blue-500');
+                    
+                    // Hide preview containers
+                    if (input.id === '{{ form.photo.id_for_label }}') {
+                        const previewContainer = input.closest('.space-y-2').querySelector('.preview-container');
+                        if (previewContainer) previewContainer.classList.add('hidden');
+                    } else if (input.id === '{{ form.nationality_card_front.id_for_label }}') {
+                        const previewContainer = input.closest('.space-y-2').querySelector('.card-front-preview-container');
+                        if (previewContainer) previewContainer.classList.add('hidden');
+                    } else if (input.id === '{{ form.nationality_card_back.id_for_label }}') {
+                        const previewContainer = input.closest('.space-y-2').querySelector('.card-back-preview-container');
+                        if (previewContainer) previewContainer.classList.add('hidden');
+                    } else if (input.id === '{{ form.dob_certificate.id_for_label }}') {
+                        const previewContainer = input.closest('.space-y-2').querySelector('.doc-preview-container');
+                        if (previewContainer) previewContainer.classList.add('hidden');
+                    }
+                }
+            });
+        });
+        
+        // Dependency validation between nationality card front and back
+        const nationalityFront = document.getElementById('{{ form.nationality_card_front.id_for_label }}');
+        const nationalityBack = document.getElementById('{{ form.nationality_card_back.id_for_label }}');
+        
+        nationalityFront.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                // If front is provided, back becomes required
+                nationalityBack.setAttribute('required', 'required');
+                nationalityBack.closest('.space-y-2').querySelector('label').innerHTML = 'Nationality Card (Back) <span class="text-red-500">*</span>';
+            } else {
+                // If front is not provided, back is not required
+                nationalityBack.removeAttribute('required');
+                nationalityBack.closest('.space-y-2').querySelector('label').innerHTML = 'Nationality Card (Back)';
+            }
+        });
+    });
+</script>
+{% endblock %}

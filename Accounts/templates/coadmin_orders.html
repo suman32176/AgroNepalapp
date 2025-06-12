@@ -1,0 +1,419 @@
+{% extends 'coadmin_base.html' %}
+{% load static %}
+
+{% block page_title %}Orders Management{% endblock %}
+
+{% block dashboard_content %}
+<!-- Page header with enhanced styling -->
+<header class="mb-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                Orders Management
+            </h1>
+            <p class="mt-2 text-gray-600 max-w-3xl">
+                Track, process, and manage all customer orders from this centralized dashboard.
+            </p>
+        </div>
+    </div>
+</header>
+
+<!-- Enhanced order stats with better UI -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+    <div class="bg-white rounded-xl shadow-md p-4 text-center transform transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-b-4 border-gray-200">
+        <div class="flex items-center justify-center mb-2">
+            <div class="p-2 rounded-full bg-gray-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+            </div>
+        </div>
+        <span class="text-sm font-medium text-gray-500">Total Orders</span>
+        <div class="text-2xl font-bold mt-1">{{ stats.total }}</div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-md p-4 text-center transform transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-b-4 border-yellow-400">
+        <div class="flex items-center justify-center mb-2">
+            <div class="p-2 rounded-full bg-yellow-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+        </div>
+        <span class="text-sm font-medium text-gray-500">Pending</span>
+        <div class="text-2xl font-bold mt-1 text-yellow-600">{{ stats.pending }}</div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-md p-4 text-center transform transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-b-4 border-blue-400">
+        <div class="flex items-center justify-center mb-2">
+            <div class="p-2 rounded-full bg-blue-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                </svg>
+            </div>
+        </div>
+        <span class="text-sm font-medium text-gray-500">Processing</span>
+        <div class="text-2xl font-bold mt-1 text-blue-600">{{ stats.processing }}</div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-md p-4 text-center transform transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-b-4 border-purple-400">
+        <div class="flex items-center justify-center mb-2">
+            <div class="p-2 rounded-full bg-purple-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            </div>
+        </div>
+        <span class="text-sm font-medium text-gray-500">Shipped</span>
+        <div class="text-2xl font-bold mt-1 text-purple-600">{{ stats.shipped }}</div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-md p-4 text-center transform transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-b-4 border-green-400">
+        <div class="flex items-center justify-center mb-2">
+            <div class="p-2 rounded-full bg-green-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+        </div>
+        <span class="text-sm font-medium text-gray-500">Delivered</span>
+        <div class="text-2xl font-bold mt-1 text-green-600">{{ stats.delivered }}</div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-md p-4 text-center transform transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-b-4 border-red-400">
+        <div class="flex items-center justify-center mb-2">
+            <div class="p-2 rounded-full bg-red-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </div>
+        </div>
+        <span class="text-sm font-medium text-gray-500">Cancelled</span>
+        <div class="text-2xl font-bold mt-1 text-red-600">{{ stats.cancelled }}</div>
+    </div>
+</div>
+
+<!-- Enhanced filters section with better UI -->
+<div class="bg-white rounded-xl shadow-md mb-8 overflow-hidden">
+    <div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+        <h2 class="text-lg font-medium text-gray-800 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            Filter Orders
+        </h2>
+    </div>
+    <form method="get" action="{% url 'coadmin_orders' %}" class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search Orders</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <input type="text" id="search" name="q" value="{{ search_query }}" placeholder="Search by customer name, email or order ID" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+            </div>
+            <div>
+                <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Order Status</label>
+                <select id="status" name="status" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <option value="all" {% if status_filter == 'all' or not status_filter %}selected{% endif %}>All Statuses</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="processing" {% if status_filter == 'processing' %}selected{% endif %}>Processing</option>
+                    <option value="shipped" {% if status_filter == 'shipped' %}selected{% endif %}>Shipped</option>
+                    <option value="delivered" {% if status_filter == 'delivered' %}selected{% endif %}>Delivered</option>
+                    <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+        </div>
+        <div class="mt-6 flex justify-end">
+            <a href="{% url 'coadmin_orders' %}" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Reset
+            </a>
+            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                Apply Filters
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Enhanced orders list with better UI -->
+<div class="bg-white shadow-md rounded-xl overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+        <div class="flex justify-between items-center">
+            <h2 class="text-lg font-medium text-gray-800 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                Order List
+            </h2>
+            <span class="text-sm text-gray-500">{{ orders.paginator.count }} orders found</span>
+        </div>
+    </div>
+    <ul class="divide-y divide-gray-200">
+        {% for order in orders %}
+        <li class="hover:bg-gray-50 transition-colors duration-150 order-item" data-order-id="{{ order.id }}">
+            <div class="px-6 py-5">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            {% if order.product.image %}
+                            <img class="h-16 w-16 rounded-lg object-cover shadow-sm" src="{{ order.product.image.url }}" alt="{{ order.product.name }}">
+                            {% else %}
+                            <div class="h-16 w-16 rounded-lg bg-indigo-100 flex items-center justify-center">
+                                <svg class="h-8 w-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="ml-4">
+                            <div class="flex items-center">
+                                <h3 class="text-lg font-medium text-gray-900">Order #{{ order.id }}</h3>
+                                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {% if order.status == 'pending' %}
+                                        bg-yellow-100 text-yellow-800
+                                    {% elif order.status == 'processing' %}
+                                        bg-blue-100 text-blue-800
+                                    {% elif order.status == 'shipped' %}
+                                        bg-purple-100 text-purple-800
+                                    {% elif order.status == 'delivered' %}
+                                        bg-green-100 text-green-800
+                                    {% elif order.status == 'cancelled' %}
+                                        bg-red-100 text-red-800
+                                    {% endif %}">
+                                    {{ order.status|title }}
+                                </span>
+                            </div>
+                            <div class="text-sm text-gray-500 mt-1">
+                                <span class="font-medium">{{ order.product.name }}</span> - Qty: {{ order.quantity }}
+                            </div>
+                            <div class="text-sm text-gray-500 flex items-center mt-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                {{ order.created_at|date:"F j, Y" }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right mt-4 md:mt-0">
+                        <div class="text-xl font-bold text-gray-900">${{ order.total_price }}</div>
+                        <div class="text-sm text-gray-500 mt-1">{{ order.customer_name }}</div>
+                        <div class="text-sm text-gray-500">{{ order.customer_email }}</div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 border-t border-gray-100 pt-4">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-6">
+                            <div class="flex items-center text-sm text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <p>{{ order.street_address }}, {{ order.city }}, {{ order.province }}</p>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                </svg>
+                                <p>{{ order.customer_phone }}</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 md:mt-0 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                            {% if order.status == 'pending' %}
+                            <form method="post" action="{% url 'accept_order' order_id=order.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Accept Order
+                                </button>
+                            </form>
+                            {% endif %}
+                            
+                            <form method="post" action="{% url 'update_order_status' order_id=order.id %}" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+                                {% csrf_token %}
+                                <select name="status" class="block w-full sm:w-auto rounded-md border-gray-300 py-2 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
+                                    <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                                    <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>Processing</option>
+                                    <option value="shipped" {% if order.status == 'shipped' %}selected{% endif %}>Shipped</option>
+                                    <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                                    <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                                </select>
+                                <button type="submit" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                    Update Status
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+        {% empty %}
+        <li class="px-6 py-10 text-center">
+            <div class="flex flex-col items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <p class="text-gray-500 text-lg font-medium mb-1">No orders found</p>
+                <p class="text-gray-400 text-sm mb-4">Try adjusting your search or filter criteria</p>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    
+    <!-- Enhanced pagination -->
+    {% if orders.has_other_pages %}
+    <div class="bg-white px-6 py-4 border-t border-gray-200">
+        <div class="flex items-center justify-between">
+            <div class="hidden sm:block">
+                <p class="text-sm text-gray-700">
+                    Showing <span class="font-medium">{{ orders.start_index }}</span> to <span class="font-medium">{{ orders.end_index }}</span> of <span class="font-medium">{{ orders.paginator.count }}</span> orders
+                </p>
+            </div>
+            <div class="flex-1 flex justify-center sm:justify-end">
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    {% if orders.has_previous %}
+                    <a href="?page={{ orders.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">Previous</span>
+                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </a>
+                    {% endif %}
+                    
+                    {% for i in orders.paginator.page_range %}
+                        {% if orders.number == i %}
+                        <span class="relative inline-flex items-center px-4 py-2 border border-indigo-500 bg-indigo-50 text-sm font-medium text-indigo-600">
+                            {{ i }}
+                        </span>
+                        {% elif i > orders.number|add:'-3' and i < orders.number|add:'3' %}
+                        <a href="?page={{ i }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            {{ i }}
+                        </a>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if orders.has_next %}
+                    <a href="?page={{ orders.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">Next</span>
+                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </a>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Quick actions card -->
+<div class="mt-8 bg-white rounded-xl shadow-md overflow-hidden">
+    <div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+        <h2 class="text-lg font-medium text-gray-800 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Quick Actions
+        </h2>
+    </div>
+    <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="{% url 'coadmin_orders' %}?status=pending" class="flex items-center p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors duration-150">
+                <div class="flex-shrink-0 bg-yellow-500 rounded-md p-2 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-900">Pending Orders</h3>
+                    <p class="text-xs text-gray-500">View and process pending orders</p>
+                </div>
+            </a>
+            <a href="{% url 'coadmin_orders' %}?status=processing" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-150">
+                <div class="flex-shrink-0 bg-blue-500 rounded-md p-2 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-900">Processing Orders</h3>
+                    <p class="text-xs text-gray-500">Track orders in progress</p>
+                </div>
+            </a>
+            <a href="{% url 'coadmin_orders' %}?status=shipped" class="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors duration-150">
+                <div class="flex-shrink-0 bg-purple-500 rounded-md p-2 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-900">Shipped Orders</h3>
+                    <p class="text-xs text-gray-500">Track shipments in transit</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for enhanced interactions -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add fade-in animation to order items
+        const orderItems = document.querySelectorAll('.order-item');
+        orderItems.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.animation = `fadeIn 0.3s ease-in-out forwards ${index * 0.05}s`;
+        });
+
+        // Add animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Highlight status changes
+        const statusSelects = document.querySelectorAll('select[name="status"]');
+        statusSelects.forEach(select => {
+            const originalValue = select.value;
+            select.addEventListener('change', function() {
+                const newValue = this.value;
+                if (newValue !== originalValue) {
+                    this.classList.add('bg-yellow-50', 'border-yellow-300');
+                    
+                    // Find the submit button and highlight it
+                    const submitBtn = this.closest('form').querySelector('button[type="submit"]');
+                    submitBtn.classList.add('animate-pulse', 'bg-indigo-700');
+                } else {
+                    this.classList.remove('bg-yellow-50', 'border-yellow-300');
+                    
+                    // Reset the submit button
+                    const submitBtn = this.closest('form').querySelector('button[type="submit"]');
+                    submitBtn.classList.remove('animate-pulse', 'bg-indigo-700');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
