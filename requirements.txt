@@ -5,3 +5,5 @@ django-allauth
 widget-tweaks
 pusher 
 gunicorn
+psycopg2-binary
+whitenoise
