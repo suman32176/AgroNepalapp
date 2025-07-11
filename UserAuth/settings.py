@@ -19,7 +19,9 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-#(iyzq$@90j-pq
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
 # ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-ALLOWED_HOSTS = ['*']
+
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1').split(',')
+
 # python manage.py runserver 192.168.1.65:8000
 
 SITE_ID = 4
