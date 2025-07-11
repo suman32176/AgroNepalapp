@@ -4,3 +4,4 @@ gunicorn
 django-allauth
 widget-tweaks
 pusher 
+gunicorn
