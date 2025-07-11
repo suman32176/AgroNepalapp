@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile, Category, Product, Order, Review, ChatMessage, Cart,Referral, Deal,NewsletterSubscriber,LikedProduct,CoAdmin,DealChatMessage
+from .models import Profile, Category, Product, Order, Review, ChatMessage, Cart,Referral, Deal,NewsletterSubscriber,LikedProduct,CoAdmin,DealChatMessage, ShareRecord
 
 # Register your models here.
 
@@ -96,3 +96,30 @@ class DealChatMessageAdmin(admin.ModelAdmin):
     date_hierarchy = 'timestamp'
 
 admin.site.register(DealChatMessage, DealChatMessageAdmin)
+
+@admin.register(ShareRecord)
+class ShareRecordAdmin(admin.ModelAdmin):
+    list_display = ('user', 'platform', 'product', 'shared_at', 'ip_address')
+    list_filter = ('platform', 'shared_at', 'user')
+    search_fields = ('user__username', 'user__email', 'ip_address')
+    readonly_fields = ('shared_at',)
+    date_hierarchy = 'shared_at'
+    
+    fieldsets = (
+        ('Share Information', {
+            'fields': ('user', 'platform', 'product')
+        }),
+        ('Technical Details', {
+            'fields': ('shared_at', 'ip_address', 'user_agent'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'product')
+    
+    def has_add_permission(self, request):
+        return False  # Prevent manual creation of share records
+    
+    def has_change_permission(self, request, obj=None):
+        return False  # Prevent editing of share records

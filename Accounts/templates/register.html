@@ -121,6 +121,37 @@
             input.setAttribute('type', type);
         }
     </script>
+    <script>
+    // Check if URL contains "/refer/"
+    if (window.location.href.includes("/refer/")) {
+
+        // Hide "Continue with Google" button
+        const links = document.querySelectorAll('a');
+        links.forEach(link => {
+            if (link.textContent.trim().includes("Continue with Google")) {
+                const parentDiv = link.closest("div.mt-6");
+                if (parentDiv) {
+                    parentDiv.style.display = "none";
+                } else {
+                    link.style.display = "none";
+                }
+            }
+        });
+
+        // Hide "Already have an account? Sign In" section
+        const paragraphs = document.querySelectorAll('p');
+        paragraphs.forEach(p => {
+            if (p.textContent.trim().includes("Already have an account?")) {
+                const parentDiv = p.closest("div.mt-6");
+                if (parentDiv) {
+                    parentDiv.style.display = "none";
+                }
+            }
+        });
+
+    }
+</script>
+
 
 </body>
 </html>

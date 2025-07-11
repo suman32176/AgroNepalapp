@@ -128,6 +128,15 @@
             input.setAttribute('type', type);
         }
     </script>
+    <script>
+    // Check if current path starts with /refer/
+    if (window.location.pathname.startsWith("/refer/")) {
+        const googleBtn = document.getElementById('google-login-btn');
+        if (googleBtn) {
+            googleBtn.style.display = 'none';
+        }
+    }
+</script>
 
 </body>
 </html>

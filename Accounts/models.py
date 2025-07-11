@@ -9,7 +9,6 @@ import uuid
 import string
 import random
 
-# added for referal 
 
 
 
@@ -363,7 +362,7 @@ class ReferralCommission(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     commission_amount = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+    is_given = models.BooleanField(default=False)
     def __str__(self):
         return f"{self.referrer.username} earned ₹{self.commission_amount} from {self.referred_user.username}'s purchase"
         
@@ -397,6 +396,49 @@ class WalletWithdrawal(models.Model):
         ordering = ['-created_at']
         verbose_name = "Wallet Withdrawal"
         verbose_name_plural = "Wallet Withdrawals"
+
+class ShareRecord(models.Model):
+    PLATFORM_CHOICES = [
+        ('whatsapp', 'WhatsApp'),
+        ('facebook', 'Facebook'),
+        ('twitter', 'Twitter'),
+        ('linkedin', 'LinkedIn'),
+        ('telegram', 'Telegram'),
+        ('email', 'Email'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shares')
+    platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, null=True, blank=True)
+    shared_at = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-shared_at']
+        indexes = [
+            models.Index(fields=['user', 'platform']),
+            models.Index(fields=['shared_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} shared on {self.platform} at {self.shared_at}"
+
+    @classmethod
+    def get_share_stats(cls, user=None):
+        """Get share statistics for a user or all users"""
+        query = cls.objects
+        if user:
+            query = query.filter(user=user)
+        
+        stats = query.values('platform').annotate(
+            count=models.Count('id')
+        ).order_by('-count')
+        
+        return {
+            'total': sum(item['count'] for item in stats),
+            'platforms': {item['platform']: item['count'] for item in stats}
+        }
 
 
 

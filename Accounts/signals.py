@@ -4,7 +4,7 @@ from django.db.models import F
 from .models import Order, Profile, Product
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
-
+from .utils import give_commission_if_delivered
 @receiver(pre_save, sender=Order)
 def update_seller_wallet_and_product_stats_on_delivery(sender, instance, **kwargs):
     """
@@ -79,3 +79,7 @@ def verify_google_user(sender, instance, created, **kwargs):
         except Profile.DoesNotExist:
             pass  # Profile will be created by the other signal handler
 
+@receiver(post_save, sender=Order)
+def handle_order_delivery(sender, instance, created, **kwargs):
+    if not created and instance.status == 'delivered':
+        give_commission_if_delivered(instance)

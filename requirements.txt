@@ -1,0 +1,6 @@
+Django
+Pillow
+gunicorn
+django-allauth
+widget-tweaks
+pusher 

@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from datetime import timedelta
 import json
 import uuid
-from .models import ChatMessage,Product,Cart,Order,Category,Review,Profile, Referral, Deal, Contact, WalletWithdrawal, Notification
+from .models import ChatMessage,Product,Cart,Order,Category,Review,Profile, Referral, Deal, Contact, WalletWithdrawal, Notification, ShareRecord
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 
@@ -33,11 +33,13 @@ def admin_dashboard(request):
     products = Product.objects.all()
     chat_messages = ChatMessage.objects.all()
     carts = Cart.objects.all()
+    share_records = ShareRecord.objects.select_related('user', 'product').order_by('-shared_at')
     
     # Get counts
     users_count = User.objects.count()
     products_count = Product.objects.count()
     orders_count = Order.objects.count()
+    print(f"Debug: orders_count in admin_dashboard: {orders_count}") # Temporary debug print
     total_revenue = Order.objects.aggregate(Sum('total_price'))['total_price__sum'] or 0
     
     # Get growth percentages (comparing to last month)
@@ -112,6 +114,7 @@ def admin_dashboard(request):
         category_sales.append(category_revenue)
     
     context = {
+        'share_records':share_records,
         'users_count': users_count,
         'products_count': products_count,
         'orders_count': orders_count,
@@ -456,7 +459,7 @@ def admin_orders(request):
         )
     
     if status_filter:
-        orders = orders.filter(status=status_filter)
+        orders = orders.filter(status=status_filter.lower())
     
     # Pagination
     paginator = Paginator(orders, 10)  # Show 10 orders per page
@@ -494,7 +497,7 @@ def admin_update_order_status(request, order_id):
         # Validate the status
         valid_statuses = ['Pending', 'Shipped', 'Delivered', 'Cancelled']
         if new_status in valid_statuses:
-            order.status = new_status
+            order.status = new_status.lower()
             order.save()
             messages.success(request, f"Order #{order.id} status updated to {new_status}")
         else:
@@ -512,7 +515,7 @@ def update_order_status(request, order_id):
         # Validate the status
         valid_statuses = ['Pending', 'Shipped', 'Delivered']
         if new_status in valid_statuses:
-            order.status = new_status
+            order.status = new_status.lower()
             order.save()
             messages.success(request, f'Order #{order_id} status updated to {new_status}')
         else:
@@ -996,4 +999,17 @@ def admin_coadmins(request):
         'pending_orders_count': Order.objects.filter(status='Pending').count(),
     }
     
+    return render(request, 'admin_dashboard.html', context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_share_records(request):
+    # Fetch all share records ordered by latest first
+    share_records = ShareRecord.objects.select_related('user', 'product').order_by('-shared_at')
+
+    context = {
+        'share_records': share_records,
+        'pending_orders_count': Order.objects.filter(status='pending').count(),
+    }
     return render(request, 'admin_dashboard.html', context)

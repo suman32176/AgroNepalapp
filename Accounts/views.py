@@ -5,10 +5,10 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.db.models import Q, Count, Sum, Avg, F
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 import json
-from .models import ChatMessage,Product,Cart,Order,Category,Review,Profile, Referral, Deal, LikedProduct,CoAdmin, DealChatMessage, Notification, ReferralCommission, WalletWithdrawal
+from .models import ChatMessage,Product,Cart,Order,Category,Review,Profile, Referral, Deal, LikedProduct,CoAdmin, DealChatMessage, Notification, ReferralCommission, WalletWithdrawal, ShareRecord
 from .forms import ProductForm ,OrderForm,DealForm,ContactForm,CoAdminRegistrationForm,CartOrderForm
 from django.contrib.auth.decorators import login_required,user_passes_test
 import uuid
@@ -17,23 +17,464 @@ from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.core.paginator import Paginator
 from decimal import Decimal
+import logging
+import traceback
+from functools import wraps
+from django.core.exceptions import ValidationError, PermissionDenied
+from django.db import transaction, IntegrityError
+from .utils import give_commission_if_delivered
 
+# Set up logging
+logger = logging.getLogger(__name__)
 
+# Error handling decorator
+def handle_errors(view_func):
+    """Decorator to handle unexpected errors in views"""
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        try:
+            return view_func(request, *args, **kwargs)
+        except Http404:
+            # Re-raise 404 errors
+            raise
+        except PermissionDenied:
+            # Re-raise permission denied errors
+            raise
+        except ValidationError as e:
+            # Handle validation errors
+            logger.error(f"Validation error in {view_func.__name__}: {str(e)}")
+            from django.contrib import messages
+            messages.error(request, f"Validation error: {str(e)}")
+            return redirect('home')
+        except IntegrityError as e:
+            # Handle database integrity errors
+            logger.error(f"Database integrity error in {view_func.__name__}: {str(e)}")
+            from django.contrib import messages
+            messages.error(request, "A database error occurred. Please try again.")
+            return redirect('home')
+        except Exception as e:
+            # Handle all other unexpected errors
+            logger.error(f"Unexpected error in {view_func.__name__}: {str(e)}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            from django.contrib import messages
+            messages.error(request, "An unexpected error occurred. Please try again or contact support.")
+            return redirect('home')
+    return wrapper
 
+# Safe API response decorator
+def safe_api_response(view_func):
+    """Decorator for API views to return JSON error responses"""
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        try:
+            return view_func(request, *args, **kwargs)
+        except Http404:
+            return JsonResponse({'error': 'Resource not found'}, status=404)
+        except PermissionDenied:
+            return JsonResponse({'error': 'Permission denied'}, status=403)
+        except ValidationError as e:
+            return JsonResponse({'error': f'Validation error: {str(e)}'}, status=400)
+        except Exception as e:
+            logger.error(f"API error in {view_func.__name__}: {str(e)}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return JsonResponse({'error': 'An unexpected error occurred'}, status=500)
+    return wrapper
 
-# Pusher credentials
-pusher_client = pusher.Pusher(
-    app_id=settings.PUSHER_APP_ID,
-    key=settings.PUSHER_KEY,
-    secret=settings.PUSHER_SECRET,
-    cluster=settings.PUSHER_CLUSTER,
-    ssl=True
-)
+# Pusher credentials with error handling
+try:
+    pusher_client = pusher.Pusher(
+        app_id=settings.PUSHER_APP_ID,
+        key=settings.PUSHER_KEY,
+        secret=settings.PUSHER_SECRET,
+        cluster=settings.PUSHER_CLUSTER,
+        ssl=True
+    )
+except Exception as e:
+    logger.error(f"Failed to initialize Pusher client: {str(e)}")
+    pusher_client = None
+
 # Create your views here.
 def is_superuser(user):
     return user.is_superuser
 
+def is_coadmin(user):
+    try:
+        profile = user.profile
+        return profile.show_request_manager_btn
+    except (Profile.DoesNotExist, AttributeError):
+        return False
 
+# Safe view wrappers
+@handle_errors
+def safe_home(request):
+    return home(request)
+
+@handle_errors
+def safe_login_attempt(request):
+    return login_attempt(request)
+
+@handle_errors
+def safe_register_attempt(request, referral_code=None):
+    if referral_code:
+        return register_attempt(request, referral_code)
+    return register_attempt(request)
+
+@handle_errors
+def safe_success(request):
+    return success(request)
+
+@handle_errors
+def safe_token_send(request):
+    return token_send(request)
+
+@handle_errors
+def safe_verify(request, auth_token):
+    return verify(request, auth_token)
+
+@handle_errors
+def safe_error_page(request):
+    return error_page(request)
+
+@handle_errors
+@login_required
+def safe_dashboard(request):
+    return dashboard(request)
+
+@handle_errors
+def safe_logout_attempt(request):
+    return logout_attempt(request)
+
+@handle_errors
+def safe_change_password(request):
+    return change_password(request)
+
+@handle_errors
+@login_required
+def safe_profile(request):
+    return profile(request)
+
+@handle_errors
+@login_required
+def safe_add_product(request):
+    return add_product(request)
+
+@handle_errors
+def safe_product_detail(request, id):
+    return product_detail(request, id)
+
+@handle_errors
+def safe_product(request):
+    return product(request)
+
+@handle_errors
+def safe_chat_room(request):
+    return chat_room(request)
+
+@handle_errors
+@csrf_exempt
+@login_required
+def safe_send_message(request):
+    return send_message(request)
+
+@handle_errors
+@login_required
+def safe_cart_view(request):
+    return cart_view(request)
+
+@handle_errors
+@login_required
+def safe_add_to_cart(request, product_id):
+    return add_to_cart(request, product_id)
+
+@handle_errors
+@login_required
+def safe_remove_from_cart(request, cart_id):
+    return remove_from_cart(request, cart_id)
+
+@handle_errors
+def safe_order(request, product_id):
+    return order(request, product_id)
+
+@handle_errors
+@login_required
+def safe_order_details(request):
+    return order_details(request)
+
+@handle_errors
+def safe_submit_review(request, id):
+    return submit_review(request, id)
+
+@handle_errors
+@login_required
+def safe_resend_verification(request):
+    return resend_verification(request)
+
+@handle_errors
+@login_required
+def safe_request_withdrawal(request):
+    return request_withdrawal(request)
+
+@handle_errors
+@login_required
+def safe_withdrawal_history(request):
+    return withdrawal_history(request)
+
+@handle_errors
+@login_required
+def safe_cancel_withdrawal(request, withdrawal_id):
+    return cancel_withdrawal(request, withdrawal_id)
+
+@handle_errors
+@login_required
+@user_passes_test(lambda u: u.is_staff or hasattr(u, 'coadmin_profile'))
+def safe_admin_withdrawals(request):
+    return admin_withdrawals(request)
+
+@handle_errors
+@login_required
+@user_passes_test(lambda u: u.is_staff or hasattr(u, 'coadmin_profile'))
+def safe_process_withdrawal(request, withdrawal_id):
+    return process_withdrawal(request, withdrawal_id)
+
+@handle_errors
+def safe_deals_list(request):
+    return deals_list(request)
+
+@handle_errors
+def safe_deal_detail(request, pk):
+    return deal_detail(request, pk)
+
+@handle_errors
+@login_required
+def safe_add_deal(request):
+    return add_deal(request)
+
+@handle_errors
+@login_required
+def safe_edit_deal(request, pk):
+    return edit_deal(request, pk)
+
+@handle_errors
+@login_required
+def safe_delete_deal(request, pk):
+    return delete_deal(request, pk)
+
+@handle_errors
+@login_required
+def safe_delete_product(request, id):
+    return delete_product(request, id)
+
+@handle_errors
+@require_POST
+@login_required
+def safe_update_cart(request, item_id):
+    return update_cart(request, item_id)
+
+@handle_errors
+@require_POST
+@login_required
+def safe_remove_from_cart_ajax(request, item_id):
+    return remove_from_cart_ajax(request, item_id)
+
+@handle_errors
+@require_POST
+@login_required
+def safe_clear_cart(request):
+    return clear_cart(request)
+
+@handle_errors
+@login_required
+def safe_cart_order_history(request):
+    return cart_order_history(request)
+
+@handle_errors
+@login_required
+def safe_update_cart_order_status(request, order_id):
+    return update_cart_order_status(request, order_id)
+
+@handle_errors
+@login_required
+def safe_cancel_cart_order(request, order_id):
+    return cancel_cart_order(request, order_id)
+
+@handle_errors
+@login_required
+def safe_cart_checkout(request):
+    return cart_checkout(request)
+
+@handle_errors
+@login_required
+def safe_cart_order_confirmation(request, order_id):
+    return cart_order_confirmation(request, order_id)
+
+@handle_errors
+@safe_api_response
+@require_POST
+def safe_get_cities(request):
+    return get_cities(request)
+
+@handle_errors
+@safe_api_response
+@require_POST
+def safe_calculate_shipping_ajax(request):
+    return calculate_shipping_ajax(request)
+
+@handle_errors
+@login_required
+def safe_update_order_status(request, order_id):
+    return update_order_status(request, order_id)
+
+@handle_errors
+@login_required
+def safe_cancel_order(request, order_id):
+    return cancel_order(request, order_id)
+
+@handle_errors
+def safe_job_page(request):
+    return job_page(request)
+
+@handle_errors
+def safe_hi(request):
+    return hi(request)
+
+@handle_errors
+def safe_home2(request):
+    return home2(request)
+
+@handle_errors
+def safe_categories_view(request):
+    return categories_view(request)
+
+@handle_errors
+def safe_category_detail_view(request, category_id):
+    return category_detail_view(request, category_id)
+
+@handle_errors
+def safe_search_products(request):
+    return search_products(request)
+
+@handle_errors
+def safe_newsletter_signup(request):
+    return newsletter_signup(request)
+
+@handle_errors
+def safe_send_hello_email(request):
+    return send_hello_email(request)
+
+@handle_errors
+def safe_seller_dashboard(request):
+    return seller_dashboard(request)
+
+@handle_errors
+@login_required
+def safe_edit_product(request, product_id):
+    return edit_product(request, product_id)
+
+@handle_errors
+@login_required
+def safe_toggle_wishlist(request, product_id):
+    return toggle_wishlist(request, product_id)
+
+@handle_errors
+@login_required
+def safe_coadmin_form(request):
+    return coadmin_form(request)
+
+@handle_errors
+@user_passes_test(is_coadmin)
+def safe_coadmin_page(request):
+    return coadmin_page(request)
+
+@handle_errors
+@login_required
+def safe_deal_chat(request, deal_id):
+    return deal_chat(request, deal_id)
+
+@handle_errors
+@login_required
+def safe_deal_chat_with_user(request, deal_id, user_id):
+    return deal_chat_with_user(request, deal_id, user_id)
+
+@handle_errors
+@csrf_exempt
+@login_required
+def safe_send_deal_message(request):
+    return send_deal_message(request)
+
+@handle_errors
+@login_required
+def safe_check_new_deal_messages(request):
+    return check_new_deal_messages(request)
+
+@handle_errors
+@user_passes_test(is_coadmin)
+def safe_coadmin_orders(request):
+    return coadmin_orders(request)
+
+@handle_errors
+@user_passes_test(is_coadmin)
+def safe_coadmin_products(request):
+    return coadmin_products(request)
+
+@handle_errors
+@user_passes_test(is_coadmin)
+def safe_coadmin_deals(request):
+    return coadmin_deals(request)
+
+@handle_errors
+@user_passes_test(is_coadmin)
+def safe_coadmin_messages(request):
+    return coadmin_messages(request)
+
+@handle_errors
+@safe_api_response
+@user_passes_test(is_coadmin)
+def safe_accept_order(request, order_id):
+    return accept_order(request, order_id)
+
+@handle_errors
+@safe_api_response
+@user_passes_test(is_coadmin)
+def safe_mark_messages_read(request):
+    return mark_messages_read(request)
+
+@handle_errors
+@login_required
+def safe_notifications_list(request):
+    return notifications_list(request)
+
+@handle_errors
+@login_required
+def safe_mark_notification_read(request, notification_id):
+    return mark_notification_read(request, notification_id)
+
+@handle_errors
+@login_required
+def safe_mark_all_notifications_read(request):
+    return mark_all_notifications_read(request)
+
+@handle_errors
+@safe_api_response
+def safe_get_unread_notifications_count(request):
+    return get_unread_notifications_count(request)
+
+@handle_errors
+@safe_api_response
+@login_required
+def safe_get_notifications_api(request):
+    return get_notifications_api(request)
+
+@handle_errors
+@safe_api_response
+@login_required
+def safe_record_share(request):
+    return record_share(request)
+
+@handle_errors
+@safe_api_response
+@login_required
+def safe_get_share_stats(request):
+    return get_share_stats(request)
 
 def home(request):
     # Fetch all products from the database
@@ -510,9 +951,16 @@ def product(request):
         elif sort_by == 'price-high':
             products = products.order_by('-price')
         elif sort_by == 'rating':
-            # This assumes you've added the avg_rating annotation
-            products = products.order_by('-avg_rating')
+            products = products.annotate(
+                avg_rating=Avg('reviews__rating'),
+                review_count=Count('reviews')
+            ).order_by(
+                F('avg_rating').desc(nulls_last=True),  # Sort by avg_rating, nulls (no ratings) at the end
+                F('sold').desc()  # For products with no ratings, sort by sold count
+            )
         elif sort_by == 'newest':
+            products = products.order_by('-created_at')
+        elif sort_by == 'featured': # New: Sort by newest for featured
             products = products.order_by('-created_at')
             
     # Calculate average rating for each product
@@ -524,7 +972,7 @@ def product(request):
     categories = Category.objects.all()
 
     # Pagination
-    paginator = Paginator(products, 1000000)  
+    paginator = Paginator(products, 100000)  
     page_number = request.GET.get('page')
     products = paginator.get_page(page_number)
 
@@ -534,6 +982,7 @@ def product(request):
         'categories': categories,
         'selected_category': category_id,  # Send back selected category to retain in dropdown
         'search_query': search_query,  # Send back search query to retain input value
+        'sort_by': sort_by, # Send back sort_by to retain selected option
         'liked_products':liked_products
     })
 
@@ -666,28 +1115,223 @@ def add_to_cart(request, product_id):
 
     return redirect('cart')
 
+# @login_required
+# def cart_checkout(request):
+#     """View to handle the checkout process for the cart"""
+#     # Get cart items
+#     cart_items = Cart.objects.filter(user=request.user)
+    
+#     # Redirect to cart if empty
+#     if not cart_items.exists():
+#         messages.warning(request, "Your cart is empty. Please add items before checkout.")
+#         return redirect('cart')
+    
+#     # Calculate cart totals
+#     cart_total = sum(item.total_price() for item in cart_items)
+    
+#     # Calculate initial shipping cost (will be updated via JS)
+#     initial_shipping_cost = Decimal('0.00')
+#     if cart_total < Decimal('1000.00') and cart_total > Decimal('0.00'):
+#         initial_shipping_cost = Decimal('100.00')
+    
+#     if request.method == 'POST':
+#         try:
+#             # Get form data
+#             customer_name = request.POST.get('customer_name')
+#             customer_email = request.POST.get('customer_email')
+#             customer_phone = request.POST.get('customer_phone')
+#             province = request.POST.get('province')
+#             city = request.POST.get('city')
+#             street_address = request.POST.get('street_address')
+#             delivery_instructions = request.POST.get('delivery_instructions', '')
+#             payment_method = request.POST.get('payment_method')
+            
+#             # Validate required fields
+#             if not all([customer_name, customer_email, customer_phone, province, city, street_address, payment_method]):
+#                 messages.error(request, "Please fill in all required fields.")
+#                 return redirect('cart_checkout')
+            
+#             # Generate a unique order group ID to link related orders
+#             order_group = str(uuid.uuid4())[:8]  # Use first 8 characters for brevity
+            
+#             # Create a separate order for each cart item
+#             first_order_id = None
+            
+#             # Check if the current user was referred by someone
+#             has_referrer = hasattr(request.user, 'profile') and request.user.profile.referred_by is not None
+#             referrer = request.user.profile.referred_by if has_referrer else None
+            
+#             # Get all admin users to allocate commission if there's no referrer
+#             admin_users = User.objects.filter(is_superuser=True).first()
+            
+#             # Track total shipping for admin commission
+#             total_shipping = Decimal('0.00')
+            
+#             for index, cart_item in enumerate(cart_items):
+#                 # Create a new order for each product
+#                 order = Order()
+                
+#                 # Set customer information
+#                 order.customer_name = customer_name
+#                 order.customer_email = customer_email
+#                 order.customer_phone = customer_phone
+#                 order.province = province
+#                 order.city = city
+#                 order.street_address = street_address
+#                 order.delivery_instructions = delivery_instructions
+#                 order.payment_method = payment_method
+                
+#                 # Set product and quantity from cart item
+#                 order.product = cart_item.product
+#                 order.quantity = cart_item.quantity
+                
+#                 # Add order group ID to link related orders
+#                 order.order_group = order_group
+                
+#                 # Calculate shipping cost (only apply to the first order)
+#                 shipping_cost = calculate_shipping_cost(province, city) if index == 0 else 0
+#                 order.shipping_cost = shipping_cost
+#                 total_shipping += Decimal(shipping_cost)
+                
+#                 # Get the product's commission amount
+#                 product_commission = cart_item.product.commission
+                
+#                 # Calculate price for this item - commission will go to referrer or admin
+#                 item_price = cart_item.product.price * cart_item.quantity
+                
+#                 # The actual amount paid to the seller is the item price minus commission
+#                 seller_amount = item_price - product_commission
+                
+#                 # Total price for the order includes the full price plus shipping
+#                 order.total_price = item_price + (shipping_cost if index == 0 else 0)
+                
+#                 # Save the order
+#                 order.save()
+                
+#                 # Store the first order ID for redirection
+#                 if index == 0:
+#                     first_order_id = order.id
+                
+#                 # Handle the commission
+                
+#                 # if has_referrer:
+#                 #     # Create a commission record for the referrer
+#                 #     commission = ReferralCommission(
+#                 #         referrer=referrer,
+#                 #         referred_user=request.user,
+#                 #         order=order,
+#                 #         product=cart_item.product,
+#                 #         commission_amount=product_commission
+#                 #     )
+#                 #     commission.save()
+#                 if has_referrer:
+#                     # Check if the referrer has shared this specific product before
+#                     shared_product = ShareRecord.objects.filter(
+#                         user=referrer,  # the referrer like 'ullu'
+#                         product=cart_item.product  # the product being purchased
+#                     ).exists()
+
+#                     if shared_product:
+#                         # Referrer shared this product, so give commission
+#                         commission = ReferralCommission(
+#                             referrer=referrer,
+#                             referred_user=request.user,
+#                             order=order,
+#                             product=cart_item.product,
+#                             commission_amount=product_commission
+#                         )
+#                         commission.save()
+                    
+#                     # Add the commission to the referrer's wallet
+#                     referrer_profile = Profile.objects.get(user=referrer)
+#                     referrer_profile.wallet_balance += product_commission
+#                     referrer_profile.save()
+                    
+#                     # Notify the referrer about the commission
+#                     create_notification(
+#                         user=referrer,
+#                         notification_type='commission',
+#                         title="Commission earned!",
+#                         message=f"You earned ₹{product_commission} commission from {request.user.username}'s purchase of {cart_item.product.name}",
+#                         link="/profile/"
+#                     )
+#                 elif admin_users:
+#                     # If no referrer, commission goes to admin
+#                     admin_profile = Profile.objects.get(user=admin_users)
+#                     admin_profile.wallet_balance += product_commission
+#                     admin_profile.save()
+            
+#             # Add shipping fee to admin wallet
+#             if admin_users and total_shipping > 0:
+#                 admin_profile = Profile.objects.get(user=admin_users)
+#                 admin_profile.wallet_balance += total_shipping
+#                 admin_profile.save()
+                
+#                 # Notify admin about the shipping commission
+#                 create_notification(
+#                     user=admin_users,
+#                     notification_type='commission',
+#                     title="Shipping fee received",
+#                     message=f"You received ₹{total_shipping} shipping fee from order #{first_order_id}",
+#                     link="/admin_orders/"
+#                 )
+            
+#             # Clear the cart
+#             cart_items.delete()
+            
+#             # Create purchase notification
+#             create_notification(
+#                 user=request.user,
+#                 notification_type='order',
+#                 title="Purchase complete!",
+#                 message=f"Your order has been placed successfully. Order #: {first_order_id}",
+#                 link=f"/cart/confirmation/{first_order_id}/"
+#             )
+            
+#             # Notify seller(s) about new order
+#             for cart_item in list(cart_items):
+#                 # Notify the seller about the new order
+#                 create_notification(
+#                     user=cart_item.product.seller,
+#                     notification_type='order',
+#                     title="New order received",
+#                     message=f"You've received a new order for {cart_item.product.name}. Order #: {first_order_id}",
+#                     link=f"/order_details/"
+#                 )
+            
+#             # Redirect to the confirmation page
+#             messages.success(request, "Your order has been placed successfully!")
+#             return redirect('cart_order_confirmation', order_id=first_order_id)
+            
+#         except Exception as e:
+#             # Log the error
+#             print(f"Error creating order: {e}")
+#             messages.error(request, f"An error occurred while processing your order: {e}")
+#             return redirect('cart_checkout')
+    
+#     context = {
+#         'cart_items': cart_items,
+#         'cart_total': cart_total,
+#         'shipping_cost': initial_shipping_cost,
+#         'total_with_shipping': cart_total + initial_shipping_cost,
+#     }
+    
+#     return render(request, 'cart_checkout.html', context)
+
 @login_required
 def cart_checkout(request):
-    """View to handle the checkout process for the cart"""
-    # Get cart items
     cart_items = Cart.objects.filter(user=request.user)
-    
-    # Redirect to cart if empty
+
     if not cart_items.exists():
         messages.warning(request, "Your cart is empty. Please add items before checkout.")
         return redirect('cart')
-    
-    # Calculate cart totals
+
     cart_total = sum(item.total_price() for item in cart_items)
-    
-    # Calculate initial shipping cost (will be updated via JS)
-    initial_shipping_cost = Decimal('0.00')
-    if cart_total < Decimal('1000.00') and cart_total > Decimal('0.00'):
-        initial_shipping_cost = Decimal('100.00')
-    
+    initial_shipping_cost = Decimal('100.00') if cart_total < Decimal('1000.00') else Decimal('0.00')
+
     if request.method == 'POST':
         try:
-            # Get form data
+            # Collect form data
             customer_name = request.POST.get('customer_name')
             customer_email = request.POST.get('customer_email')
             customer_phone = request.POST.get('customer_phone')
@@ -696,33 +1340,22 @@ def cart_checkout(request):
             street_address = request.POST.get('street_address')
             delivery_instructions = request.POST.get('delivery_instructions', '')
             payment_method = request.POST.get('payment_method')
-            
-            # Validate required fields
+
             if not all([customer_name, customer_email, customer_phone, province, city, street_address, payment_method]):
                 messages.error(request, "Please fill in all required fields.")
                 return redirect('cart_checkout')
-            
-            # Generate a unique order group ID to link related orders
-            order_group = str(uuid.uuid4())[:8]  # Use first 8 characters for brevity
-            
-            # Create a separate order for each cart item
+
+            order_group = str(uuid.uuid4())[:8]
             first_order_id = None
-            
-            # Check if the current user was referred by someone
+
             has_referrer = hasattr(request.user, 'profile') and request.user.profile.referred_by is not None
             referrer = request.user.profile.referred_by if has_referrer else None
-            
-            # Get all admin users to allocate commission if there's no referrer
             admin_users = User.objects.filter(is_superuser=True).first()
-            
-            # Track total shipping for admin commission
+
             total_shipping = Decimal('0.00')
-            
+
             for index, cart_item in enumerate(cart_items):
-                # Create a new order for each product
                 order = Order()
-                
-                # Set customer information
                 order.customer_name = customer_name
                 order.customer_email = customer_email
                 order.customer_phone = customer_phone
@@ -731,76 +1364,44 @@ def cart_checkout(request):
                 order.street_address = street_address
                 order.delivery_instructions = delivery_instructions
                 order.payment_method = payment_method
-                
-                # Set product and quantity from cart item
                 order.product = cart_item.product
                 order.quantity = cart_item.quantity
-                
-                # Add order group ID to link related orders
                 order.order_group = order_group
-                
-                # Calculate shipping cost (only apply to the first order)
+
                 shipping_cost = calculate_shipping_cost(province, city) if index == 0 else 0
                 order.shipping_cost = shipping_cost
                 total_shipping += Decimal(shipping_cost)
-                
-                # Get the product's commission amount
+
                 product_commission = cart_item.product.commission
-                
-                # Calculate price for this item - commission will go to referrer or admin
                 item_price = cart_item.product.price * cart_item.quantity
-                
-                # The actual amount paid to the seller is the item price minus commission
-                seller_amount = item_price - product_commission
-                
-                # Total price for the order includes the full price plus shipping
                 order.total_price = item_price + (shipping_cost if index == 0 else 0)
-                
-                # Save the order
                 order.save()
-                
-                # Store the first order ID for redirection
+
                 if index == 0:
                     first_order_id = order.id
-                
-                # Handle the commission
+
+                # ✅ Create commission but DO NOT give wallet balance now
                 if has_referrer:
-                    # Create a commission record for the referrer
-                    commission = ReferralCommission(
-                        referrer=referrer,
-                        referred_user=request.user,
-                        order=order,
-                        product=cart_item.product,
-                        commission_amount=product_commission
-                    )
-                    commission.save()
-                    
-                    # Add the commission to the referrer's wallet
-                    referrer_profile = Profile.objects.get(user=referrer)
-                    referrer_profile.wallet_balance += product_commission
-                    referrer_profile.save()
-                    
-                    # Notify the referrer about the commission
-                    create_notification(
-                        user=referrer,
-                        notification_type='commission',
-                        title="Commission earned!",
-                        message=f"You earned ₹{product_commission} commission from {request.user.username}'s purchase of {cart_item.product.name}",
-                        link="/profile/"
-                    )
+                    shared_product = ShareRecord.objects.filter(user=referrer, product=cart_item.product).exists()
+                    if shared_product:
+                        ReferralCommission.objects.create(
+                            referrer=referrer,
+                            referred_user=request.user,
+                            order=order,
+                            product=cart_item.product,
+                            commission_amount=product_commission,
+                            is_given=False  # Wait for delivery
+                        )
                 elif admin_users:
-                    # If no referrer, commission goes to admin
                     admin_profile = Profile.objects.get(user=admin_users)
                     admin_profile.wallet_balance += product_commission
                     admin_profile.save()
-            
-            # Add shipping fee to admin wallet
+
             if admin_users and total_shipping > 0:
                 admin_profile = Profile.objects.get(user=admin_users)
                 admin_profile.wallet_balance += total_shipping
                 admin_profile.save()
-                
-                # Notify admin about the shipping commission
+
                 create_notification(
                     user=admin_users,
                     notification_type='commission',
@@ -808,11 +1409,11 @@ def cart_checkout(request):
                     message=f"You received ₹{total_shipping} shipping fee from order #{first_order_id}",
                     link="/admin_orders/"
                 )
-            
-            # Clear the cart
+
+            # Clear cart
             cart_items.delete()
-            
-            # Create purchase notification
+
+            # Notify buyer
             create_notification(
                 user=request.user,
                 notification_type='order',
@@ -820,10 +1421,9 @@ def cart_checkout(request):
                 message=f"Your order has been placed successfully. Order #: {first_order_id}",
                 link=f"/cart/confirmation/{first_order_id}/"
             )
-            
-            # Notify seller(s) about new order
+
+            # Notify sellers
             for cart_item in list(cart_items):
-                # Notify the seller about the new order
                 create_notification(
                     user=cart_item.product.seller,
                     notification_type='order',
@@ -831,24 +1431,21 @@ def cart_checkout(request):
                     message=f"You've received a new order for {cart_item.product.name}. Order #: {first_order_id}",
                     link=f"/order_details/"
                 )
-            
-            # Redirect to the confirmation page
+
             messages.success(request, "Your order has been placed successfully!")
             return redirect('cart_order_confirmation', order_id=first_order_id)
-            
+
         except Exception as e:
-            # Log the error
             print(f"Error creating order: {e}")
             messages.error(request, f"An error occurred while processing your order: {e}")
             return redirect('cart_checkout')
-    
+
     context = {
         'cart_items': cart_items,
         'cart_total': cart_total,
         'shipping_cost': initial_shipping_cost,
         'total_with_shipping': cart_total + initial_shipping_cost,
     }
-    
     return render(request, 'cart_checkout.html', context)
 
 @login_required
@@ -1213,92 +1810,336 @@ def cancel_cart_order(request, order_id):
 # order start>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
+# def order(request, product_id):
+#     chat_messages = ChatMessage.objects.all().order_by('timestamp')
+#     product = get_object_or_404(Product, id=product_id)
+    
+#     if request.method == 'POST':
+#         form = OrderForm(request.POST)
+#         if form.is_valid():
+#             order = form.save(commit=False)
+#             order.product = product
+            
+#             # If user is authenticated, ensure we use their email
+#             if request.user.is_authenticated:
+#                 order.customer_email = request.user.email
+            
+#             # Calculate product total
+#             order.total_price = product.price * order.quantity
+            
+#             # Calculate shipping cost based on location
+#             province = form.cleaned_data.get('province')
+#             city = form.cleaned_data.get('city')
+            
+#             # Get shipping cost from your shipping rates data
+#             shipping_cost = calculate_shipping_cost(province, city)
+#             order.shipping_cost = shipping_cost
+#             order.total_price += shipping_cost
+            
+#             # Check if the current user was referred by someone
+#             has_referrer = request.user.is_authenticated and hasattr(request.user, 'profile') and request.user.profile.referred_by is not None
+#             referrer = request.user.profile.referred_by if has_referrer else None
+            
+#             # Get admin user to allocate commission if there's no referrer
+#             admin_users = User.objects.filter(is_superuser=True).first()
+            
+#             # Get the product's commission amount
+#             product_commission = product.commission
+            
+#             # If using wallet payment, check balance
+#             if form.cleaned_data.get('payment_method') == 'wallet' and request.user.is_authenticated:
+#                 if request.user.profile.wallet_balance < order.total_price:
+#                     messages.error(request, 'Insufficient wallet balance for this order.')
+#                     return redirect('order', product_id=product_id)
+                
+#                 # Deduct from wallet
+#                 request.user.profile.wallet_balance -= order.total_price
+#                 request.user.profile.save()
+            
+#             order.save()
+            
+#             # Handle the commission
+#             if has_referrer:
+#                 # Create a commission record for the referrer
+#                 commission = ReferralCommission(
+#                     referrer=referrer,
+#                     referred_user=request.user,
+#                     order=order,
+#                     product=product,
+#                     commission_amount=product_commission
+#                 )
+#                 commission.save()
+                
+#                 # Add the commission to the referrer's wallet
+#                 referrer_profile = Profile.objects.get(user=referrer)
+#                 referrer_profile.wallet_balance += product_commission
+#                 referrer_profile.save()
+                
+#                 # Notify the referrer about the commission
+#                 create_notification(
+#                     user=referrer,
+#                     notification_type='commission',
+#                     title="Commission earned!",
+#                     message=f"You earned ₹{product_commission} commission from {request.user.username}'s purchase of {product.name}",
+#                     link="/profile/"
+#                 )
+#             elif admin_users:
+#                 # If no referrer, commission goes to admin
+#                 admin_profile = Profile.objects.get(user=admin_users)
+#                 admin_profile.wallet_balance += product_commission
+#                 admin_profile.save()
+            
+#             # Add shipping fee to admin wallet
+#             if admin_users and shipping_cost > 0:
+#                 admin_profile = Profile.objects.get(user=admin_users)
+#                 admin_profile.wallet_balance += shipping_cost
+#                 admin_profile.save()
+                
+#                 # Notify admin about the shipping commission
+#                 create_notification(
+#                     user=admin_users,
+#                     notification_type='commission',
+#                     title="Shipping fee received",
+#                     message=f"You received ₹{shipping_cost} shipping fee from order #{order.id}",
+#                     link="/admin_orders/"
+#                 )
+            
+#             # Create purchase notification for buyer
+#             if request.user.is_authenticated:
+#                 create_notification(
+#                     user=request.user,
+#                     notification_type='order',
+#                     title="Order placed successfully",
+#                     message=f"Your order for {product.name} has been placed. Order #: {order.id}",
+#                     link=f"/order_details/"
+#                 )
+                
+#             # Create notification for seller about new order
+#             create_notification(
+#                 user=product.seller,
+#                 notification_type='order',
+#                 title="New order received",
+#                 message=f"You've received a new order for {product.name}. Order #: {order.id}",
+#                 link=f"/order_details/"
+#             )
+            
+#             messages.success(request, 'Your order has been placed successfully!')
+#             return redirect('order_confirmation', order_id=order.id)
+#     else:
+#         # Pre-fill form with user data if authenticated
+#         initial_data = {}
+#         if request.user.is_authenticated:
+#             initial_data = {
+#                 'customer_name': request.user.get_full_name() or request.user.username,
+#                 'customer_email': request.user.email,
+#             }
+#             # Add phone if available in profile
+#             if hasattr(request.user, 'profile') and hasattr(request.user.profile, 'phone_number'):
+#                 initial_data['customer_phone'] = request.user.profile.phone_number
+        
+#         form = OrderForm(initial=initial_data)
+    
+#     context = {
+#         'product': product,
+#         'form': form,
+#         'chat_messages': chat_messages,
+#     }
+#     return render(request, 'order.html', context)
+
+# def order(request, product_id):
+#     chat_messages = ChatMessage.objects.all().order_by('timestamp')
+#     product = get_object_or_404(Product, id=product_id)
+
+#     if request.method == 'POST':
+#         form = OrderForm(request.POST)
+#         if form.is_valid():
+#             order = form.save(commit=False)
+#             order.product = product
+
+#             if request.user.is_authenticated:
+#                 order.customer_email = request.user.email
+
+#             # Calculate product total
+#             order.total_price = product.price * order.quantity
+
+#             # Shipping cost
+#             province = form.cleaned_data.get('province')
+#             city = form.cleaned_data.get('city')
+#             shipping_cost = calculate_shipping_cost(province, city)
+#             order.shipping_cost = shipping_cost
+#             order.total_price += shipping_cost
+
+#             # Check referrer
+#             has_referrer = request.user.is_authenticated and hasattr(request.user, 'profile') and request.user.profile.referred_by is not None
+#             referrer = request.user.profile.referred_by if has_referrer else None
+
+#             # Admin user fallback
+#             admin_users = User.objects.filter(is_superuser=True).first()
+#             product_commission = product.commission
+
+#             # Wallet payment handling
+#             if form.cleaned_data.get('payment_method') == 'wallet' and request.user.is_authenticated:
+#                 if request.user.profile.wallet_balance < order.total_price:
+#                     messages.error(request, 'Insufficient wallet balance for this order.')
+#                     return redirect('order', product_id=product_id)
+#                 request.user.profile.wallet_balance -= order.total_price
+#                 request.user.profile.save()
+
+#             order.save()
+
+#             # ✅ Only give commission if referrer has shared this specific product
+#             if has_referrer and ShareRecord.objects.filter(user=referrer, product=product).exists():
+#                 # Give commission to referrer
+#                 commission = ReferralCommission(
+#                     referrer=referrer,
+#                     referred_user=request.user,
+#                     order=order,
+#                     product=product,
+#                     commission_amount=product_commission
+#                 )
+#                 commission.save()
+
+#                 # Update referrer's wallet
+#                 referrer_profile = Profile.objects.get(user=referrer)
+#                 referrer_profile.wallet_balance += product_commission
+#                 referrer_profile.save()
+
+#                 # Notify referrer
+#                 create_notification(
+#                     user=referrer,
+#                     notification_type='commission',
+#                     title="Commission earned!",
+#                     message=f"You earned ₹{product_commission} commission from {request.user.username}'s purchase of {product.name}",
+#                     link="/profile/"
+#                 )
+
+#             elif admin_users:
+#                 # No referrer or product not shared → commission to admin
+#                 admin_profile = Profile.objects.get(user=admin_users)
+#                 admin_profile.wallet_balance += product_commission
+#                 admin_profile.save()
+
+#             # Add shipping fee to admin wallet
+#             if admin_users and shipping_cost > 0:
+#                 admin_profile = Profile.objects.get(user=admin_users)
+#                 admin_profile.wallet_balance += shipping_cost
+#                 admin_profile.save()
+
+#                 # Notify admin
+#                 create_notification(
+#                     user=admin_users,
+#                     notification_type='commission',
+#                     title="Shipping fee received",
+#                     message=f"You received ₹{shipping_cost} shipping fee from order #{order.id}",
+#                     link="/admin_orders/"
+#                 )
+
+#             # Notify buyer
+#             if request.user.is_authenticated:
+#                 create_notification(
+#                     user=request.user,
+#                     notification_type='order',
+#                     title="Order placed successfully",
+#                     message=f"Your order for {product.name} has been placed. Order #: {order.id}",
+#                     link=f"/order_details/"
+#                 )
+
+#             # Notify seller
+#             create_notification(
+#                 user=product.seller,
+#                 notification_type='order',
+#                 title="New order received",
+#                 message=f"You've received a new order for {product.name}. Order #: {order.id}",
+#                 link=f"/order_details/"
+#             )
+
+#             messages.success(request, 'Your order has been placed successfully!')
+#             return redirect('order_confirmation', order_id=order.id)
+
+#     else:
+#         initial_data = {}
+#         if request.user.is_authenticated:
+#             initial_data = {
+#                 'customer_name': request.user.get_full_name() or request.user.username,
+#                 'customer_email': request.user.email,
+#             }
+#             if hasattr(request.user, 'profile') and hasattr(request.user.profile, 'phone_number'):
+#                 initial_data['customer_phone'] = request.user.profile.phone_number
+
+#         form = OrderForm(initial=initial_data)
+
+#     context = {
+#         'product': product,
+#         'form': form,
+#         'chat_messages': chat_messages,
+#     }
+#     return render(request, 'order.html', context)
+
 def order(request, product_id):
     chat_messages = ChatMessage.objects.all().order_by('timestamp')
     product = get_object_or_404(Product, id=product_id)
-    
+
     if request.method == 'POST':
         form = OrderForm(request.POST)
         if form.is_valid():
             order = form.save(commit=False)
             order.product = product
-            
-            # If user is authenticated, ensure we use their email
+
             if request.user.is_authenticated:
                 order.customer_email = request.user.email
-            
+
             # Calculate product total
             order.total_price = product.price * order.quantity
-            
-            # Calculate shipping cost based on location
+
+            # Shipping cost
             province = form.cleaned_data.get('province')
             city = form.cleaned_data.get('city')
-            
-            # Get shipping cost from your shipping rates data
             shipping_cost = calculate_shipping_cost(province, city)
             order.shipping_cost = shipping_cost
             order.total_price += shipping_cost
-            
-            # Check if the current user was referred by someone
+
+            # Check referrer
             has_referrer = request.user.is_authenticated and hasattr(request.user, 'profile') and request.user.profile.referred_by is not None
             referrer = request.user.profile.referred_by if has_referrer else None
-            
-            # Get admin user to allocate commission if there's no referrer
+
+            # Admin user fallback
             admin_users = User.objects.filter(is_superuser=True).first()
-            
-            # Get the product's commission amount
             product_commission = product.commission
-            
-            # If using wallet payment, check balance
+
+            # Wallet payment handling
             if form.cleaned_data.get('payment_method') == 'wallet' and request.user.is_authenticated:
                 if request.user.profile.wallet_balance < order.total_price:
                     messages.error(request, 'Insufficient wallet balance for this order.')
                     return redirect('order', product_id=product_id)
-                
-                # Deduct from wallet
                 request.user.profile.wallet_balance -= order.total_price
                 request.user.profile.save()
-            
+
             order.save()
-            
-            # Handle the commission
-            if has_referrer:
-                # Create a commission record for the referrer
-                commission = ReferralCommission(
+
+            # ✅ Create commission record but DO NOT give money yet
+            if has_referrer and ShareRecord.objects.filter(user=referrer, product=product).exists():
+                ReferralCommission.objects.create(
                     referrer=referrer,
                     referred_user=request.user,
                     order=order,
                     product=product,
-                    commission_amount=product_commission
+                    commission_amount=product_commission,
+                    is_given=False  # Wait until delivery
                 )
-                commission.save()
-                
-                # Add the commission to the referrer's wallet
-                referrer_profile = Profile.objects.get(user=referrer)
-                referrer_profile.wallet_balance += product_commission
-                referrer_profile.save()
-                
-                # Notify the referrer about the commission
-                create_notification(
-                    user=referrer,
-                    notification_type='commission',
-                    title="Commission earned!",
-                    message=f"You earned ₹{product_commission} commission from {request.user.username}'s purchase of {product.name}",
-                    link="/profile/"
-                )
+
             elif admin_users:
-                # If no referrer, commission goes to admin
+                # Commission goes to admin → can handle similarly if needed
                 admin_profile = Profile.objects.get(user=admin_users)
                 admin_profile.wallet_balance += product_commission
                 admin_profile.save()
-            
+
             # Add shipping fee to admin wallet
             if admin_users and shipping_cost > 0:
                 admin_profile = Profile.objects.get(user=admin_users)
                 admin_profile.wallet_balance += shipping_cost
                 admin_profile.save()
-                
-                # Notify admin about the shipping commission
+
+                # Notify admin
                 create_notification(
                     user=admin_users,
                     notification_type='commission',
@@ -1306,8 +2147,8 @@ def order(request, product_id):
                     message=f"You received ₹{shipping_cost} shipping fee from order #{order.id}",
                     link="/admin_orders/"
                 )
-            
-            # Create purchase notification for buyer
+
+            # Notify buyer
             if request.user.is_authenticated:
                 create_notification(
                     user=request.user,
@@ -1316,8 +2157,8 @@ def order(request, product_id):
                     message=f"Your order for {product.name} has been placed. Order #: {order.id}",
                     link=f"/order_details/"
                 )
-                
-            # Create notification for seller about new order
+
+            # Notify seller
             create_notification(
                 user=product.seller,
                 notification_type='order',
@@ -1325,23 +2166,22 @@ def order(request, product_id):
                 message=f"You've received a new order for {product.name}. Order #: {order.id}",
                 link=f"/order_details/"
             )
-            
+
             messages.success(request, 'Your order has been placed successfully!')
             return redirect('order_confirmation', order_id=order.id)
+
     else:
-        # Pre-fill form with user data if authenticated
         initial_data = {}
         if request.user.is_authenticated:
             initial_data = {
                 'customer_name': request.user.get_full_name() or request.user.username,
                 'customer_email': request.user.email,
             }
-            # Add phone if available in profile
             if hasattr(request.user, 'profile') and hasattr(request.user.profile, 'phone_number'):
                 initial_data['customer_phone'] = request.user.profile.phone_number
-        
+
         form = OrderForm(initial=initial_data)
-    
+
     context = {
         'product': product,
         'form': form,
@@ -1350,6 +2190,25 @@ def order(request, product_id):
     return render(request, 'order.html', context)
 
 
+
+# def give_commission_if_delivered(order):
+#     commissions = ReferralCommission.objects.filter(order=order, is_given=False)
+#     for commission in commissions:
+#         referrer_profile = commission.referrer.profile
+#         referrer_profile.wallet_balance += commission.commission_amount
+#         referrer_profile.save()
+
+#         commission.is_given = True
+#         commission.save()
+
+#         create_notification(
+#             user=commission.referrer,
+#             notification_type='commission',
+#             title="Commission earned!",
+#             message=f"You earned ₹{commission.commission_amount} commission from {commission.referred_user.username}'s purchase of {commission.product.name}",
+#             link="/profile/"
+#         )
+        
 def calculate_shipping_cost(province, city):
     # Shipping rates dictionary (same as in the JavaScript)
     shipping_rates = {
@@ -2757,6 +3616,43 @@ def process_withdrawal(request, withdrawal_id):
     return render(request, 'process_withdrawal.html', {
         'withdrawal': withdrawal
     })
+
+@login_required
+def record_share(request):
+    """Record a share action"""
+    if request.method == 'POST':
+        platform = request.POST.get('platform')
+        product_id = request.POST.get('product_id')
+        
+        if platform in dict(ShareRecord.PLATFORM_CHOICES):
+            try:
+                product = Product.objects.get(id=product_id) if product_id else None
+            except Product.DoesNotExist:
+                product = None
+                
+            share = ShareRecord(
+                user=request.user,
+                platform=platform,
+                product=product,
+                ip_address=request.META.get('REMOTE_ADDR'),
+                user_agent=request.META.get('HTTP_USER_AGENT')
+            )
+            share.save()
+            
+            # Get updated stats
+            stats = ShareRecord.get_share_stats(request.user)
+            return JsonResponse({
+                'success': True,
+                'stats': stats
+            })
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)
+
+@login_required
+def get_share_stats(request):
+    """Get share statistics for the current user"""
+    stats = ShareRecord.get_share_stats(request.user)
+    return JsonResponse(stats)
     
     
     
