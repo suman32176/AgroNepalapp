@@ -1,4 +1,5 @@
 from django.db.models.signals import pre_save, post_save
+from . import site_signal
 from django.dispatch import receiver
 from django.db.models import F
 from .models import Order, Profile, Product
