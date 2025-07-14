@@ -96,15 +96,15 @@ WSGI_APPLICATION = 'UserAuth.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# postgresql://agronepal_user:nPw0hf7B5lZLD9Lw1VfeAY8GTSvOvy3v@dpg-d1ogihbipnbc73f0l3ug-a/agronepal
+
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('MYSQL_DB_NAME'),
-        'USER': os.getenv('MYSQL_USER'),
-        'PASSWORD': os.getenv('MYSQL_PASSWORD'),
-        'HOST': os.getenv('MYSQL_HOST'),
-        'PORT': os.getenv('MYSQL_PORT', '3306'),
-    }
+    'default': dj_database_url.config(
+        default='postgresql://agronepal_user:nPw0hf7B5lZLD9Lw1VfeAY8GTSvOvy3v@dpg-d1ogihbipnbc73f0l3ug-a/agronepal',
+        conn_max_age=600
+    )
 }
 
 
