@@ -2,7 +2,7 @@ Django
 Pillow
 gunicorn
 django-allauth
-widget-tweaks
+django-widget-tweaks
 pusher 
 gunicorn
 psycopg2-binary
