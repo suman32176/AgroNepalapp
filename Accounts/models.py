@@ -71,11 +71,15 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
 def get_default_seller():
-    return User.objects.first().id
+    user = User.objects.first()
+    if user:
+        return user.id
+    return None
 
 class Product(models.Model):
-    seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products',default=get_default_seller)
+    seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products',default=get_default_seller, null=True,blank=True)
     name = models.CharField(max_length=200)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     description = models.TextField()
