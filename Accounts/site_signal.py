@@ -5,9 +5,8 @@ from django.dispatch import receiver
 @receiver(post_migrate)
 def create_or_update_site(sender, **kwargs):
     Site.objects.update_or_create(
-        id=1,
+        domain='agronepal-ozxu.onrender.com',  # Your domain
         defaults={
-            'domain': 'agronepal-ozxu.onrender.com',  # Replace with your domain
-            'name': 'AgroNepal'
+            'name': 'AgroNepal',
         }
     )
