@@ -20,7 +20,12 @@ DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
 # ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'agronepal-ozxu.onrender.com',
+    'localhost',
+    '127.0.0.1',
+]
+
 
 # python manage.py runserver 192.168.1.65:8000
 
