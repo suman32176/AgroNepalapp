@@ -1,27 +1,16 @@
-# from django.apps import AppConfig
-
-
-# class AccountsConfig(AppConfig):
-#     default_auto_field = 'django.db.models.BigAutoField'
-#     name = 'Accounts'
-    
-#     def ready(self):
-#         """Import signals when the app is ready"""
-#         import Accounts.signals  
-
-
 from django.apps import AppConfig
-from django.contrib.sites.models import Site
 
 class AccountsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'Accounts'
-    
+
     def ready(self):
-        """Import signals when the app is ready"""
+        """Import signals and create/update Site when app is ready"""
         import Accounts.signals
 
-        # Create or update default Site object
+        # Move import inside ready() to avoid AppRegistryNotReady error
+        from django.contrib.sites.models import Site
+
         try:
             site, created = Site.objects.get_or_create(
                 id=1,
@@ -34,6 +23,5 @@ class AccountsConfig(AppConfig):
                 site.domain = 'agronepal-ozxu.onrender.com'
                 site.name = 'AgroNepal'
                 site.save()
-        except Exception as e:
-            # You can log the error if needed
-            pass
+        except Exception:
+            pass  # You can log the error if needed
