@@ -5,9 +5,8 @@ from django.contrib.sites.models import Site
 @receiver(post_migrate)
 def create_or_update_site(sender, **kwargs):
     Site.objects.update_or_create(
-        id=1,
+        domain='agronepal-ozxu.onrender.com',
         defaults={
-            'domain': 'agronepal-ozxu.onrender.com',
-            'name': 'AgroNepal',
+            'name': 'AgroNepal'
         }
     )
