@@ -29,7 +29,7 @@ ALLOWED_HOSTS = [
 
 # python manage.py runserver 192.168.1.65:8000
 
-SITE_ID = 4
+SITE_ID = 1
 
 
 # Application definition
