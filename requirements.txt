@@ -9,4 +9,6 @@ psycopg2-binary
 whitenoise
 mysqlclient
 PyJWT
+dj-database-url
+psycopg2-binary
 
