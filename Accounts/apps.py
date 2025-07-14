@@ -8,3 +8,4 @@ class AccountsConfig(AppConfig):
     def ready(self):
         """Import signals when the app is ready"""
         import Accounts.signals  
+        import Accounts.site_signal
