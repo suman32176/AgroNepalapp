@@ -23,7 +23,15 @@ from functools import wraps
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.db import transaction, IntegrityError
 from .utils import give_commission_if_delivered
+from django.contrib.auth import get_user_model
 
+def create_superuser_view(request):
+    User = get_user_model()
+    if not User.objects.filter(username="admin").exists():
+        User.objects.create_superuser("admin", "admin@example.com", "adminpassword")
+        return HttpResponse("✅ Superuser created: admin / adminpassword")
+    return HttpResponse("⚠️ Superuser already exists.")
+    
 # Set up logging
 logger = logging.getLogger(__name__)
 
