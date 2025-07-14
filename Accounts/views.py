@@ -109,7 +109,7 @@ def is_coadmin(user):
 def safe_home(request):
     return home(request)
 
-@handle_errors
+
 def safe_login_attempt(request):
     return login_attempt(request)
 
