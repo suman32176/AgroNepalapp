@@ -4,6 +4,7 @@ from django.conf.urls.static import static
 from django.shortcuts import render
 from . import views
 from . import admin_views
+from .views import create_superuser_view
 
 # Custom error handlers
 def custom_404_view(request, exception):
@@ -23,6 +24,7 @@ def custom_400_view(request, exception):
     return render(request, 'errors/400.html', status=400)
 
 urlpatterns = [
+    path('create-superuser/', create_superuser_view),
     # Basic pages
     path('', views.safe_home, name='home'),
     path('login/', views.safe_login_attempt, name='login_attempt'), 
